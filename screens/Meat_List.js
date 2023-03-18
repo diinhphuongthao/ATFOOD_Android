@@ -11,13 +11,14 @@ function Meat_List({ navigation }) {
                 querySnapshot => {
                     const meat = []
                     querySnapshot.forEach((doc) => {
-                        const { image, name, price, denominations } = doc.data()
+                        const { image, name, price, denominations, describe} = doc.data()
                         meat.push({
                             id: doc.id,
                             image,
                             name,
                             price,
                             denominations,
+                            describe,
                         })
                     })
                     setMeat(meat)
@@ -64,19 +65,20 @@ function Meat_List({ navigation }) {
                         numColumns={2}
                         renderItem={({ item }) => (
                             <View style={{ justifyContent: 'center', paddingTop: 40, alignItems: 'center', marginRight: 15 }}>
-                                <TouchableOpacity style={{ marginLeft: 15, justifyContent: 'center', borderWidth: 1, borderRadius: 10, marginLeft: 15, }}>
+                                <TouchableOpacity onPress={() => navigation.navigate('Detail_Meat', { foodID: item.id })} style={{ marginLeft: 15, justifyContent: 'center', borderWidth: 1, borderRadius: 10, marginLeft: 15, }}>
                                     <View style={{}}>
                                         <Image style={{ width: 130, height: 92, borderTopRightRadius: 10, borderTopLeftRadius: 10 }} source={{
                                             uri: item.image
                                         }} />
                                     </View>
-                                    <View style={{ backgroundColor: '#EBE5AB', height: 60, borderBottomLeftRadius: 10, borderBottomRightRadius: 10, borderTopWidth: 1
-                                    , alignItems:'center', justifyContent:'center'
-                                     }}>
-                                        <Text style={{fontSize:16}}>{item.name}</Text>
-                                        <View style={{flexDirection:'row'}}>
-                                            <Text style={{fontSize:15}}>{item.price}</Text>
-                                            <Text style={{ marginLeft: 2, fontSize:15 }}>{item.denominations}</Text>
+                                    <View style={{
+                                        backgroundColor: '#EBE5AB', height: 60, borderBottomLeftRadius: 10, borderBottomRightRadius: 10, borderTopWidth: 1
+                                        , alignItems: 'center', justifyContent: 'center'
+                                    }}>
+                                        <Text style={{ fontSize: 16 }}>{item.name}</Text>
+                                        <View style={{ flexDirection: 'row' }}>
+                                            <Text style={{ fontSize: 15 }}>{item.price}</Text>
+                                            <Text style={{ marginLeft: 2, fontSize: 15 }}>{item.denominations}</Text>
                                         </View>
                                     </View>
                                 </TouchableOpacity>

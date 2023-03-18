@@ -64,7 +64,7 @@ function Fish_List({navigation}) {
                         numColumns={2}
                         renderItem={({ item }) => (
                             <View style={{ justifyContent: 'center', paddingTop: 40, alignItems: 'center', marginRight: 15 }}>
-                                <TouchableOpacity style={{ marginLeft: 15, justifyContent: 'center', borderWidth: 1, borderRadius: 10, marginLeft: 15, }}>
+                                <TouchableOpacity onPress={() => navigation.navigate('Detail_Fish', { foodID: item.id })} style={{ marginLeft: 15, justifyContent: 'center', borderWidth: 1, borderRadius: 10, marginLeft: 15, }}>
                                     <View style={{}}>
                                         <Image style={{ width: 130, height: 92, borderTopRightRadius: 10, borderTopLeftRadius: 10 }} source={{
                                             uri: item.image

@@ -19,11 +19,14 @@
     "expo-checkbox": "^2.2.2",
     "expo-status-bar": "~1.4.2",
     "firebase": "^9.17.1",
+    "format-currency": "^1.0.0",
     "list-item": "^2.0.0",
     "react": "18.1.0",
     "react-native": "0.70.5",
+    "react-native-format-currency": "^0.0.3",
     "react-native-safe-area-context": "^4.5.0",
-    "react-native-screens": "^3.20.0"
+    "react-native-screens": "^3.20.0",
+    "route-params": "^0.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

@@ -11,11 +11,45 @@ function Login({ navigation }) {
 
   loginUser = async (email, password) => {
     try {
-      await firebase.auth().signInWithEmailAndPassword(email, password)
+      await firebase.auth().signInWithEmailAndPassword(email, password);
+      const currentUser = firebase.auth().currentUser;
+      if (currentUser && currentUser.email === "nvpvmq@gmail.com") {
+        // chuyển hướng đến màn hình Home_NVPV
+        // ví dụ:
+        navigation.navigate("Home_NVPV");
+      } else if(currentUser && currentUser.email === "nvbepmq@gmail.com"){
+        // chuyển hướng đến màn hình Home_NVPV
+        // ví dụ:
+        navigation.navigate("Home_NVPV");
+      }
     } catch (error) {
-      alert(error.messgae)
+      alert(error.message);
     }
   }
+
+  // loginUser = async (email, password) => {
+  //   try {
+  //     await firebase.auth().signInWithEmailAndPassword(email, password)
+  //   } catch (error) {
+  //     alert(error.messgae)
+  //   }
+  // }
+
+  // loginUser = async (email, password) => {
+  //   try {
+  //     if (email === 'nvphucvumq' && password === 'nvphucvumq') {
+  //       // Xử lý phân quyền tại đây
+  //       console.log('Đăng nhập thành công');
+  //       navigation.navigate('Home_NVPV');
+  //     } else {
+  //       throw new Error('Tên đăng nhập hoặc mật khẩu không đúng');
+  //     }
+  //   } catch (error) {
+  //     alert(error.message)
+  //   }
+  // }
+
+  
 
   return (
     <View style={{ backgroundColor: '#41B9B9', height: '100%', }}>
