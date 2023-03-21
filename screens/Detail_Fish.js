@@ -67,8 +67,6 @@ function Detail_Fish({ route, navigation }) {
         foodDetails: firebase.firestore.FieldValue.arrayUnion(foodItem),
       }, { merge: true }); // Sử dụng option {merge: true} để cập nhật field 'foodDetails' mà không ghi đè lên những fields khác
 
-      resetFoodCount();
-
       console.log('Đã thêm sản phẩm vào giỏ hàng');
     } catch (error) {
       console.error('Lỗi khi thêm sản phẩm vào giỏ hàng:', error);

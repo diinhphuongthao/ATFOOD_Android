@@ -129,7 +129,7 @@ function Cart({ navigation }) {
             customerPhone: userData.phone,
             items: cartItems,
             totalPrice: calculateTotalPrice(),
-            status: 'pending',
+            status: 'Đang chờ',
             createdAt: new Date(),
         };
         await ordersRef.add(order);
@@ -169,7 +169,7 @@ function Cart({ navigation }) {
                         }} source={{
                             uri: item.image
                         }} />
-                        <View style={{ width: 120, }}>
+                        <View style={{ width: 150, }}>
                             <Text style={{ fontSize: 18 }}>{item.name}</Text>
                         </View>
                         <View style={{ width: 120 }}>
@@ -182,7 +182,7 @@ function Cart({ navigation }) {
                             </View>
                         </View>
                     </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight:25 }}>
                         <TouchableOpacity onPress={() => decreaseQuantity(item.id)}>
                             <Text style={{ fontSize: 20, marginRight: 10 }}>-</Text>
                         </TouchableOpacity>

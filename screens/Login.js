@@ -18,9 +18,9 @@ function Login({ navigation }) {
         // ví dụ:
         navigation.navigate("Home_NVPV");
       } else if(currentUser && currentUser.email === "nvbepmq@gmail.com"){
-        // chuyển hướng đến màn hình Home_NVPV
+        // chuyển hướng đến màn hình Home_NVBep
         // ví dụ:
-        navigation.navigate("Home_NVPV");
+        navigation.navigate("Home_NVBep");
       }
     } catch (error) {
       alert(error.message);
