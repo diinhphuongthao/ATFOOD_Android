@@ -22,6 +22,16 @@ import Chat_NVPV from "../screens/Chat_NVPV";
 import Menu_NVPV from "../screens/Menu_NVPV";
 import Order_Detail from "../screens/Order_Detail";
 import Order_History_NVPV from "../screens/Order_History_NVPV";
+import Kitchen_List from "../screens/Kitchen_List";
+import Kitchen_List_Detail from "../screens/Kitchen_List_Detail";
+import Kitchen_List_Order from "../screens/Kitchen_List_Order";
+import Kitchen_List_Cooking from "../screens/Kitchen_List_Cooking";
+import Chat_Kitchen from "../screens/Chat_Kitchen";
+import Shipper_List from "../screens/Shipper_List";
+import Shipper_List_Detail from "../screens/Shipper_List_Detail";
+import Shipper_List_Order from "../screens/Shipper_List_Order";
+import Shipper_List_Delivering from "../screens/Shipper_List_Delivering";
+import Chat_Shipper from "../screens/Chat_Shipper";
 import { firebase } from '../config'
 import { useState, useEffect } from 'react';
 
@@ -68,6 +78,37 @@ function StackNavigator() {
 
 
         );
+    } if (currentUser && currentUser.email === "nvbepmq@gmail.com") {
+        return (
+
+            <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#daa520', } }}>
+                <Stack.Screen name='Kitchen_List' component={Kitchen_List} options={{ headerShown: false }} />
+                <Stack.Screen name='Kitchen_List_Detail' component={Kitchen_List_Detail} options={{ headerShown: false }} />
+                <Stack.Screen name='Kitchen_List_Order' component={Kitchen_List_Order} options={{ headerShown: false }} />
+                <Stack.Screen name='Kitchen_List_Cooking' component={Kitchen_List_Cooking} options={{ headerShown: false }} />
+                <Stack.Screen name='Chat_Kitchen' component={Chat_Kitchen} options={{ headerShown: false }} />
+            </Stack.Navigator>
+
+
+        );
+    }
+    const emailParts = currentUser.email.split('@');
+    const emailName = emailParts[0];
+    const emailDomain = emailParts[1];
+    const emailNumber = parseInt(emailName.replace('nvship', ''));
+    if (emailDomain === 'gmail.com' && emailNumber >= 1 && emailNumber <= 10) {
+        return (
+
+            <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#daa520', } }}>
+                <Stack.Screen name='Shipper_List' component={Shipper_List} options={{ headerShown: false }} />
+                <Stack.Screen name='Shipper_List_Detail' component={Shipper_List_Detail} options={{ headerShown: false }}/>
+                <Stack.Screen name='Shipper_List_Order' component={Shipper_List_Order} options={{ headerShown: false }} />
+                <Stack.Screen name='Shipper_List_Delivering' component={Shipper_List_Delivering} options={{ headerShown: false }} />
+                <Stack.Screen name='Chat_Shipper' component={Chat_Shipper} options={{ headerShown: false }} />
+            </Stack.Navigator>
+
+
+        );
     }
     return (
 
@@ -86,12 +127,6 @@ function StackNavigator() {
             <Stack.Screen name='Detail_Drink' component={Detail_Drink} options={{ headerShown: false }} />
             <Stack.Screen name='Cart' component={Cart} options={{ headerShown: false }} />
 
-            {/* <Stack.Screen name='Home_NVPV' component={Home_NVPV} options={{ headerShown: false }} />
-            <Stack.Screen name='Order_NVPV' component={Order_NVPV} options={{ headerShown: false }} />
-            <Stack.Screen name='Table_NVPV' component={Table_NVPV} options={{ headerShown: false }} />
-            <Stack.Screen name='Chat_NVPV' component={Chat_NVPV} options={{ headerShown: false }} />
-            <Stack.Screen name='Menu_NVPV' component={Menu_NVPV} options={{ headerShown: false }} />
-            <Stack.Screen name='Order_Detail' component={Order_Detail} options={{ headerShown: false }} /> */}
         </Stack.Navigator>
 
 

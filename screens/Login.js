@@ -13,43 +13,25 @@ function Login({ navigation }) {
     try {
       await firebase.auth().signInWithEmailAndPassword(email, password);
       const currentUser = firebase.auth().currentUser;
+      const emailParts = currentUser.email.split('@');
+      const emailName = emailParts[0];
+      const emailDomain = emailParts[1];
+      const emailNumber = parseInt(emailName.replace('nvship', ''));
       if (currentUser && currentUser.email === "nvpvmq@gmail.com") {
         // chuyển hướng đến màn hình Home_NVPV
         // ví dụ:
         navigation.navigate("Home_NVPV");
-      } else if(currentUser && currentUser.email === "nvbepmq@gmail.com"){
+      } else if (currentUser && currentUser.email === "nvbepmq@gmail.com") {
         // chuyển hướng đến màn hình Home_NVBep
         // ví dụ:
-        navigation.navigate("Home_NVBep");
+        navigation.navigate("Kitchen_List");
+      } if (emailDomain === 'gmail.com' && emailNumber >= 1 && emailNumber <= 10) {
+        navigation.navigate('Shipper_List');
       }
     } catch (error) {
       alert(error.message);
     }
   }
-
-  // loginUser = async (email, password) => {
-  //   try {
-  //     await firebase.auth().signInWithEmailAndPassword(email, password)
-  //   } catch (error) {
-  //     alert(error.messgae)
-  //   }
-  // }
-
-  // loginUser = async (email, password) => {
-  //   try {
-  //     if (email === 'nvphucvumq' && password === 'nvphucvumq') {
-  //       // Xử lý phân quyền tại đây
-  //       console.log('Đăng nhập thành công');
-  //       navigation.navigate('Home_NVPV');
-  //     } else {
-  //       throw new Error('Tên đăng nhập hoặc mật khẩu không đúng');
-  //     }
-  //   } catch (error) {
-  //     alert(error.message)
-  //   }
-  // }
-
-  
 
   return (
     <View style={{ backgroundColor: '#41B9B9', height: '100%', }}>
@@ -77,7 +59,7 @@ function Login({ navigation }) {
             height: 40, width: 320, backgroundColor: '#ffffff', justifyContent: 'flex-start', borderRadius: 20, marginLeft: 10
             , flexDirection: 'row'
           }}>
-            <View style={{ justifyContent:'center'}}>
+            <View style={{ justifyContent: 'center' }}>
               <Image style={{ height: 30, width: 30, marginLeft: 10 }} source={require('../image/mail.png')} />
             </View>
             <TextInput placeholder='Email'
@@ -93,7 +75,7 @@ function Login({ navigation }) {
             height: 40, width: 320, backgroundColor: '#ffffff', justifyContent: 'flex-start', borderRadius: 20, marginLeft: 10
             , flexDirection: 'row'
           }}>
-            <View style={{ paddingTop: 2, justifyContent:'center' }}>
+            <View style={{ paddingTop: 2, justifyContent: 'center' }}>
               <Image style={{ height: 30, width: 30, marginLeft: 10, }} source={require('../image/pass.png')} />
             </View>
             <TextInput secureTextEntry={true} placeholder='Password'

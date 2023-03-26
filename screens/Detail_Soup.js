@@ -8,6 +8,7 @@ import { collection, doc, getDoc, getFirestore, setDoc } from 'firebase/firestor
 
 function Detail_Soup({ route, navigation }) {
   const { foodID } = route.params;
+  const [note, setNote]= useState("");
 
   const [foodcount, setFoodCount] = useState([]);
   const [foodDetail, setFoodDetail] = useState([]);
@@ -40,7 +41,9 @@ function Detail_Soup({ route, navigation }) {
     return false;
   };
   
-
+  const handleNoteChange = (text) => {
+    setNote(text); // Cập nhật giá trị của note khi người dùng nhập liệu vào TextInput
+  };
 
   const addToCart = async () => {
     try {
@@ -60,7 +63,8 @@ function Detail_Soup({ route, navigation }) {
         price: foodDetail.price,
         quantity: quantity,
         image: foodDetail.image,
-        denominations: foodDetail.denominations
+        denominations: foodDetail.denominations,
+        note: note.toString()
       };
 
       await cartDocRef.set({
@@ -179,7 +183,7 @@ function Detail_Soup({ route, navigation }) {
            
               <View style={{ alignItems: 'center', paddingTop:10}}>
                 <View style={{ backgroundColor: 'white', width: 340,height:100, borderWidth: 1, borderRadius:10 }}>
-                  <TextInput style={{ marginLeft: 10, fontSize:16 }} placeholder='ghi chú cho món ăn...'>
+                  <TextInput style={{ marginLeft: 10, fontSize:16 }} placeholder='ghi chú cho món ăn...'  onChangeText={handleNoteChange}>
                   </TextInput>
                 </View>
               </View>

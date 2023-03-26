@@ -115,12 +115,12 @@ function Cart({ navigation }) {
     const sendOrder = async () => {
         // Lấy id khách hàng
         const userId = firebase.auth().currentUser.uid;
-    
+
         // Lấy thông tin khách hàng từ Firestore
         const userRef = firebase.firestore().collection('users').doc(userId);
         const userDoc = await userRef.get();
         const userData = userDoc.data();
-    
+
         // Tạo đơn hàng mới trong Firestore
         const ordersRef = firebase.firestore().collection('Orders');
         const order = {
@@ -132,8 +132,9 @@ function Cart({ navigation }) {
             status: 'Đang chờ',
             createdAt: new Date(),
         };
+        order.imageStatus = 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/clockwise.png?alt=media&token=45c770f5-89b3-4f73-96b6-059e549e12b0';
         await ordersRef.add(order);
-    
+
         // Xóa giỏ hàng hiện tại
         const cartRef = firebase.firestore().collection('Cart');
         cartItems.forEach((item) => {
@@ -141,7 +142,7 @@ function Cart({ navigation }) {
         });
         alert('Đã tạo đơn hàng thành công!');
     };
-    
+
 
 
 
@@ -182,7 +183,7 @@ function Cart({ navigation }) {
                             </View>
                         </View>
                     </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight:25 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 25 }}>
                         <TouchableOpacity onPress={() => decreaseQuantity(item.id)}>
                             <Text style={{ fontSize: 20, marginRight: 10 }}>-</Text>
                         </TouchableOpacity>
@@ -230,10 +231,10 @@ function Cart({ navigation }) {
                         width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
                         alignItems: 'center', justifyContent: 'center',
                         borderWidth: 2, borderColor: '#13625D',
-                    }} onPress={() => navigation.navigate('Cart')}>
+                    }} onPress={() => navigation.navigate('Order_History')}>
                         <Image style={{
-                            height: 38, width: 38
-                        }} source={require('../image/Notification.png')} />
+                            height: 30, width: 30
+                        }} source={require('../image/order_history.png')} />
                     </TouchableOpacity>
                 </View>
             </View>

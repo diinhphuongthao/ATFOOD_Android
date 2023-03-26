@@ -3,17 +3,17 @@ import React, { useState, useEffect } from 'react'
 import { firebase } from '../config'
 import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore'
 
-function Order_Detail({ route }) {
+function Shipper_List_Detail({ route }) {
     const { orderId } = route.params;
-    const [order, setOrder] = useState(null);
+    const [deliverys, setDeliverys] = useState(null);
 
     useEffect(() => {
         const subscriber = firebase.firestore()
-            .collection('Orders')
+            .collection('Deliverys')
             .doc(orderId)
             .onSnapshot((documentSnapshot) => {
                 if (documentSnapshot.exists) {
-                    setOrder(documentSnapshot.data());
+                    setDeliverys(documentSnapshot.data());
                 }
             });
 
@@ -26,7 +26,7 @@ function Order_Detail({ route }) {
             .doc(orderId)
             .onSnapshot((documentSnapshot) => {
                 if (documentSnapshot.exists) {
-                    setOrder(documentSnapshot.data());
+                    setDeliverys(documentSnapshot.data());
                 }
             });
 
@@ -34,7 +34,7 @@ function Order_Detail({ route }) {
         return () => subscriber();
     }, [orderId]);
 
-    if (!order) {
+    if (!deliverys) {
         return <ActivityIndicator />;
     }
 
@@ -101,7 +101,7 @@ function Order_Detail({ route }) {
             /> */}
             <View style={{alignItems:'center', justifyContent:'center'}}>
                 <FlatList
-                    data={order.items}
+                    data={deliverys.items}
                     renderItem={renderCartItem}
                     keyExtractor={(item) => item.id}
                 />
@@ -110,4 +110,4 @@ function Order_Detail({ route }) {
     )
 }
 
-export default Order_Detail
+export default Shipper_List_Detail
