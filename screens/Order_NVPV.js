@@ -2,7 +2,7 @@ import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Button, Fl
 import React, { useState, useEffect } from 'react'
 import { firebase } from '../config'
 import moment from 'moment-timezone';
-import { collection, doc, getDoc, getFirestore, setDoc, updateDoc, onSnapshot, writeBatch } from 'firebase/firestore'
+import { collection, doc, getDoc, getFirestore, setDoc, updateDoc, onSnapshot, writeBatch, getDocs, collectionGroup } from 'firebase/firestore'
 
 function Order_NVPV({ navigation }) {
   const handlePress = () => {
@@ -10,6 +10,7 @@ function Order_NVPV({ navigation }) {
   };
   const [orders, setOrders] = useState([]);
   const [isCancelDialogVisible, setIsCancelDialogVisible] = useState(false);
+
   useEffect(() => {
     const subscriber = firebase.firestore()
       .collection('Orders')
@@ -35,9 +36,11 @@ function Order_NVPV({ navigation }) {
   }, []);
 
   const handleOrderStatusUpdate = async (orderId) => {
+    const userId = firebase.auth().currentUser.uid;
     const orderRef = doc(firebase.firestore(), 'Orders', orderId);
     const snapshot = await getDoc(orderRef);
     const order = snapshot.data();
+
     if (order.status === 'Đang chế biến') {
       alert('Đơn hàng đang chế biến, không thể chuyển cho bếp');
       return;
@@ -49,9 +52,43 @@ function Order_NVPV({ navigation }) {
     if (order.status === 'Hoàn thành đơn món') {
       alert('Đã hoàn thành đơn món, đợi chuyển cho shipper');
       return;
-    } 
-    
-   
+    }
+
+    const querySnapshot = await firebase.firestore().collectionGroup('orders').get();
+
+    const orderCustomerIds = [];
+    querySnapshot.forEach((doc) => {
+      orderCustomerIds.push(doc.ref.parent.parent.id);
+      // doc.ref.parent là bộ sưu tập con "orders"
+      // doc.ref.parent.parent là bộ sưu tập cha "OrderCustomer"
+    });
+
+    const ordersCollectionRef = firebase.firestore().collectionGroup('Orders');
+    const ordersSnapshot = await ordersCollectionRef.get();
+
+    const orderCustomerId = [];
+    ordersSnapshot.forEach((doc) => {
+      orderCustomerId.push(doc.id);
+    });
+
+
+    if (orderCustomerId.length >= orderCustomerIds.length || orderCustomerId.length <= orderCustomerIds.length) {
+      // nested loop để so sánh id của 2 mảng
+      for (let i = 0; i < orderCustomerId.length; i++) {
+        for (let j = 0; j < orderCustomerIds.length; j++) {
+          if (orderCustomerId[i] === orderCustomerIds[j]) {
+            // nếu có id nào trùng nhau thì ta sẽ thay đổi trạng thái của document trong subcollection orders
+            const orderId = querySnapshot.docs[j].id;
+            const orderRef = querySnapshot.docs[j].ref;
+            orderRef.update({
+              status: "Đã chuyển cho bếp",
+              imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/kitchen.png?alt=media&token=39eef676-b517-47f4-86ac-4e9ab659f1de'
+            });
+            console.log(`Updated order with id ${orderId}`);
+          }
+        }
+      }
+    }
 
     // Tạo một batch để update trạng thái đơn hàng và chuyển sang collection Kitchen
     const batch = writeBatch(firebase.firestore());
@@ -71,6 +108,8 @@ function Order_NVPV({ navigation }) {
       imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/kitchen_waiting.png?alt=media&token=fd1747fd-76bc-4644-996b-1a5dcd874917'
     });
 
+    // Lấy tất cả các subcollection trong collection OrderCustomer
+
     // Thực hiện batch
     await batch.commit();
 
@@ -78,6 +117,7 @@ function Order_NVPV({ navigation }) {
       unsubscribe();
     };
   };
+
 
 
   const cancelOrder = async (orderId) => {
@@ -179,27 +219,73 @@ function Order_NVPV({ navigation }) {
       const orderSnapshot = await orderRef.get();
       const orderData = orderSnapshot.data();
       const historyRef = firebase.firestore().collection('OrderHistory').doc(orderId);
-      const order = await orderRef.get();
+      const history = await historyRef.get();
+      const historyData = history.data();
+
+
+      const querySnapshot = await firebase.firestore().collectionGroup('orders').get();
+
+      const orderCustomerIds = [];
+      querySnapshot.forEach((doc) => {
+        orderCustomerIds.push(doc.ref.parent.parent.id);
+        // doc.ref.parent là bộ sưu tập con "orders"
+        // doc.ref.parent.parent là bộ sưu tập cha "OrderCustomer"
+      });
+
+      const ordersCollectionRef = firebase.firestore().collectionGroup('Orders');
+      const ordersSnapshot = await ordersCollectionRef.get();
+
+      const orderCustomerId = [];
+      ordersSnapshot.forEach((doc) => {
+        orderCustomerId.push(doc.id);
+      });
+
+      if (orderCustomerId.length >= orderCustomerIds.length || orderCustomerId.length <= orderCustomerIds.length) {
+        // nested loop để so sánh id của 2 mảng
+        for (let i = 0; i < orderCustomerId.length; i++) {
+          for (let j = 0; j < orderCustomerIds.length; j++) {
+            if (orderCustomerId[i] === orderCustomerIds[j]) {
+              // nếu có id nào trùng nhau thì ta sẽ thay đổi trạng thái của document trong subcollection orders
+              const orderId = querySnapshot.docs[j].id;
+              const orderRef = querySnapshot.docs[j].ref;
+              orderRef.update({
+                status: "Chờ shipper nhận đơn",
+                imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/wait-time.png?alt=media&token=b3a9697a-f32b-4f81-8764-cb1ba9b1fe09'
+              });
+              console.log(`Updated order with id ${orderId}`);
+            }
+          }
+        }
+      }
+
+
       // Kiểm tra trạng thái đơn hàng
       if (orderData.status === "Hoàn thành đơn món") {
         // Lưu đơn hàng vào collection "Deliverys"
         const deliveryRef = firebase.firestore().collection("Deliverys").doc(orderId);
         await deliveryRef.set(orderData);
 
-         // Update trạng thái đơn hàng thành "Chờ shipper nhận đơn"
-         const deliveryStatusRef = firebase.firestore().collection("Deliverys").doc(orderId);
-         await deliveryStatusRef.update({
-           status: "Chờ shipper nhận đơn",
-           imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/wait-time.png?alt=media&token=b3a9697a-f32b-4f81-8764-cb1ba9b1fe09'
-         });
-   
-         alert("Chuyển đơn hàng thành công!");
-  
-        await historyRef.set({
-          ...order.data(),
-          canceledAt: firebase.firestore.FieldValue.serverTimestamp()
+        // Update trạng thái đơn hàng thành "Chờ shipper nhận đơn"
+        const deliveryStatusRef = firebase.firestore().collection("Deliverys").doc(orderId);
+        await deliveryStatusRef.update({
+          status: "Chờ shipper nhận đơn",
+          imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/wait-time.png?alt=media&token=b3a9697a-f32b-4f81-8764-cb1ba9b1fe09'
         });
-  
+        // Lưu lịch sử đơn hàng
+        const historyRef = firebase.firestore().collection('OrderHistory').doc(orderId);
+        await historyRef.update({
+          status: "Chờ shipper nhận đơn",
+          imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/wait-time.png?alt=media&token=b3a9697a-f32b-4f81-8764-cb1ba9b1fe09',
+          deliveryTime: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert("Chuyển đơn hàng thành công!");
+
+        // await historyRef.set({
+        //   ...orderData.data(),
+        //   canceledAt: firebase.firestore.FieldValue.serverTimestamp()
+        // });
+
         console.log('Order moved to history successfully');
         // Xóa đơn hàng khỏi collection "Orders"
         await orderRef.delete();
@@ -214,7 +300,7 @@ function Order_NVPV({ navigation }) {
       alert("Có lỗi xảy ra khi chuyển đơn hàng!");
     }
   };
-  
+
   return (
     <View style={{ backgroundColor: '#DDF0F0', height: '100%' }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>

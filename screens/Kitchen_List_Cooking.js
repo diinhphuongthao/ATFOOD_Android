@@ -34,11 +34,45 @@ function Kitchen_List_Cooking({ navigation }) {
 
     const handleCookingStatusUpdate = async (orderId) => {
         try {
-          // Lấy thông tin đơn hàng từ collection "Cooking"
-          const cookingRef = firebase.firestore().collection("Cooking").doc(orderId);
-          const cookingSnapshot = await cookingRef.get();
-          const cookingData = cookingSnapshot.data();
-      
+     
+          const querySnapshot = await firebase.firestore().collectionGroup('orders').get();
+
+          const orderCustomerIds = [];
+          querySnapshot.forEach((doc) => {
+              orderCustomerIds.push(doc.ref.parent.parent.id);
+              // doc.ref.parent là bộ sưu tập con "orders"
+              // doc.ref.parent.parent là bộ sưu tập cha "OrderCustomer"
+          });
+
+          const CookingRef = firebase.firestore().collectionGroup('Cooking');
+          const kitchenSnapshot = await CookingRef.get();
+          const cookingData = kitchenSnapshot.docs[0].data();
+
+
+          const orderCustomerId = [];
+          kitchenSnapshot.forEach((doc) => {
+              orderCustomerId.push(doc.id);
+          });
+
+          if (orderCustomerId.length >= orderCustomerIds.length || orderCustomerId.length <= orderCustomerIds.length) {
+              // nested loop để so sánh id của 2 mảng
+              for (let i = 0; i < orderCustomerId.length; i++) {
+                  for (let j = 0; j < orderCustomerIds.length; j++) {
+                      if (orderCustomerId[i] === orderCustomerIds[j]) {
+                          // nếu có id nào trùng nhau thì ta sẽ thay đổi trạng thái của document trong subcollection orders
+                          const orderId = querySnapshot.docs[j].id;
+                          const orderRef = querySnapshot.docs[j].ref;
+                          orderRef.update({
+                              status: "Hoàn thành đơn món",
+                              imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/done.png?alt=media&token=2f6a78be-961a-43bf-af43-4ec3075f787a'
+                          });
+                          console.log(`Updated order with id ${orderId}`);
+                      }
+                  }
+              }
+          }
+
+
           // Kiểm tra trạng thái đơn hàng
           if (cookingData.status === "Đang chế biến") {
             // Cập nhật trạng thái đơn món thành "Hoàn thành đơn món" và lưu vào collection "Orders"
@@ -58,7 +92,9 @@ function Kitchen_List_Cooking({ navigation }) {
             }); 
       
             // Xóa đơn hàng khỏi collection "Cooking"
-            await cookingRef.delete();
+            kitchenSnapshot.forEach(async (doc) => {
+                await doc.ref.delete();
+            });
       
             alert("Đơn món đã được chuyển sang trạng thái hoàn thành!");
           } else {
@@ -69,6 +105,40 @@ function Kitchen_List_Cooking({ navigation }) {
           alert("Có lỗi xảy ra khi cập nhật trạng thái đơn hàng!");
         }
       };
+
+      const handleKitchenBackStatusUpdate = async (orderId) => {
+        try {
+          // Lấy đối tượng đơn hàng trong Collection Orders
+          const orderRef = firebase.firestore().collection('Orders').doc(orderId);
+          const orderDoc = await orderRef.get();
+          const orderData = orderDoc.data();
+      
+          // Tạo mới đơn hàng trong Collection Kitchen
+          const kitchenRef = firebase.firestore().collection('Kitchen').doc(orderId);
+          await kitchenRef.set({
+            ...orderData,
+            status: 'Chờ bếp xác nhận lại',
+            imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/kitchen_waiting.png?alt=media&token=fd1747fd-76bc-4644-996b-1a5dcd874917'
+          });
+          console.log(`Moved order with id ${orderId} back to Kitchen collection`);
+      
+          // Cập nhật trạng thái đơn hàng trong Collection Orders là "Trả đơn"
+          await orderRef.update({
+            status: 'Chờ bếp xác nhận lại',
+            imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/kitchen_waiting.png?alt=media&token=fd1747fd-76bc-4644-996b-1a5dcd874917'
+          });
+          console.log(`Updated order with id ${orderId} status to "Trả đơn"`);
+
+           // Xóa đơn hàng khỏi danh sách Collection Cooking
+           const cookingRef = firebase.firestore().collection('Cooking').doc(orderId);
+           await cookingRef.delete();
+           console.log(`Deleted cooking order with id ${orderId}`);
+      
+        } catch (error) {
+          console.error('Error updating order and deleting cooking order:', error);
+        }
+      };
+      
       
 
 
@@ -154,7 +224,7 @@ function Kitchen_List_Cooking({ navigation }) {
                                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                                     <View style={{ alignItems: 'center', justifyContent: 'center', flexDirection: 'column', height: 100, width: 140, paddingBottom: 2 }}>
                                         <View style={{ paddingTop: 10 }}>
-                                            <TouchableOpacity onPress={() => handleOrderStatusUpdate(item.key)}>
+                                            <TouchableOpacity onPress={() => handleKitchenBackStatusUpdate(item.key)}>
                                                 <View style={{
                                                     backgroundColor: '#86D3D3', height: 40, width: 120, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, justifyContent: 'center',
 

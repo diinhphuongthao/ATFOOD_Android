@@ -1,6 +1,7 @@
 import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Button, FlatList, TextInput } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { firebase } from '../config'
+import moment from 'moment-timezone';
 import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore'
 
 function Cart({ navigation }) {
@@ -9,7 +10,8 @@ function Cart({ navigation }) {
     const [itemQuantity, setItemQuantity] = useState({});
 
     useEffect(() => {
-        const cartRef = firebase.firestore().collection('Cart');
+        const userId = firebase.auth().currentUser.uid;
+        const cartRef = firebase.firestore().collection('Cart').doc(userId).collection('cartItems');
         const unsubscribe = cartRef.onSnapshot((snapshot) => {
             const items = snapshot.docs.map((doc) => {
                 return { id: doc.id, ...doc.data().foodDetails[0] };
@@ -36,7 +38,8 @@ function Cart({ navigation }) {
 
 
     const increaseQuantity = async (id, foodId) => {
-        const itemRef = firebase.firestore().collection('Cart').doc(id);
+        const userId = firebase.auth().currentUser.uid;
+        const itemRef = firebase.firestore().collection('Cart').doc(userId).collection('cartItems').doc(id);
         const itemDoc = await itemRef.get();
         const itemData = itemDoc.data();
 
@@ -57,7 +60,8 @@ function Cart({ navigation }) {
     };
 
     const decreaseQuantity = async (id, foodId) => {
-        const itemRef = firebase.firestore().collection('Cart').doc(id);
+        const userId = firebase.auth().currentUser.uid;
+        const itemRef = firebase.firestore().collection('Cart').doc(userId).collection('cartItems').doc(id);
         const itemDoc = await itemRef.get();
         const itemData = itemDoc.data();
 
@@ -84,13 +88,14 @@ function Cart({ navigation }) {
     };
 
     const deleteItem = (id) => {
+        const userId = firebase.auth().currentUser.uid;
         const index = cartItems.findIndex((item) => item.id === id);
         if (index >= 0) {
             const updatedItems = [...cartItems];
             updatedItems.splice(index, 1);
             setCartItems(updatedItems);
             // Delete item from Firestore
-            const cartRef = firebase.firestore().collection('Cart').doc(id);
+            const cartRef = firebase.firestore().collection('Cart').doc(userId).collection('cartItems').doc(id);
             cartRef.delete().then(() => {
                 console.log("Item deleted successfully.");
             }).catch((error) => {
@@ -98,6 +103,7 @@ function Cart({ navigation }) {
             });
         }
     };
+
 
     const handlePress = () => {
         navigation.goBack();
@@ -111,7 +117,6 @@ function Cart({ navigation }) {
 
         return totalPrice;
     }
-
     const sendOrder = async () => {
         // Lấy id khách hàng
         const userId = firebase.auth().currentUser.uid;
@@ -120,6 +125,23 @@ function Cart({ navigation }) {
         const userRef = firebase.firestore().collection('users').doc(userId);
         const userDoc = await userRef.get();
         const userData = userDoc.data();
+
+        // Kiểm tra nếu đã có đơn hàng chưa hoàn thành thì không cho đặt thêm
+        const orderRef = firebase.firestore().collection('Orders').where('uid', '==', userId);
+        const orderSnapshot = await orderRef.get();
+        if (!orderSnapshot.empty) {
+            alert('Bạn đã có đơn hàng chưa hoàn thành. Vui lòng đợi trong ít phút trước khi đặt đơn hàng mới.');
+            return;
+        }
+
+        // Kiểm tra nếu đã có đơn hàng chưa hoàn thành thì không cho đặt thêm
+        const deliverRef = firebase.firestore().collection('Delivering').where('uid', '==', userId);
+        const deliverSnapshot = await deliverRef.get();
+        if (!deliverSnapshot.empty) {
+            alert('Bạn đã có đơn hàng chưa hoàn thành. Vui lòng đợi trong ít phút trước khi đặt đơn hàng mới.');
+            return;
+        }
+
 
         // Tạo đơn hàng mới trong Firestore
         const ordersRef = firebase.firestore().collection('Orders');
@@ -133,10 +155,27 @@ function Cart({ navigation }) {
             createdAt: new Date(),
         };
         order.imageStatus = 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/clockwise.png?alt=media&token=45c770f5-89b3-4f73-96b6-059e549e12b0';
-        await ordersRef.add(order);
+        await ordersRef.doc(userId).set(order);
 
+        const orderCustomerRef = firebase.firestore().collection('OrderCustomer').doc(userId);
+        // Tạo một subcollection có tên là "orders"
+        const ordersCollectionRef = orderCustomerRef.collection("orders");
+
+        // Thêm một đơn đặt món vào subcollection
+        const orders = {
+            customerName: userData.name,
+            customerPhone: userData.phone,
+            totalPrice: calculateTotalPrice(),
+            status: 'Đang chờ',
+            items: cartItems,
+            createdAt: new Date(),
+        };
+        orders.imageStatus = 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/clockwise.png?alt=media&token=45c770f5-89b3-4f73-96b6-059e549e12b0';
+        await ordersCollectionRef.doc(userId).set(orders);
+
+        // Cập nhật thông tin đơn hàng vào document chính của user
         // Xóa giỏ hàng hiện tại
-        const cartRef = firebase.firestore().collection('Cart');
+        const cartRef = firebase.firestore().collection('Cart').doc(userId).collection('cartItems');
         cartItems.forEach((item) => {
             cartRef.doc(item.id).delete();
         });

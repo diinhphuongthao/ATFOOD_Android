@@ -51,7 +51,7 @@ function Kitchen_List({ navigation }) {
           </View>
         </View>
       </View>
-      <View style={{paddingTop:260}}>
+      <View style={{paddingTop:160}}>
         <TouchableOpacity style={{ height: 50, width: 160, borderWidth: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F46C6C', borderRadius: 15 }}
           onPress={() => { firebase.auth().signOut() }}>
           <Text style={{ fontSize: 22 }}>

@@ -1,5 +1,6 @@
-import { Text, StyleSheet, View, Image, TouchableOpacity, TextInput, ImageBackground, SafeAreaView } from 'react-native'
-import React, { useState } from 'react'
+import { Text, StyleSheet, View, Image, TouchableOpacity, TextInput, ImageBackground, SafeAreaView, KeyboardAvoidingView } from 'react-native'
+import React, { useState, useRef } from 'react'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { firebase } from '../config'
 
 
@@ -13,7 +14,8 @@ function SignUp({ navigation }) {
   const auth = firebase.auth;
 
 
- const registerUser = async (name, phone, email, password) => {
+
+  const registerUser = async (name, phone, email, password) => {
     await firebase.auth().createUserWithEmailAndPassword(email, password)
       .then(() => {
         firebase.auth().currentUser.sendEmailVerification({
@@ -47,7 +49,8 @@ function SignUp({ navigation }) {
 
   return (
     <View style={{ backgroundColor: '#41B9B9', height: '100%', }}>
-      <View>
+ 
+      <KeyboardAwareScrollView>
         <View style={{ paddingTop: 15, marginLeft: 15 }}>
           <TouchableOpacity style={{
             width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
@@ -69,57 +72,71 @@ function SignUp({ navigation }) {
         </View>
 
 
-        <View style={{ flexDirection: 'column', paddingTop: 20, alignItems: 'center' }}>
+        
+          <View style={{ flexDirection: 'column', paddingTop: 20, alignItems: 'center' }}>
+          
+            <View style={{
+              backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start'
+              , borderRadius: 20, flexDirection: 'row', alignItems: 'center'
+            }}>
+              <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/name.png')} />
+              <TextInput placeholder='Name'
+                onChangeText={(name) => setName(name)}
+                autoCorrect={false}
+                style={{ marginLeft: 10, width: 270 }}
 
-          <View style={{
-            backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start'
-            , borderRadius: 20, flexDirection: 'row', alignItems: 'center'
-          }}>
-            <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/name.png')} />
-            <TextInput placeholder='Name'
-              onChangeText={(name) => setName(name)}
-              autoCorrect={false}
-              style={{ marginLeft: 10 }}></TextInput>
+              ></TextInput>
+            </View>
+          
+
+
+            <View style={{
+              backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start'
+              , borderRadius: 20, flexDirection: 'row', alignItems: 'center'
+            }}>
+              <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/phone.png')} />
+              <TextInput placeholder='Phone'
+                onChangeText={(phone) => setPhone(phone)}
+                autoCorrect={false}
+                style={{ marginLeft: 10, width: 270 }}
+
+              ></TextInput>
+            </View>
+
+            <View style={{
+              backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start'
+              , borderRadius: 20, flexDirection: 'row', alignItems: 'center'
+            }}>
+              <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/mail.png')} />
+              <TextInput placeholder='Email'
+                onChangeText={(email) => setEmail(email)}
+                autoCorrect={false}
+                autoCapitalize="none"
+                keyboardType='email-address'
+                style={{ marginLeft: 10, width: 270 }}
+
+              ></TextInput>
+            </View>
+       
+            <View style={{
+              backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start'
+              , borderRadius: 20, flexDirection: 'row', alignItems: 'center'
+            }}>
+              <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/pass.png')} />
+              <TextInput placeholder='Password'
+                onChangeText={(password) => setPassword(password)}
+                autoCorrect={false}
+                autoCapitalize="none"
+                secureTextEntry={true}
+                style={{ marginLeft: 10, width: 270 }}
+
+              ></TextInput>
+            </View>
+            
+
           </View>
+       
 
-
-          <View style={{
-            backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start'
-            , borderRadius: 20, flexDirection: 'row', alignItems: 'center'
-          }}>
-            <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/phone.png')} />
-            <TextInput placeholder='Phone'
-              onChangeText={(phone) => setPhone(phone)}
-              autoCorrect={false}
-              style={{ marginLeft: 10 }}></TextInput>
-          </View>
-
-          <View style={{
-            backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start'
-            , borderRadius: 20, flexDirection: 'row', alignItems: 'center'
-          }}>
-            <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/mail.png')} />
-            <TextInput placeholder='Email'
-              onChangeText={(email) => setEmail(email)}
-              autoCorrect={false}
-              autoCapitalize="none"
-              keyboardType='email-address'
-              style={{ marginLeft: 10 }}></TextInput>
-          </View>
-
-          <View style={{
-            backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start'
-            , borderRadius: 20, flexDirection: 'row', alignItems: 'center'
-          }}>
-            <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/pass.png')} />
-            <TextInput placeholder='Password'
-              onChangeText={(password) => setPassword(password)}
-              autoCorrect={false}
-              autoCapitalize="none"
-              secureTextEntry={true}
-              style={{ marginLeft: 10 }}></TextInput>
-          </View>
-        </View>
 
 
         <View style={{ alignItems: 'center', paddingTop: 30, }}>
@@ -133,7 +150,8 @@ function SignUp({ navigation }) {
             </View>
           </TouchableOpacity>
         </View>
-      </View>
+        </KeyboardAwareScrollView>
+   
     </View>
 
   )

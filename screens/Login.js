@@ -59,14 +59,14 @@ function Login({ navigation }) {
             height: 40, width: 320, backgroundColor: '#ffffff', justifyContent: 'flex-start', borderRadius: 20, marginLeft: 10
             , flexDirection: 'row'
           }}>
-            <View style={{ justifyContent: 'center' }}>
+            <View style={{ justifyContent: 'center'}}>
               <Image style={{ height: 30, width: 30, marginLeft: 10 }} source={require('../image/mail.png')} />
             </View>
             <TextInput placeholder='Email'
               onChangeText={(email) => setEmail(email)}
               autoCapitalize="none"
               autoCorrect={false}
-              style={{ fontSize: 16, marginLeft: 10 }}></TextInput>
+              style={{ fontSize: 16, marginLeft: 10, width: 250,}}></TextInput>
           </View>
         </View>
 
@@ -82,7 +82,7 @@ function Login({ navigation }) {
               onChangeText={(password) => setPassword(password)}
               autoCapitalize="none"
               autoCorrect={false}
-              style={{ fontSize: 16, marginLeft: 10, }}></TextInput>
+              style={{ fontSize: 16, marginLeft: 10, width: 250 }}></TextInput>
           </View>
         </View>
       </View>

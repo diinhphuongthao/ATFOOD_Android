@@ -32,50 +32,58 @@ function Shipper_List_Delivering({ navigation }) {
         return () => subscriber();
     }, []);
 
-    const handleKitchenStatusUpdate = async (orderId) => {
+    const handleDeliveryStatusUpdate = async (orderId) => {
         try {
-            // Lấy thông tin đơn hàng từ collection "Kitchen"
-            const kitchenRef = firebase.firestore().collection("Kitchen").doc(orderId);
-            const kitchenSnapshot = await kitchenRef.get();
-            const kitchenData = kitchenSnapshot.data();
+            const deliveringCollectionRef = firebase.firestore().collection('Delivering');
+            const deliveringDocRef = deliveringCollectionRef.doc(orderId);
+            const querySnapshot = await firebase.firestore().collectionGroup('orders').get();
 
-            // Kiểm tra trạng thái đơn hàng
-            if (kitchenData.status === "Chờ bếp nhận đơn") {
-                // Cập nhật trạng thái đơn món thành "Đang chế biến" và lưu vào collection "Orders"
-                const orderRef = firebase.firestore().collection("Orders").doc(orderId);
-                await orderRef.update({
-                    status: "Đang chế biến",
-                    imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/cooking.png?alt=media&token=3e9b95c4-9499-4911-95a9-a043305cd340'
-                });
+            const orderCustomerIds = [];
+            querySnapshot.forEach((doc) => {
+                orderCustomerIds.push(doc.ref.parent.parent.id);
+                // doc.ref.parent là bộ sưu tập con "orders"
+                // doc.ref.parent.parent là bộ sưu tập cha "OrderCustomer"
+            });
 
-                // Lưu lịch sử đơn hàng
-                const historyRef = firebase.firestore().collection('OrderHistory').doc(orderId);
-                await historyRef.set({
-                    ...kitchenData,
-                    status: "Đang chế biến",
-                    imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/cooking.png?alt=media&token=3e9b95c4-9499-4911-95a9-a043305cd340',
-                    cookingTime: firebase.firestore.FieldValue.serverTimestamp()
-                }); 
+            const ordersCollectionRef = firebase.firestore().collectionGroup('Delivering');
+            const ordersSnapshot = await ordersCollectionRef.get();
 
-                // Không xóa đơn món khỏi collection Kitchen mà chuyển đến collection Cooking
-                const cookingRef = firebase.firestore().collection('Cooking').doc(orderId);
-                await  cookingRef.set({
-                    ...kitchenData,
-                    status: "Đang chế biến",
-                    imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/cooking.png?alt=media&token=3e9b95c4-9499-4911-95a9-a043305cd340',
-                    cookingTime: firebase.firestore.FieldValue.serverTimestamp()
-                }); 
+            const orderCustomerId = [];
+            ordersSnapshot.forEach((doc) => {
+                orderCustomerId.push(doc.id);
+            });
 
-                // Xóa đơn hàng khỏi collection "Kitchen"
-                await kitchenRef.delete();
-
-                alert("Bếp đã nhận đơn món và bắt đầu chế biến!");
-            } else {
-                alert("Đơn hàng không ở trạng thái chờ bếp nhận đơn!");
+            if (orderCustomerId.length >= orderCustomerIds.length || orderCustomerId.length <= orderCustomerIds.length) {
+                // nested loop để so sánh id của 2 mảng
+                for (let i = 0; i < orderCustomerId.length; i++) {
+                    for (let j = 0; j < orderCustomerIds.length; j++) {
+                        if (orderCustomerId[i] === orderCustomerIds[j]) {
+                            // nếu có id nào trùng nhau thì ta sẽ thay đổi trạng thái của document trong subcollection orders
+                            const orderId = querySnapshot.docs[j].id;
+                            const orderRef = querySnapshot.docs[j].ref;
+                            orderRef.update({
+                                status: 'Giao đơn món thành công',
+                                imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/checked.png?alt=media&token=08e9edcb-dfd0-4a35-a521-9999aea87af0',
+                                updatedAt: new Date()
+                            });
+                            console.log(`Updated order with id ${orderId}`);
+                        }
+                    }
+                }
             }
+
+            await deliveringDocRef.update({
+                status: 'Giao đơn món thành công',
+                imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/checked.png?alt=media&token=08e9edcb-dfd0-4a35-a521-9999aea87af0',
+                updatedAt: new Date()
+            });
+            const oldOrderRef = firebase.firestore().collection('OldOrder').doc();
+            const deliveringDoc = await deliveringDocRef.get();
+            await oldOrderRef.set(deliveringDoc.data());
+            await deliveringDocRef.delete();
+            console.log('Delivery status updated successfully');
         } catch (error) {
-            console.error(error);
-            alert("Có lỗi xảy ra khi cập nhật trạng thái đơn hàng!");
+            console.log(`Error updating delivery status: ${error}`);
         }
     };
 
@@ -125,7 +133,7 @@ function Shipper_List_Delivering({ navigation }) {
                                 <View style={{ flexDirection: 'column' }}>
                                     <View style={{ paddingBottom: 10, justifyContent: 'center', alignItems: 'center' }}>
                                         <View style={{
-                                            height: 40, width: 200, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center'
+                                            height: 40, width: 240, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center'
                                             , borderRadius: 30, borderWidth: 1, flexDirection: 'row'
                                         }}>
                                             <Image style={{
@@ -176,11 +184,11 @@ function Shipper_List_Delivering({ navigation }) {
                                             </TouchableOpacity>
                                         </View>
                                         <View style={{ paddingTop: 10 }}>
-                                            <TouchableOpacity onPress={() => handleKitchenStatusUpdate(item.key)}>
+                                            <TouchableOpacity onPress={() => handleDeliveryStatusUpdate(item.key)}>
                                                 <View style={{
                                                     backgroundColor: '#9AE893', height: 40, width: 120, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, justifyContent: 'center',
                                                 }}>
-                                                    <Text style={{ textAlign: 'center' }}>Nhận đơn</Text>
+                                                    <Text style={{ textAlign: 'center' }}>Hoàn thành giao đơn</Text>
                                                 </View>
                                             </TouchableOpacity>
                                         </View>

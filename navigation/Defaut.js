@@ -14,6 +14,7 @@ import Detail_Meat from "../screens/Detail_Meat";
 import Detail_Soup from "../screens/Detail_Soup";
 import Detail_Fish from "../screens/Detail_Fish";
 import Detail_Drink from "../screens/Detail_Drink";
+import Order_History from "../screens/Order_History";
 import Cart from "../screens/Cart";
 import Home_NVPV from "../screens/Home_NVPV";
 import Order_NVPV from "../screens/Order_NVPV";
@@ -125,6 +126,7 @@ function StackNavigator() {
             <Stack.Screen name='Detail_Soup' component={Detail_Soup} options={{ headerShown: false }} />
             <Stack.Screen name='Detail_Fish' component={Detail_Fish} options={{ headerShown: false }} />
             <Stack.Screen name='Detail_Drink' component={Detail_Drink} options={{ headerShown: false }} />
+            <Stack.Screen name='Order_History' component={Order_History} options={{ headerShown: false }} />
             <Stack.Screen name='Cart' component={Cart} options={{ headerShown: false }} />
 
         </Stack.Navigator>

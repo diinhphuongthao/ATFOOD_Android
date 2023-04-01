@@ -1,6 +1,7 @@
-import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Button, TextInput } from 'react-native'
+import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Button, TextInput, Keyboard } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { firebase } from '../config'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { collection, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
 
 
@@ -8,7 +9,7 @@ import { collection, doc, getDoc, getFirestore, setDoc } from 'firebase/firestor
 
 function Detail_Soup({ route, navigation }) {
   const { foodID } = route.params;
-  const [note, setNote]= useState("");
+  const [note, setNote] = useState("");
 
   const [foodcount, setFoodCount] = useState([]);
   const [foodDetail, setFoodDetail] = useState([]);
@@ -18,45 +19,45 @@ function Detail_Soup({ route, navigation }) {
   const [quantity, setQuantity] = useState(1);
   const [cart, setCart] = useState([]);
 
-  const checkProductInCart = async () => {
-    const cartRef = firebase.firestore().collection('Cart');
-    const cartSnapshot = await cartRef.get();
-    const cartDocs = cartSnapshot.docs;
-  
-    // Duyệt qua tất cả các document trong collection 'Cart'
-    for (const doc of cartDocs) {
-      const cartData = doc.data();
-      const foodDetails = cartData.foodDetails;
-  
-      // Duyệt qua tất cả các food item trong field 'foodDetails' của document
-      for (const foodItem of foodDetails) {
-        if (foodItem.foodID === foodID) {
-          // Nếu foodID đã có trong giỏ hàng thì trả về true
-          return true;
-        }
-      }
-    }
-  
-    // Nếu không tìm thấy foodID trong giỏ hàng thì trả về false
-    return false;
-  };
-  
   const handleNoteChange = (text) => {
     setNote(text); // Cập nhật giá trị của note khi người dùng nhập liệu vào TextInput
   };
 
   const addToCart = async () => {
+    const userId = firebase.auth().currentUser.uid;
+    const cartRef = firebase.firestore().collection('Cart').doc(userId);
     try {
-        const isAddedToCart = await checkProductInCart();
-
-    if (isAddedToCart) {
-      console.log('Sản phẩm đã có trong giỏ hàng');
-      alert('Món ăn đã có trong giỏ hàng');
-      return;
-    }
-      const cartRef = firebase.firestore().collection('Cart');
-      const cartDocRef = cartRef.doc();
-
+      // Kiểm tra xem món ăn đã tồn tại trong giỏ hàng chưa
+      const snapshot = await cartRef.collection('cartItems').get();
+      if (snapshot.docs.length > 0) {
+        // Kiểm tra từng document để tìm foodID giống với foodID mà bạn muốn kiểm tra
+        for (let i = 0; i < snapshot.docs.length; i++) {
+          const foodDetails = snapshot.docs[i].data().foodDetails;
+          for (let j = 0; j < foodDetails.length; j++) {
+            if (foodDetails[j].foodID === foodID) {
+              // Món ăn đã tồn tại trong giỏ hàng, không thêm vào nữa
+              console.log('Món ăn đã tồn tại trong giỏ hàng');
+              alert('Món ăn đã tồn tại trong giỏ hàng');
+              return;
+            }
+          }
+        }
+      }
+      // Kiểm tra nếu đã có đơn hàng chưa hoàn thành thì không cho đặt thêm
+      const orderRef = firebase.firestore().collection('Orders').where('uid', '==', userId);
+      const orderSnapshot = await orderRef.get();
+      if (!orderSnapshot.empty) {
+          alert('Bạn đã có đơn hàng chưa hoàn thành. Vui lòng đợi trong ít phút trước khi đặt đơn hàng mới.');
+          return;
+      }
+      // Kiểm tra nếu đã có đơn hàng chưa hoàn thành thì không cho đặt thêm
+      const deliverRef = firebase.firestore().collection('Delivering').where('uid', '==', userId);
+      const deliverSnapshot = await deliverRef.get();
+      if (!deliverSnapshot.empty) {
+          alert('Bạn đã có đơn hàng chưa hoàn thành. Vui lòng đợi trong ít phút trước khi đặt đơn hàng mới.');
+          return;
+      }
+      const cartDocRef = cartRef.collection('cartItems').doc();
       const foodItem = {
         foodID: foodID,
         name: foodDetail.name,
@@ -66,21 +67,14 @@ function Detail_Soup({ route, navigation }) {
         denominations: foodDetail.denominations,
         note: note.toString()
       };
-
       await cartDocRef.set({
         foodDetails: firebase.firestore.FieldValue.arrayUnion(foodItem),
-      }, { merge: true }); // Sử dụng option {merge: true} để cập nhật field 'foodDetails' mà không ghi đè lên những fields khác
-
-
+      }, { merge: true });
       console.log('Đã thêm sản phẩm vào giỏ hàng');
     } catch (error) {
       console.error('Lỗi khi thêm sản phẩm vào giỏ hàng:', error);
     }
   };
-
-
-
-
 
   const increaseQuantity = () => {
     setQuantity(quantity + 1);
@@ -120,7 +114,7 @@ function Detail_Soup({ route, navigation }) {
             width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
             borderWidth: 2, borderColor: '#13625D',
-          }} onPress={() => navigation.navigate('Meat_List')}>
+          }} onPress={() => navigation.navigate('Soup_List')}>
             <Image style={{
               height: 38, width: 38, borderRadius: 360,
             }} source={require('../image/return.png')} />
@@ -144,7 +138,7 @@ function Detail_Soup({ route, navigation }) {
         </View>
       </View>
 
-      <ScrollView style={{
+      <KeyboardAwareScrollView style={{
         position: 'absolute',
         top: 200,
         left: 0,
@@ -154,6 +148,7 @@ function Detail_Soup({ route, navigation }) {
         paddingTop: 230
       }}>
         <View style={{ width: '100%' }}>
+
           <View style={{ backgroundColor: '#DFAE30', height: 700, borderTopRightRadius: 60, borderTopLeftRadius: 60 }}>
             <View style={{ alignItems: 'center', paddingTop: 15 }}>
               <Text style={{ fontSize: 30, color: '#2947E1' }}>{foodDetail.name}</Text>
@@ -180,17 +175,35 @@ function Detail_Soup({ route, navigation }) {
               <Text style={{ marginLeft: 5, fontSize: 20 }}>{foodDetail.price}</Text>
               <Text style={{ marginLeft: 2, fontSize: 20 }}>{foodDetail.denominations}</Text>
             </View>
-           
-              <View style={{ alignItems: 'center', paddingTop:10}}>
-                <View style={{ backgroundColor: 'white', width: 340,height:100, borderWidth: 1, borderRadius:10 }}>
-                  <TextInput style={{ marginLeft: 10, fontSize:16 }} placeholder='ghi chú cho món ăn...'  onChangeText={handleNoteChange}>
-                  </TextInput>
-                </View>
+
+            <View style={{ alignItems: 'center', paddingTop: 10 }}>
+
+            <View style={{ backgroundColor: 'white', width: 340, height: 100, borderWidth: 1, borderRadius: 10 }}>
+                <TextInput
+                  style={{
+                    marginLeft: 10,
+                    fontSize: 16,
+                    width: 310,
+                    height: 90,
+                    paddingTop: 10, // căn lề trên
+                    textAlignVertical:'top'
+                  }}
+                  placeholder='ghi chú cho món ăn...'
+                  multiline={true} // đa dòng
+                  onChangeText={handleNoteChange}
+                  onKeyPress={({ nativeEvent }) => {
+                    if (nativeEvent.key === 'Enter' && nativeEvent.returnKeyType === 'done') {
+                      Keyboard.dismiss();
+                    }
+                  }}
+                  returnKeyType={'done'}
+                />
               </View>
             </View>
-          
+          </View>
+
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
 
 

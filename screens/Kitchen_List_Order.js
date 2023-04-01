@@ -35,12 +35,47 @@ function Kitchen_List_Order({ navigation }) {
     const handleKitchenStatusUpdate = async (orderId) => {
         try {
             // Lấy thông tin đơn hàng từ collection "Kitchen"
-            const kitchenRef = firebase.firestore().collection("Kitchen").doc(orderId);
-            const kitchenSnapshot = await kitchenRef.get();
-            const kitchenData = kitchenSnapshot.data();
+
+
+            const querySnapshot = await firebase.firestore().collectionGroup('orders').get();
+
+            const orderCustomerIds = [];
+            querySnapshot.forEach((doc) => {
+                orderCustomerIds.push(doc.ref.parent.parent.id);
+                // doc.ref.parent là bộ sưu tập con "orders"
+                // doc.ref.parent.parent là bộ sưu tập cha "OrderCustomer"
+            });
+
+            const KitchenRef = firebase.firestore().collectionGroup('Kitchen');
+            const kitchenSnapshot = await KitchenRef.get();
+            const kitchenData = kitchenSnapshot.docs[0].data();
+
+
+            const orderCustomerId = [];
+            kitchenSnapshot.forEach((doc) => {
+                orderCustomerId.push(doc.id);
+            });
+
+            if (orderCustomerId.length >= orderCustomerIds.length || orderCustomerId.length <= orderCustomerIds.length) {
+                // nested loop để so sánh id của 2 mảng
+                for (let i = 0; i < orderCustomerId.length; i++) {
+                    for (let j = 0; j < orderCustomerIds.length; j++) {
+                        if (orderCustomerId[i] === orderCustomerIds[j]) {
+                            // nếu có id nào trùng nhau thì ta sẽ thay đổi trạng thái của document trong subcollection orders
+                            const orderId = querySnapshot.docs[j].id;
+                            const orderRef = querySnapshot.docs[j].ref;
+                            orderRef.update({
+                                status: "Đang chế biến",
+                                imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/cooking.png?alt=media&token=3e9b95c4-9499-4911-95a9-a043305cd340'
+                            });
+                            console.log(`Updated order with id ${orderId}`);
+                        }
+                    }
+                }
+            }
 
             // Kiểm tra trạng thái đơn hàng
-            if (kitchenData.status === "Chờ bếp nhận đơn") {
+            if (kitchenData.status === "Chờ bếp nhận đơn" || kitchenData.status === "Chờ bếp xác nhận lại") {
                 // Cập nhật trạng thái đơn món thành "Đang chế biến" và lưu vào collection "Orders"
                 const orderRef = firebase.firestore().collection("Orders").doc(orderId);
                 await orderRef.update({
@@ -55,19 +90,21 @@ function Kitchen_List_Order({ navigation }) {
                     status: "Đang chế biến",
                     imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/cooking.png?alt=media&token=3e9b95c4-9499-4911-95a9-a043305cd340',
                     cookingTime: firebase.firestore.FieldValue.serverTimestamp()
-                }); 
+                });
 
                 // Không xóa đơn món khỏi collection Kitchen mà chuyển đến collection Cooking
                 const cookingRef = firebase.firestore().collection('Cooking').doc(orderId);
-                await  cookingRef.set({
+                await cookingRef.set({
                     ...kitchenData,
                     status: "Đang chế biến",
                     imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/cooking.png?alt=media&token=3e9b95c4-9499-4911-95a9-a043305cd340',
                     cookingTime: firebase.firestore.FieldValue.serverTimestamp()
-                }); 
+                });
 
                 // Xóa đơn hàng khỏi collection "Kitchen"
-                await kitchenRef.delete();
+                kitchenSnapshot.forEach(async (doc) => {
+                    await doc.ref.delete();
+                });
 
                 alert("Bếp đã nhận đơn món và bắt đầu chế biến!");
             } else {
@@ -78,6 +115,29 @@ function Kitchen_List_Order({ navigation }) {
             alert("Có lỗi xảy ra khi cập nhật trạng thái đơn hàng!");
         }
     };
+    const handleKitchenBackStatusUpdate = async (orderId) => {
+        try {
+          // Lấy đối tượng đơn hàng trong Collection Orders
+          const orderRef = firebase.firestore().collection('Orders').doc(orderId);
+          const orderDoc = await orderRef.get();
+      
+          // Cập nhật trạng thái đơn hàng là "Trả đơn"
+          await orderRef.update({
+            status: 'Trả đơn',
+            imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/rejected.png?alt=media&token=6fa60c08-56a2-4d6e-a8db-b2d0048d2c1a',
+          });
+          console.log(`Updated order with id ${orderId}`);
+      
+          // Xóa đơn hàng khỏi danh sách Collection Cooking
+          const cookingRef = firebase.firestore().collection('Kitchen').doc(orderId);
+          await cookingRef.delete();
+          console.log(`Deleted cooking order with id ${orderId}`);
+      
+        } catch (error) {
+          console.error('Error updating order and deleting cooking order:', error);
+        }
+      };
+      
 
 
 
@@ -129,7 +189,7 @@ function Kitchen_List_Order({ navigation }) {
                                             , borderRadius: 30, borderWidth: 1, flexDirection: 'row'
                                         }}>
                                             <Image style={{
-                                                height: 25, width: 25, marginRight: 5
+                                                height: 25, width: 25,
                                             }} source={{
                                                 uri: item.imageStatus
                                             }} />
@@ -162,7 +222,7 @@ function Kitchen_List_Order({ navigation }) {
                                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                                     <View style={{ alignItems: 'center', justifyContent: 'center', flexDirection: 'column', height: 100, width: 140, paddingBottom: 2 }}>
                                         <View style={{ paddingTop: 10 }}>
-                                            <TouchableOpacity onPress={() => handleOrderStatusUpdate(item.key)}>
+                                            <TouchableOpacity onPress={() => handleKitchenBackStatusUpdate(item.key)}>
                                                 <View style={{
                                                     backgroundColor: '#86D3D3', height: 40, width: 120, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, justifyContent: 'center',
 
