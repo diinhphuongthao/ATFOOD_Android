@@ -42,7 +42,7 @@ import { firebase } from '../config'
               </View>
               <View style={{ paddingTop: 20, }}>
                   <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
-                      <Text style={{ fontSize: 18 }}>Soup</Text>
+                      <Text style={{ fontSize: 18 }}>Món canh</Text>
                   </View>
               </View>
               <View style={{ paddingTop: 15, marginRight: 15 }}>

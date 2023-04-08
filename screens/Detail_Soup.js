@@ -122,7 +122,7 @@ function Detail_Soup({ route, navigation }) {
         </View>
         <View style={{ paddingTop: 20, }}>
           <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ fontSize: 18 }}>Detail</Text>
+            <Text style={{ fontSize: 18 }}>Chi tiết</Text>
           </View>
         </View>
         <View style={{ paddingTop: 15, marginRight: 15 }}>

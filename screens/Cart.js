@@ -147,6 +147,8 @@ function Cart({ navigation }) {
         const ordersRef = firebase.firestore().collection('Orders');
         const order = {
             uid: userId,
+            address: userData.address,
+            coordinate: userData.coordinate,
             customerName: userData.name,
             customerPhone: userData.phone,
             items: cartItems,
@@ -262,7 +264,7 @@ function Cart({ navigation }) {
                 </View>
                 <View style={{ paddingTop: 20, }}>
                     <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
-                        <Text style={{ fontSize: 18 }}>Cart</Text>
+                        <Text style={{ fontSize: 18 }}>Giỏ hàng</Text>
                     </View>
                 </View>
                 <View style={{ paddingTop: 15, marginRight: 15 }}>
@@ -308,7 +310,7 @@ function Cart({ navigation }) {
                             borderWidth: 1,
 
                         }} onPress={sendOrder}>
-                            <Text style={{ fontSize: 18, }}>Confirm Order</Text>
+                            <Text style={{ fontSize: 18, }}>Xác nhận đơn</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

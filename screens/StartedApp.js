@@ -30,7 +30,7 @@ function StartedApp({ navigation }) {
                             , borderColor: '#13625D'
                         }}>
                             <View>
-                                <Text style={{ marginLeft: 12, fontSize: 18, color: '#000000' }}>Get Started</Text>
+                                <Text style={{ marginLeft: 12, fontSize: 18, color: '#000000' }}>Bắt đầu</Text>
                             </View>
                             <View>
                                 <Image style={{ marginLeft: 5, height: 18, width: 32, }} source={require('../image/right_arow.png')} />

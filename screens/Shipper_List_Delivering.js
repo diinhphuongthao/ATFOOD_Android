@@ -86,6 +86,9 @@ function Shipper_List_Delivering({ navigation }) {
             console.log(`Error updating delivery status: ${error}`);
         }
     };
+    const handleMap = async () => {
+        
+    };
 
 
 

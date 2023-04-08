@@ -20,7 +20,7 @@ function List_Food({ navigation }) {
         </View>
         <View style={{ paddingTop: 20, }}>
           <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ fontSize: 18 }}>Food order</Text>
+            <Text style={{ fontSize: 18 }}>Loại món ăn</Text>
           </View>
         </View>
         <View style={{ paddingTop: 15, marginRight: 15 }}>
@@ -51,7 +51,7 @@ function List_Food({ navigation }) {
 
               }}>
                 <Image style={{ height: 50, width: 50, }} source={require('../image/meal.png')} />
-                <Text style={{ fontSize: 18, paddingTop: 5 }}>Meat</Text>
+                <Text style={{ fontSize: 18, paddingTop: 5 }}>Món thịt</Text>
               </TouchableOpacity>
             </View>
             <View style={{ paddingTop: 20 }}>
@@ -62,7 +62,7 @@ function List_Food({ navigation }) {
                 ,
               }}>
                 <Image style={{ height: 50, width: 50, }} source={require('../image/fish_01.png')} />
-                <Text style={{ fontSize: 18, paddingTop: 5 }}>Fish</Text>
+                <Text style={{ fontSize: 18, paddingTop: 5 }}>Món cá</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -76,7 +76,7 @@ function List_Food({ navigation }) {
                 ,
               }}>
                 <Image style={{ height: 50, width: 50, }} source={require('../image/hot_soup.png')} />
-                <Text style={{ fontSize: 18, paddingTop: 5 }}>Soup</Text>
+                <Text style={{ fontSize: 18, paddingTop: 5 }}>Món canh</Text>
               </TouchableOpacity>
             </View>
             <View style={{ paddingTop: 20 }}>
@@ -87,7 +87,7 @@ function List_Food({ navigation }) {
                 ,
               }}>
                 <Image style={{ height: 50, width: 50, }} source={require('../image/soft_drink.png')} />
-                <Text style={{ fontSize: 18, paddingTop: 5 }}>Drink</Text>
+                <Text style={{ fontSize: 18, paddingTop: 5 }}>Thức uống</Text>
               </TouchableOpacity>
             </View>
           </View>

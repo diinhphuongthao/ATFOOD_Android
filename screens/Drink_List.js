@@ -42,7 +42,7 @@ function Drink_List({navigation}) {
               </View>
               <View style={{ paddingTop: 20, }}>
                   <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
-                      <Text style={{ fontSize: 18 }}>Fish</Text>
+                      <Text style={{ fontSize: 18 }}>Thức uống</Text>
                   </View>
               </View>
               <View style={{ paddingTop: 15, marginRight: 15 }}>

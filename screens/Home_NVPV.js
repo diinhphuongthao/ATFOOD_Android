@@ -35,7 +35,7 @@ function Home_NVPV({ navigation }) {
 
           <View style={{ marginLeft: 10 }}>
             <View style={{}}>
-              <TouchableOpacity onPress={() => navigation.navigate('Chat_NVPV')} style={{
+              <TouchableOpacity onPress={() => navigation.navigate('Chat')} style={{
                 width: 160, height: 100, backgroundColor: '#ffffff', alignItems: 'center', justifyContent: 'center'
                 , borderRadius: 20
                 , borderWidth: 1

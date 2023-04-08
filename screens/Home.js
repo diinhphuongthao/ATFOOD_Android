@@ -144,7 +144,7 @@ function Home({ navigation }) {
           , borderWidth: 1
         }}>
           <Image style={{ height: 28, width: 28, }} source={require('../image/table.png')} />
-          <Text style={{ fontSize: 11 }}>Table reservations</Text>
+          <Text style={{ fontSize: 11 }}>Đặt bàn</Text>
         </TouchableOpacity>
         <TouchableOpacity  onPress={() => navigation.navigate('List_Food')} style={{
           width: 102, height: 54, backgroundColor: '#ffffff', alignItems: 'center', justifyContent: 'center'
@@ -152,15 +152,15 @@ function Home({ navigation }) {
           , borderWidth: 1
         }}>
           <Image style={{ height: 28, width: 28, }} source={require('../image/order.png')} />
-          <Text style={{ fontSize: 11 }}>Food order</Text>
+          <Text style={{ fontSize: 11 }}>Đặt món</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{
           width: 102, height: 54, backgroundColor: '#ffffff', marginLeft: 20, alignItems: 'center', justifyContent: 'center'
           , borderRadius: 10
           , borderWidth: 1
-        }}>
-          <Image style={{ height: 28, width: 28, }} source={require('../image/food.png')} />
-          <Text style={{ fontSize: 11, marginRight: 3 }}>Menu</Text>
+        }} onPress={() => navigation.navigate('Chat_NVPV')}>
+          <Image style={{ height: 28, width: 28, }} source={require('../image/chat_box.png')} />
+          <Text style={{ fontSize: 11, marginRight: 3 }}>Nhắn tin</Text>
         </TouchableOpacity>
       </View>
 

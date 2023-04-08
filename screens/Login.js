@@ -78,7 +78,7 @@ function Login({ navigation }) {
             <View style={{ paddingTop: 2, justifyContent: 'center' }}>
               <Image style={{ height: 30, width: 30, marginLeft: 10, }} source={require('../image/pass.png')} />
             </View>
-            <TextInput secureTextEntry={true} placeholder='Password'
+            <TextInput secureTextEntry={true} placeholder='Mật khẩu'
               onChangeText={(password) => setPassword(password)}
               autoCapitalize="none"
               autoCorrect={false}
@@ -97,13 +97,13 @@ function Login({ navigation }) {
           />
           <Text style={{
             fontSize: 14, fontWeight: 'bold', color: '#CCF0EA', marginLeft: 5
-          }}>Remember Password</Text>
+          }}>Nhớ mật khẩu</Text>
         </View>
-        <View style={{ alignItems: 'center', paddingTop: 15, marginLeft: 42 }}>
+        <View style={{ alignItems: 'center', paddingTop: 15, marginLeft: 66 }}>
           <TouchableOpacity><Text style={{
             fontSize: 14, fontWeight: 'bold', color: '#CCF0EA'
             , borderBottomWidth: 1, borderColor: '#13625D'
-          }}>Forgot password?</Text></TouchableOpacity>
+          }}>Quên mật khẩu?</Text></TouchableOpacity>
         </View>
       </View>
 
@@ -114,7 +114,7 @@ function Login({ navigation }) {
             , borderWidth: 1
             , borderColor: '#13625D'
           }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Sign In</Text>
+            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Đăng nhập</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -141,13 +141,13 @@ function Login({ navigation }) {
 
       <View style={{ alignItems: 'center', paddingTop: 25, }}>
         <View style={{ flexDirection: 'row' }}>
-          <View><Text style={{ fontSize: 16, }}>You don't have account?</Text></View>
+          <View><Text style={{ fontSize: 16, }}>Bạn chưa có tài khoản?</Text></View>
           <View>
             <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
               <Text style={{
                 fontSize: 16, fontWeight: 'bold', marginLeft: 5, color: '#CCF0EA'
                 , borderBottomWidth: 2, borderColor: '#13625D'
-              }}>Sign Up Here</Text>
+              }}>Đăng ký ở đây</Text>
             </TouchableOpacity>
           </View>
         </View>

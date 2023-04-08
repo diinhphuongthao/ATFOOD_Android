@@ -1,21 +1,19 @@
 import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Button, FlatList, TextInput, SafeAreaView, KeyboardAvoidingView } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { firebase } from '../config'
 import moment from 'moment-timezone';
-import { collection, doc, getDoc, getFirestore, setDoc, updateDoc, Timestamp } from 'firebase/firestore'
+import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-
-
-
-
-function Chat_NVPV({ navigation }) {
+function Chat_Detail({ orderId, route, navigation }) {
+  const { itemId } = route.params;
+  // console.log(itemId)
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
 
 
   const currentUser = firebase.auth().currentUser;
-  const orderRef = firebase.firestore().collection('MessageOrders').doc(currentUser.uid);
-
+  const orderRef = firebase.firestore().collection('MessageOrders').doc(itemId);
   const userRef = firebase.firestore().collection('users').doc(currentUser.uid);
   const handleSend = () => {
     if (message === '') {
@@ -26,23 +24,17 @@ function Chat_NVPV({ navigation }) {
         const userData = doc.data();
         const newMessage = {
           content: message,
-          senderId: currentUser.uid,
-          senderName: userData.name,
-          senderPhone: userData.phone,
+          nvid: currentUser.uid,
+          nvName: userData.name,
+          nvPhone: userData.phone,
           time: new Date().getTime()
         };
         const newMessage2 = {
-
-          id: currentUser.uid,
-          senderName: userData.name,
-          senderPhone: userData.phone,
-
+          nvid: currentUser.uid,
+          nvName: userData.name,
+          nvPhone: userData.phone,
         };
-
-
-
-
-        setMessages([...messages, newMessage,]);
+        setMessages([...messages, newMessage, newMessage2]);
         setMessage('');
 
         // Lưu tin nhắn mới vào database
@@ -65,17 +57,7 @@ function Chat_NVPV({ navigation }) {
     });
   }
 
-
   const renderItem = ({ item }) => {
-    const timestamp = item.time;
-    const date = new Date(timestamp);
-    // const year = date.getFullYear();
-    // const month = ('0' + (date.getMonth() + 1)).slice(-2);
-    // const day = ('0' + date.getDate()).slice(-2);
-    const hours = ('0' + date.getHours()).slice(-2);
-    const minutes = ('0' + date.getMinutes()).slice(-2);
-    const seconds = ('0' + date.getSeconds()).slice(-2);
-    const dateString = `${hours}:${minutes}:${seconds}`;
     let sender = item.senderName;
     let textStyle = styles.messageContainer; // Mặc định là style của senderName
 
@@ -87,13 +69,10 @@ function Chat_NVPV({ navigation }) {
     return (
       <View style={textStyle}>
         <Text style={styles.messageText}>{item.content}</Text>
-        <Text style={styles.messageInfo}>{`${sender}  
-        ${dateString}`}</Text>
+        <Text style={styles.messageInfo}>{`${sender} • ${item.time}`}</Text>
       </View>
     );
   };
-
-
 
   React.useEffect(() => {
     const unsubscribe = orderRef.collection('messages')
@@ -116,7 +95,7 @@ function Chat_NVPV({ navigation }) {
       })
       .then(() => {
         orderRef.delete().then(() => {
-          navigation.navigate('Home');
+          navigation.navigate('Chat');
         });
       })
       .catch(error => {
@@ -125,18 +104,16 @@ function Chat_NVPV({ navigation }) {
   }
 
 
-
-
-
   return (
     <SafeAreaView style={styles.container}>
+
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
         <View style={{ paddingTop: 15, marginLeft: 15 }}>
           <TouchableOpacity style={{
             width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
             borderWidth: 2, borderColor: '#13625D',
-          }} onPress={handleDeleteConversation}>
+          }} onPress={() => navigation.navigate('Chat')}>
             <Image style={{
               height: 38, width: 38, borderRadius: 360,
             }} source={require('../image/return.png')} />
@@ -152,7 +129,7 @@ function Chat_NVPV({ navigation }) {
             width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
             borderWidth: 2, borderColor: '#13625D',
-          }}>
+          }} onPress={handleDeleteConversation}>
             {/* <Image style={{
               height: 26, width: 26
             }} source={require('../image/cart.png')} /> */}
@@ -164,14 +141,12 @@ function Chat_NVPV({ navigation }) {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
       >
-
         <FlatList
           data={messages}
           renderItem={renderItem}
           keyExtractor={(item, index) => index.toString()}
           inverted={true}
         />
-
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
@@ -186,7 +161,6 @@ function Chat_NVPV({ navigation }) {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-
     </SafeAreaView>
   );
 };
@@ -252,4 +226,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-export default Chat_NVPV;
+export default Chat_Detail;

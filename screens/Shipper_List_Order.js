@@ -1,10 +1,12 @@
-import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Button, FlatList, TextInput, Alert, query, where } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Button, FlatList, TextInput, Alert, query, where, Linking } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react'
 import { firebase } from '../config'
 import moment from 'moment-timezone';
 import { collection, doc, getDoc, getFirestore, setDoc, updateDoc, onSnapshot } from 'firebase/firestore'
+import Geocoder from 'react-native-geocoding';
 
-function Shipper_List_Order({ navigation }) {
+function Shipper_List_Order({ navigation,orderId }) {
+
   const handlePress = () => {
     navigation.goBack();
   };
@@ -112,6 +114,39 @@ function Shipper_List_Order({ navigation }) {
   };
 
 
+
+
+  const handleDeliveryAddressSearch = async (orderId) => {
+    try {
+      const deliveryRef = firebase.firestore().collection("Deliverys").doc(orderId);
+      const deliverySnapshot = await deliveryRef.get();
+      const deliveryData = deliverySnapshot.data();
+  
+      if (deliveryData) {
+        const address = deliveryData.address;
+  
+        // Get the location of IUH
+        const iuhLocation = "Khu phố 6, phường Linh Trung, Thủ Đức, Thành phố Hồ Chí Minh";
+        
+        // Create URL for Google Maps with directions
+        const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}&dir_action=navigate&travelmode=driving&origin=${encodeURIComponent(iuhLocation)}`;
+  
+        // Open Google Maps app with directions
+        Linking.openURL(directionsUrl);
+      } else {
+        alert("Không tìm thấy thông tin địa chỉ của đơn hàng!");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Có lỗi xảy ra khi tìm kiếm địa chỉ đơn hàng!");
+    }
+  };
+  
+  
+
+  
+
+
   return (
     <View style={{ backgroundColor: '#DDF0F0', height: '100%' }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
@@ -194,7 +229,7 @@ function Shipper_List_Order({ navigation }) {
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                   <View style={{ alignItems: 'center', justifyContent: 'center', flexDirection: 'column', height: 100, width: 140, paddingBottom: 2 }}>
                     <View style={{ paddingTop: 10 }}>
-                      <TouchableOpacity onPress={() => handleOrderStatusUpdate(item.key)}>
+                      <TouchableOpacity onPress={() =>handleDeliveryAddressSearch(item.key)}>
                         <View style={{
                           backgroundColor: '#86D3D3', height: 40, width: 120, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, justifyContent: 'center',
 
