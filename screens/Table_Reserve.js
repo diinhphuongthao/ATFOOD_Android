@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore'
 
-function Table_NVPV({navigation}) {
+function Table_Reserve({ navigation }) {
   const [tables, setTables] = useState([]);
 
   useEffect(() => {
@@ -26,9 +26,6 @@ function Table_NVPV({navigation}) {
   
     return unsubscribe;
   }, []);
-  
-
-
   return (
     <View style={{ backgroundColor: '#DDF0F0', height: '100%' }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
@@ -37,7 +34,7 @@ function Table_NVPV({navigation}) {
             width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
             borderWidth: 2, borderColor: '#13625D',
-          }} onPress={() => navigation.navigate('Home_NVPV')}>
+          }} onPress={() => navigation.navigate('Home')}>
             <Image style={{
               height: 38, width: 38, borderRadius: 360,
             }} source={require('../image/return.png')} />
@@ -84,9 +81,9 @@ function Table_NVPV({navigation}) {
 
                 {item.amount == 10 ? (
                   <TouchableOpacity onPress={() => {
-                   
-                      navigation.navigate('Table_NVPV_Detail', { TableId: item.id });
-                    
+                    if (item.status !== "đang chờ") {
+                      navigation.navigate('Table_Reserve_Detail', { TableId: item.id });
+                    }
                   }} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                     <View style={{ flexDirection: 'column' }}>
                       <View style={{ height: 20, width: 20, backgroundColor: item.status === "đang chờ" ? "#FFFF00" : item.status === "đã đặt" ? "#F54E4E" : "#16BB13", padding: 10, marginHorizontal: 3, borderWidth: 2, borderRadius: 5, marginVertical: 5 }}></View>
@@ -111,9 +108,9 @@ function Table_NVPV({navigation}) {
                   </TouchableOpacity>
                 ) : item.amount == 9 ? (
                   <TouchableOpacity onPress={() => {
-                   
-                      navigation.navigate('Table_NVPV_Detail', { TableId: item.id });
-                    
+                    if (item.status !== "đang chờ") {
+                      navigation.navigate('Table_Reserve_Detail', { TableId: item.id });
+                    }
                   }} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                     <View style={{ flexDirection: 'column' }}>
                       <View style={{ height: 20, width: 20, backgroundColor: item.status === "đang chờ" ? "#FFFF00" : item.status === "đã đặt" ? "#F54E4E" : "#16BB13", padding: 10, marginHorizontal: 3, borderWidth: 2, borderRadius: 5, marginVertical: 5 }}></View>
@@ -137,9 +134,9 @@ function Table_NVPV({navigation}) {
                   </TouchableOpacity>
                 ) : item.amount == 8 ? (
                   <TouchableOpacity onPress={() => {
-                   
-                      navigation.navigate('Table_NVPV_Detail', { TableId: item.id });
-                    
+                    if (item.status !== "đang chờ") {
+                      navigation.navigate('Table_Reserve_Detail', { TableId: item.id });
+                    }
                   }} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                     <View style={{ flexDirection: 'column' }}>
                       <View style={{ height: 20, width: 20, backgroundColor: item.status === "đang chờ" ? "#FFFF00" : item.status === "đã đặt" ? "#F54E4E" : "#16BB13", padding: 10, marginHorizontal: 3, borderWidth: 2, borderRadius: 5, marginVertical: 5 }}></View>
@@ -162,9 +159,9 @@ function Table_NVPV({navigation}) {
                   </TouchableOpacity>
                 ) : item.amount == 7 ? (
                   <TouchableOpacity onPress={() => {
-                   
-                      navigation.navigate('Table_NVPV_Detail', { TableId: item.id });
-                    
+                    if (item.status !== "đang chờ") {
+                      navigation.navigate('Table_Reserve_Detail', { TableId: item.id });
+                    }
                   }} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                     <View style={{ flexDirection: 'column' }}>
                       <View style={{ height: 20, width: 20, backgroundColor: item.status === "đang chờ" ? "#FFFF00" : item.status === "đã đặt" ? "#F54E4E" : "#16BB13", padding: 10, marginHorizontal: 5, borderWidth: 2, borderRadius: 5, marginVertical: 5 }}></View>
@@ -186,9 +183,9 @@ function Table_NVPV({navigation}) {
                   </TouchableOpacity>
                 ) : item.amount == 6 ? (
                   <TouchableOpacity onPress={() => {
-                   
-                      navigation.navigate('Table_NVPV_Detail', { TableId: item.id });
-                    
+                    if (item.status !== "đang chờ") {
+                      navigation.navigate('Table_Reserve_Detail', { TableId: item.id });
+                    }
                   }} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                     <View style={{ flexDirection: 'column' }}>
                       <View style={{ height: 20, width: 20, backgroundColor: item.status === "đang chờ" ? "#FFFF00" : item.status === "đã đặt" ? "#F54E4E" : "#16BB13", padding: 10, marginHorizontal: 5, borderWidth: 2, borderRadius: 5, marginVertical: 10 }}></View>
@@ -209,9 +206,9 @@ function Table_NVPV({navigation}) {
                   </TouchableOpacity>
                 ) : item.amount == 5 ? (
                   <TouchableOpacity onPress={() => {
-                   
-                      navigation.navigate('Table_NVPV_Detail', { TableId: item.id });
-                    
+                    if (item.status !== "đang chờ") {
+                      navigation.navigate('Table_Reserve_Detail', { TableId: item.id });
+                    }
                   }} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                     <View style={{ flexDirection: 'column' }}>
                       <View style={{ height: 20, width: 20, backgroundColor: item.status === "đang chờ" ? "#FFFF00" : item.status === "đã đặt" ? "#F54E4E" : "#16BB13", padding: 10, marginHorizontal: 5, borderWidth: 2, borderRadius: 5, marginVertical: 10 }}></View>
@@ -232,9 +229,9 @@ function Table_NVPV({navigation}) {
 
                 ) : item.amount == 4 ? (
                   <TouchableOpacity onPress={() => {
-                   
-                      navigation.navigate('Table_NVPV_Detail', { TableId: item.id });
-                    
+                    if (item.status !== "đang chờ") {
+                      navigation.navigate('Table_Reserve_Detail', { TableId: item.id });
+                    }
                   }} style={{ justifyContent: 'center', alignItems: 'center' }}>
                     <View style={{ flexDirection: 'row' }}>
                       <View style={{ height: 20, width: 20, backgroundColor: item.status === "đang chờ" ? "#FFFF00" : item.status === "đã đặt" ? "#F54E4E" : "#16BB13", padding: 10, marginHorizontal: 5, borderWidth: 2, borderRadius: 5, marginVertical: 10 }}></View>
@@ -253,9 +250,9 @@ function Table_NVPV({navigation}) {
                 ) : item.amount == 3 ? (
                   <TouchableOpacity
                     onPress={() => {
-                     
-                        navigation.navigate('Table_NVPV_Detail', { TableId: item.id });
-                      
+                      if (item.status !== "đang chờ") {
+                        navigation.navigate('Table_Reserve_Detail', { TableId: item.id });
+                      }
                     }} style={{ justifyContent: 'center', alignItems: 'center' }}>
                     <View style={{ flexDirection: 'row' }}>
                       <View style={{ height: 20, width: 20, backgroundColor: item.status === "đang chờ" ? "#FFFF00" : item.status === "đã đặt" ? "#F54E4E" : "#16BB13", padding: 10, marginHorizontal: 5, borderWidth: 2, borderRadius: 5, marginVertical: 10 }}></View>
@@ -270,9 +267,9 @@ function Table_NVPV({navigation}) {
                 ) : (
                   <TouchableOpacity
                     onPress={() => {
-                     
-                        navigation.navigate('Table_NVPV_Detail', { TableId: item.id });
-                      
+                      if (item.status !== "đang chờ") {
+                        navigation.navigate('Table_Reserve_Detail', { TableId: item.id });
+                      }
                     }} style={{ justifyContent: 'center', alignItems: 'center' }}>
                     <View style={{ height: 20, width: 20, backgroundColor: item.status === "đang chờ" ? "#FFFF00" : item.status === "đã đặt" ? "#F54E4E" : "#16BB13", padding: 10, marginVertical: 5, borderWidth: 2, borderRadius: 5 }}></View>
                     <View style={{ backgroundColor: item.status === "đang chờ" ? "#FFFF00" : item.status === "đã đặt" ? "#F54E4E" : "#16BB13", padding: 10, borderWidth: 2, borderRadius: 20, height: 60, justifyContent: 'center', alignItems: 'center', width: 100 }}>
@@ -297,5 +294,8 @@ function Table_NVPV({navigation}) {
     </View>
   )
 
+
 }
-export default Table_NVPV;
+
+
+export default Table_Reserve;

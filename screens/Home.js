@@ -138,7 +138,7 @@ function Home({ navigation }) {
       </View>
 
       <View style={{ flexDirection: 'row', justifyContent: 'center', paddingTop: 30, }}>
-        <TouchableOpacity style={{
+        <TouchableOpacity onPress={() => navigation.navigate('Table_Reserve')} style={{
           width: 102, height: 54, backgroundColor: '#ffffff', marginRight: 20, alignItems: 'center', justifyContent: 'center'
           , borderRadius: 10
           , borderWidth: 1

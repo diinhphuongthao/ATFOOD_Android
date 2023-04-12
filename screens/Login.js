@@ -59,14 +59,16 @@ function Login({ navigation }) {
             height: 40, width: 320, backgroundColor: '#ffffff', justifyContent: 'flex-start', borderRadius: 20, marginLeft: 10
             , flexDirection: 'row'
           }}>
-            <View style={{ justifyContent: 'center'}}>
+            <View style={{ justifyContent: 'center' }}>
               <Image style={{ height: 30, width: 30, marginLeft: 10 }} source={require('../image/mail.png')} />
             </View>
             <TextInput placeholder='Email'
+     
               onChangeText={(email) => setEmail(email)}
               autoCapitalize="none"
               autoCorrect={false}
-              style={{ fontSize: 16, marginLeft: 10, width: 250,}}></TextInput>
+
+              style={{ fontSize: 16, marginLeft: 10, width: 250, }}></TextInput>
           </View>
         </View>
 
@@ -78,7 +80,9 @@ function Login({ navigation }) {
             <View style={{ paddingTop: 2, justifyContent: 'center' }}>
               <Image style={{ height: 30, width: 30, marginLeft: 10, }} source={require('../image/pass.png')} />
             </View>
-            <TextInput secureTextEntry={true} placeholder='Mật khẩu'
+            <TextInput
+              secureTextEntry={true}
+              placeholder='Mật khẩu'
               onChangeText={(password) => setPassword(password)}
               autoCapitalize="none"
               autoCorrect={false}
@@ -118,27 +122,6 @@ function Login({ navigation }) {
           </View>
         </TouchableOpacity>
       </View>
-
-
-      {/* <View style={{ alignItems: 'center', paddingTop: 20 }}>
-        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Or Login With</Text>
-      </View>
-
-      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingTop: 10 }}>
-        <TouchableOpacity>
-          <View style={{ backgroundColor: '#ffff00', width: 140, height: 50, borderRadius: 10, justifyContent: 'center',justifyContent: 'center', alignItems: 'center', flexDirection:'row'  }}>
-            <Image style={{ height: 40, width: 40 }} source={require('../image/FB.png')} />
-            <Text style={{marginLeft:5}}>Facebook</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity >
-        <View style={{ backgroundColor: '#ffff00', width: 140, height: 50, marginLeft: 20, borderRadius: 10, justifyContent: 'center', alignItems: 'center', flexDirection:'row' }}>
-            <Image style={{ height: 40, width: 40 }} source={require('../image/GG.png')} />
-            <Text style={{marginLeft:5}}>Google</Text>
-        </View>
-        </TouchableOpacity>
-      </View> */}
-
       <View style={{ alignItems: 'center', paddingTop: 25, }}>
         <View style={{ flexDirection: 'row' }}>
           <View><Text style={{ fontSize: 16, }}>Bạn chưa có tài khoản?</Text></View>
@@ -152,8 +135,6 @@ function Login({ navigation }) {
           </View>
         </View>
       </View>
-
-
       <View style={{ flexDirection: 'row', justifyContent: 'center', marginRight: 14 }}>
         <View style={{ alignItems: 'center', paddingTop: 4, marginRight: 232 }}>
           <Image style={{ height: 118, width: 117, }} source={require('../image/tree.png')} />
