@@ -2,9 +2,9 @@ import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Button, Fl
 import React, { useState, useEffect } from 'react'
 import { firebase } from '../config'
 import moment from 'moment-timezone';
-import { collection, doc, getDoc, getFirestore, setDoc, updateDoc, onSnapshot, writeBatch, getDocs, collectionGroup } from 'firebase/firestore'
+import { collection, doc, getDoc, getFirestore, setDoc, updateDoc, onSnapshot, writeBatch, getDocs, collectionGroup, } from 'firebase/firestore'
 
-function Order_NVPV({ navigation }) {
+function Order_NVPV({ navigation}) {
   const handlePress = () => {
     navigation.goBack();
   };
@@ -154,8 +154,18 @@ function Order_NVPV({ navigation }) {
             style: 'cancel'
           },
           {
-            text: 'Xác nhận',
-            onPress: () => resolve(true),
+            text: 'Hủy đơn vì nhà hàng hết món',
+            onPress: () => resolve('bếp hết nguyên liệu'),
+            style: 'destructive'
+          },
+          {
+            text: 'Hủy đơn vì tài xế đều bận',
+            onPress: () => resolve('tài xế đều bận'),
+            style: 'destructive'
+          },
+          {
+            text: 'Hủy đơn vì nhà hàng đóng cửa',
+            onPress: () => resolve('nhà hàng đóng cửa'),
             style: 'destructive'
           }
         ],
@@ -168,7 +178,9 @@ function Order_NVPV({ navigation }) {
       try {
         const orderRef = doc(firebase.firestore(), 'Orders', orderId);
         await updateDoc(orderRef, {
-          status: 'Đã hủy đơn'
+          status: 'Đã hủy đơn',
+          imageStatus:
+            'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/cancel.png?alt=media&token=ff491b3f-02a3-4ac4-b31b-4bd30d2d3c2c'
         });
         console.log('Order canceled successfully');
       } catch (error) {
@@ -178,26 +190,71 @@ function Order_NVPV({ navigation }) {
 
 
       // Move canceled order to history
-      const historyRef = firebase.firestore().collection('OrderHistory').doc(orderId);
+      const historyRef = firebase.firestore().collection('OrderHistory').doc()
       try {
         await historyRef.set({
           ...order.data(),
-          canceledAt: firebase.firestore.FieldValue.serverTimestamp()
+          status: 'Đã hủy đơn',
+          imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/cancel.png?alt=media&token=ff491b3f-02a3-4ac4-b31b-4bd30d2d3c2c',
+          canceledAt: firebase.firestore.FieldValue.serverTimestamp(),
+          cancelReason: confirmed
         });
         console.log('Order moved to history successfully');
       } catch (error) {
         console.log(`Error moving order to history: ${error}`);
         return;
       }
+  
+      const NotificationRef = firebase.firestore().collection('Notification').doc(orderId).collection('notificate').doc();
       try {
-        const orderRef = doc(firebase.firestore(), 'OrderHistory', orderId);
-        await updateDoc(orderRef, {
+        await NotificationRef.set({
+          ...order.data(),
+          canceledAt: firebase.firestore.FieldValue.serverTimestamp(),
+          cancelReason: confirmed
+        });
+        console.log('Order moved to Notification');
+      } catch (error) {
+        console.log(`Error moving order to Notification: ${error}`);
+        return;
+      }
+
+      const customerRef = firebase.firestore().collection('OrderCustomer').doc(orderId).collection('orders').doc(orderId);
+      const customer = await customerRef.get();
+      if (!customer.exists) {
+        console.log('Order not found');
+        return;
+      }
+
+      try {  
+        await customerRef.update({
           status: 'Đã hủy đơn',
           imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/cancel.png?alt=media&token=ff491b3f-02a3-4ac4-b31b-4bd30d2d3c2c'
         });
         console.log('Order canceled successfully');
       } catch (error) {
         console.log(`Error canceling order: ${error}`);
+        return;
+      }
+
+      const HisRef = firebase.firestore().collection('History').doc(orderId).collection('orders').doc();
+      try {  
+        await HisRef.set({
+          ...order.data(),
+          status: 'Đã hủy đơn',
+          imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/cancel.png?alt=media&token=ff491b3f-02a3-4ac4-b31b-4bd30d2d3c2c'
+        });
+        console.log('Order canceled successfully');
+      } catch (error) {
+        console.log(`Error canceling order: ${error}`);
+        return;
+      }
+
+
+      try {
+        await customerRef.delete();
+        console.log('Order removed from current list successfully');
+      } catch (error) {
+        console.log(`Error removing order from current list: ${error}`);
         return;
       }
 
@@ -209,6 +266,8 @@ function Order_NVPV({ navigation }) {
         console.log(`Error removing order from current list: ${error}`);
         return;
       }
+
+
     }
   };
 
@@ -301,6 +360,12 @@ function Order_NVPV({ navigation }) {
     }
   };
 
+
+  const onPressOrderHistory = () => {
+    navigation.navigate('Order_History_NVPV');
+  }
+  
+
   return (
     <View style={{ backgroundColor: '#DDF0F0', height: '100%' }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
@@ -325,7 +390,7 @@ function Order_NVPV({ navigation }) {
             width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
             borderWidth: 2, borderColor: '#13625D',
-          }} onPress={() => navigation.navigate('Order_History_NVPV')}>
+          }} onPress={onPressOrderHistory}>
             <Image style={{
               height: 30, width: 30
             }} source={require('../image/order_history.png')} />

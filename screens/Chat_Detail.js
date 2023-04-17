@@ -58,6 +58,15 @@ function Chat_Detail({ orderId, route, navigation }) {
   }
 
   const renderItem = ({ item }) => {
+    const timestamp = item.time;
+    const date = new Date(timestamp);
+    // const year = date.getFullYear();
+    // const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    // const day = ('0' + date.getDate()).slice(-2);
+    const hours = ('0' + date.getHours()).slice(-2);
+    const minutes = ('0' + date.getMinutes()).slice(-2);
+    const seconds = ('0' + date.getSeconds()).slice(-2);
+    const dateString = `${hours}:${minutes}:${seconds}`;
     let sender = item.senderName;
     let textStyle = styles.messageContainer; // Mặc định là style của senderName
 
@@ -69,7 +78,7 @@ function Chat_Detail({ orderId, route, navigation }) {
     return (
       <View style={textStyle}>
         <Text style={styles.messageText}>{item.content}</Text>
-        <Text style={styles.messageInfo}>{`${sender} • ${item.time}`}</Text>
+        <Text style={styles.messageInfo}>{`${sender} • ${dateString}`}</Text>
       </View>
     );
   };

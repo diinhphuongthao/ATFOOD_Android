@@ -23,6 +23,20 @@ function Detail_Drink({ route, navigation }) {
   const handleNoteChange = (text) => {
     setNote(text); // Cập nhật giá trị của note khi người dùng nhập liệu vào TextInput
   };
+  const [cartItems, setCartItems] = useState([]);
+   // Lấy số lượng item trong giỏ hàng từ sub collection "cartItems"
+   useEffect(() => {
+    const userId = firebase.auth().currentUser.uid;
+    const cartRef = firebase.firestore().collection('Cart').doc(userId).collection('cartItems');
+    const unsubscribe = cartRef.onSnapshot((querySnapshot) => {
+      const cartItemsCount = querySnapshot.size;
+      setCartItems(cartItemsCount);
+      
+    }, (error) => {
+      console.log('Error getting cart items: ', error);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const addToCart = async () => {
     const userId = firebase.auth().currentUser.uid;
@@ -133,6 +147,15 @@ function Detail_Drink({ route, navigation }) {
             <Image style={{
               height: 26, width: 26
             }} source={require('../image/cart.png')} />
+             {cartItems > 0 && (
+              <View style={{
+                position: 'absolute', top: 30, right: -6, backgroundColor: '#DA2121',
+                width: 18, height: 18, borderRadius: 9,
+                alignItems: 'center', justifyContent: 'center'
+              }}>
+                <Text style={{ color: 'white', fontSize: 12 }}>{cartItems}</Text>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </View>

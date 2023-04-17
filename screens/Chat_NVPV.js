@@ -76,13 +76,27 @@ function Chat_NVPV({ navigation }) {
     const minutes = ('0' + date.getMinutes()).slice(-2);
     const seconds = ('0' + date.getSeconds()).slice(-2);
     const dateString = `${hours}:${minutes}:${seconds}`;
+    
     let sender = item.senderName;
-    let textStyle = styles.messageContainer; // Mặc định là style của senderName
-
+    let textStyle = styles.messageContainerRight;
+    
     if (item.nvName) {
       sender = item.nvName;
-      textStyle = styles.messageContainerRight; // Style của nvName
+      textStyle = styles.messageContainer; // Style của nvName
     }
+
+    // if (item.nvName == 'nhan vien phuc vu') {
+    //   sender = item.nvName;
+    //   textStyle = styles.messageContainer; // Style của nvName
+    // } else {
+    //   textStyle = styles.messageContainerRight;
+    // }
+
+    // let sender = item.senderName;
+    // let textStyle = styles.messageContainer; // Mặc định là style của senderName
+
+
+
 
     return (
       <View style={textStyle}>
@@ -206,7 +220,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignSelf: 'flex-end',
     maxWidth: '50%',
-    marginRight:10
+    marginRight: 10
   },
   messageContainer: {
     backgroundColor: '#A7D0F7',
@@ -215,7 +229,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignSelf: 'flex-start',
     maxWidth: '50%',
-    marginLeft:10
+    marginLeft: 10
   },
   messageText: {
     fontSize: 16,

@@ -9,7 +9,7 @@ import { collection, doc, getDoc, getFirestore, setDoc } from 'firebase/firestor
 
 function Detail_Fish({ route, navigation }) {
   const { foodID } = route.params;
-  const [note, setNote]= useState("");
+  const [note, setNote] = useState("");
 
   const [foodcount, setFoodCount] = useState([]);
   const [foodDetail, setFoodDetail] = useState([]);
@@ -22,6 +22,23 @@ function Detail_Fish({ route, navigation }) {
   const handleNoteChange = (text) => {
     setNote(text); // Cập nhật giá trị của note khi người dùng nhập liệu vào TextInput
   };
+  const [cartItems, setCartItems] = useState([]);
+
+  // Lấy số lượng item trong giỏ hàng từ sub collection "cartItems"
+  useEffect(() => {
+    const userId = firebase.auth().currentUser.uid;
+    const cartRef = firebase.firestore().collection('Cart').doc(userId).collection('cartItems');
+    const unsubscribe = cartRef.onSnapshot((querySnapshot) => {
+      const cartItemsCount = querySnapshot.size;
+      setCartItems(cartItemsCount);
+      
+    }, (error) => {
+      console.log('Error getting cart items: ', error);
+    });
+    return () => unsubscribe();
+  }, []);
+
+
 
   const addToCart = async () => {
     const userId = firebase.auth().currentUser.uid;
@@ -47,15 +64,15 @@ function Detail_Fish({ route, navigation }) {
       const orderRef = firebase.firestore().collection('Orders').where('uid', '==', userId);
       const orderSnapshot = await orderRef.get();
       if (!orderSnapshot.empty) {
-          alert('Bạn đã có đơn hàng chưa hoàn thành. Vui lòng đợi trong ít phút trước khi đặt đơn hàng mới.');
-          return;
+        alert('Bạn đã có đơn hàng chưa hoàn thành. Vui lòng đợi trong ít phút trước khi đặt đơn hàng mới.');
+        return;
       }
       // Kiểm tra nếu đã có đơn hàng chưa hoàn thành thì không cho đặt thêm
       const deliverRef = firebase.firestore().collection('Delivering').where('uid', '==', userId);
       const deliverSnapshot = await deliverRef.get();
       if (!deliverSnapshot.empty) {
-          alert('Bạn đã có đơn hàng chưa hoàn thành. Vui lòng đợi trong ít phút trước khi đặt đơn hàng mới.');
-          return;
+        alert('Bạn đã có đơn hàng chưa hoàn thành. Vui lòng đợi trong ít phút trước khi đặt đơn hàng mới.');
+        return;
       }
       const cartDocRef = cartRef.collection('cartItems').doc();
       const foodItem = {
@@ -134,6 +151,15 @@ function Detail_Fish({ route, navigation }) {
             <Image style={{
               height: 26, width: 26
             }} source={require('../image/cart.png')} />
+            {cartItems > 0 && (
+              <View style={{
+                position: 'absolute', top: 30, right: -6, backgroundColor: '#DA2121',
+                width: 18, height: 18, borderRadius: 9,
+                alignItems: 'center', justifyContent: 'center'
+              }}>
+                <Text style={{ color: 'white', fontSize: 12 }}>{cartItems}</Text>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -148,7 +174,7 @@ function Detail_Fish({ route, navigation }) {
         paddingTop: 230
       }}>
         <View style={{ width: '100%' }}>
-        
+
           <View style={{ backgroundColor: '#DFAE30', height: 700, borderTopRightRadius: 60, borderTopLeftRadius: 60 }}>
             <View style={{ alignItems: 'center', paddingTop: 15 }}>
               <Text style={{ fontSize: 30, color: '#2947E1' }}>{foodDetail.name}</Text>
@@ -177,8 +203,8 @@ function Detail_Fish({ route, navigation }) {
             </View>
 
             <View style={{ alignItems: 'center', paddingTop: 10 }}>
-              
-            <View style={{ backgroundColor: 'white', width: 340, height: 100, borderWidth: 1, borderRadius: 10 }}>
+
+              <View style={{ backgroundColor: 'white', width: 340, height: 100, borderWidth: 1, borderRadius: 10 }}>
                 <TextInput
                   style={{
                     marginLeft: 10,
@@ -186,7 +212,7 @@ function Detail_Fish({ route, navigation }) {
                     width: 310,
                     height: 90,
                     paddingTop: 10, // căn lề trên
-                    textAlignVertical:'top'
+                    textAlignVertical: 'top'
                   }}
                   placeholder='ghi chú cho món ăn...'
                   multiline={true} // đa dòng
@@ -201,7 +227,7 @@ function Detail_Fish({ route, navigation }) {
               </View>
             </View>
           </View>
-          
+
         </View>
       </KeyboardAwareScrollView>
 

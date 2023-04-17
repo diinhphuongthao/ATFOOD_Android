@@ -33,6 +33,7 @@ function Order_Detail({ route }) {
         // Unsubscribe from events when no longer in use
         return () => subscriber();
     }, [orderId]);
+    
 
     if (!order) {
         return <ActivityIndicator />;

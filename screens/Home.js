@@ -36,11 +36,12 @@ function Home({ navigation }) {
         querySnapshot => {
           const discount = []
           querySnapshot.forEach((doc) => {
-            const { image, name } = doc.data()
+            const { image, name, description } = doc.data()
             discount.push({
               id: doc.id,
               image,
               name,
+              description
             })
           })
           setDiscount(discount)
@@ -178,7 +179,7 @@ function Home({ navigation }) {
             data={discount}
             renderItem={({ item }) => (
               <View style={{ justifyContent: 'center' }}>
-                <TouchableOpacity style={{ marginLeft: 15, justifyContent: 'center', borderWidth: 1, borderRadius: 10 }}>
+                <TouchableOpacity onPress={() => navigation.navigate('Banner_Detail', {bannerId: item.id} )} style={{ marginLeft: 15, justifyContent: 'center', borderWidth: 1, borderRadius: 10 }}>
                   <Image style={{ width: 138, height: 92, }} source={{
                     uri: item.image
                   }} />
@@ -203,7 +204,7 @@ function Home({ navigation }) {
             data={holiday}
             renderItem={({ item }) => (
               <View style={{ justifyContent: 'center' }}>
-                <TouchableOpacity style={{ marginLeft: 15, justifyContent: 'center', borderWidth: 1, borderRadius: 10 }}>
+                <TouchableOpacity onPress={() => navigation.navigate('Banner_Detail', {bannerId: item.id})} style={{ marginLeft: 15, justifyContent: 'center', borderWidth: 1, borderRadius: 10 }}>
                   <Image style={{ width: 138, height: 92, }} source={{
                     uri: item.image
                   }} />
@@ -228,7 +229,7 @@ function Home({ navigation }) {
             data={news}
             renderItem={({ item }) => (
               <View style={{ justifyContent: 'center' }}>
-                <TouchableOpacity style={{ marginLeft: 15, justifyContent: 'center', borderWidth: 1, borderRadius: 10 }}>
+                <TouchableOpacity onPress={() => navigation.navigate('Banner_Detail', {bannerId: item.id})} style={{ marginLeft: 15, justifyContent: 'center', borderWidth: 1, borderRadius: 10 }}>
                   <Image style={{ width: 138, height: 92, }} source={{
                     uri: item.image
                   }} />

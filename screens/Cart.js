@@ -118,6 +118,10 @@ function Cart({ navigation }) {
         return totalPrice;
     }
     const sendOrder = async () => {
+        if (cartItems.length === 0) {
+            alert('Giỏ hàng của bạn đang trống. Vui lòng chọn ít nhất một món để đặt hàng.');
+            return;
+          }
         // Lấy id khách hàng
         const userId = firebase.auth().currentUser.uid;
 
@@ -148,7 +152,6 @@ function Cart({ navigation }) {
         const order = {
             uid: userId,
             address: userData.address,
-            coordinate: userData.coordinate,
             customerName: userData.name,
             customerPhone: userData.phone,
             items: cartItems,
@@ -165,6 +168,7 @@ function Cart({ navigation }) {
 
         // Thêm một đơn đặt món vào subcollection
         const orders = {
+            address: userData.address,
             customerName: userData.name,
             customerPhone: userData.phone,
             totalPrice: calculateTotalPrice(),

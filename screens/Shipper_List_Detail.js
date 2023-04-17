@@ -5,7 +5,9 @@ import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'fireba
 
 function Shipper_List_Detail({ route }) {
     const { orderId } = route.params;
+    const userId = firebase.auth().currentUser.uid;
     const [deliverys, setDeliverys] = useState(null);
+
 
     useEffect(() => {
         const subscriber = firebase.firestore()
@@ -20,6 +22,7 @@ function Shipper_List_Detail({ route }) {
         // Unsubscribe from events when no longer in use
         return () => subscriber();
     }, [orderId]);
+
     useEffect(() => {
         const subscriber = firebase.firestore()
             .collection('OrderHistory')
@@ -34,11 +37,32 @@ function Shipper_List_Detail({ route }) {
         return () => subscriber();
     }, [orderId]);
 
+
+    useEffect(() => {
+        const unsubscribe = firebase
+          .firestore()
+          .collection('History')
+          .doc(userId)
+          .collection('orders')
+          .doc(orderId)
+          .onSnapshot((doc) => {
+            if (doc.exists) {
+              const orderData = doc.data();
+              setDeliverys(orderData);
+            }
+          }, (error) => {
+            console.log('Error getting order document:', error);
+          });
+      
+        return () => unsubscribe();
+      }, [orderId]);
+      
+
+
+
     if (!deliverys) {
         return <ActivityIndicator />;
     }
-
-
     const renderCartItem = ({ item }) => {
         return (
             <View
@@ -46,7 +70,7 @@ function Shipper_List_Detail({ route }) {
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'center',
-                   paddingTop:20,
+                    paddingTop: 20,
                     borderBottomWidth: 1,
                     borderBottomColor: '#eee',
                 }}>
@@ -74,8 +98,8 @@ function Shipper_List_Detail({ route }) {
                             </View>
                         </View>
                     </View>
-                    <View style={{ backgroundColor: 'white', borderRadius: 10, height: 100, width: 120, alignItems:'center', marginRight:10 }}>
-                        <Text style={{width:100}}>{item.note}</Text>
+                    <View style={{ backgroundColor: 'white', borderRadius: 10, height: 100, width: 120, alignItems: 'center', marginRight: 10 }}>
+                        <Text style={{ width: 100 }}>{item.note}</Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
                         <View style={{ backgroundColor: 'white', width: 40, alignItems: 'center', borderRadius: 20 }}>
@@ -95,11 +119,7 @@ function Shipper_List_Detail({ route }) {
 
     return (
         <View style={{ alignItems: 'center' }}>
-            {/* <FlatList
-                data={order.items}
-                renderItem={({ item }) => <Text>{item.name}</Text>}
-            /> */}
-            <View style={{alignItems:'center', justifyContent:'center'}}>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                 <FlatList
                     data={deliverys.items}
                     renderItem={renderCartItem}
