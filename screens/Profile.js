@@ -25,16 +25,16 @@ function Profile({ navigation }) {
         const docRef = firebase.firestore().collection('users').doc(currentUser.uid);
 
         const unsubscribe = docRef.onSnapshot((doc) => {
-          setUsers(doc.data());
-          console.log(doc.data())
+            setUsers(doc.data());
+            console.log(doc.data())
         }, (error) => {
-          console.error('Error fetching user data: ', error);
-          alert(error.message);
+            console.error('Error fetching user data: ', error);
+            alert(error.message);
         });
-        
+
         return () => {
-          unsubscribe(); // Hủy đăng ký lắng nghe khi component bị hủy
-        };        
+            unsubscribe(); // Hủy đăng ký lắng nghe khi component bị hủy
+        };
     }, [currentUser]);
 
     const updateName = async () => {
@@ -42,37 +42,37 @@ function Profile({ navigation }) {
         await userRef.update({
             name: users.name,
         }).catch((error) => {
-          console.error('Error updating name: ', error);
+            console.error('Error updating name: ', error);
         });
-      };
-      
-      const updateEmail = async () => {
+    };
+
+    const updateEmail = async () => {
         const userRef = firebase.firestore().collection('users').doc(currentUser.uid);
         await userRef.update({
             email: users.email,
         }).catch((error) => {
-          console.error('Error updating email: ', error);
+            console.error('Error updating email: ', error);
         });
-      };
-      
-      const updatePhone = async () => {
+    };
+
+    const updatePhone = async () => {
         const userRef = firebase.firestore().collection('users').doc(currentUser.uid);
         await userRef.update({
             phone: users.phone,
         }).catch((error) => {
-          console.error('Error updating phone: ', error);
+            console.error('Error updating phone: ', error);
         });
-      };
-      
-      const updateAddress = async () => {
+    };
+
+    const updateAddress = async () => {
         const userRef = firebase.firestore().collection('users').doc(currentUser.uid);
         await userRef.update({
             address: users.address,
         }).catch((error) => {
-          console.error('Error updating address: ', error);
+            console.error('Error updating address: ', error);
         });
-      };
-      
+    };
+
     const [initialName, setInitialName] = useState(users.name);
     const handleEditName = () => {
         if (editName) {
@@ -199,22 +199,23 @@ function Profile({ navigation }) {
 
 
     return (
-        <View style={{ backgroundColor: '#DDF0F0', height: '100%' }}>
+        <View style={{ backgroundColor: '#F0F0DD', height: '100%' }}>
             <View style={{ paddingTop: 15, marginLeft: 15 }}>
                 <TouchableOpacity style={{
-                    width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+                    width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
                     alignItems: 'center', justifyContent: 'center',
-                    borderWidth: 2, borderColor: '#13625D',
+                    borderWidth: 2, borderColor: '#BFB12D',
                 }} onPress={() => navigation.navigate('Home')}>
                     <Image style={{
                         height: 38, width: 38, borderRadius: 360,
                     }} source={require('../image/return.png')} />
                 </TouchableOpacity>
             </View>
-            <View style={{ alignItems: 'center' }}>
+            <View style={{ alignItems: 'center',paddingTop: 10 }}>
+                <Image style={{ width: 100, height: 100, }} source={require('../image/profile.png')} />
             </View>
-            <View style={{ alignItems: 'center', paddingTop: 50 }}>
-                <View style={{ justifyContent: 'center', width: '100%', height: 320, backgroundColor: '#9ABEF4', }}>
+            <View style={{ alignItems: 'center', paddingTop: 20 }}>
+                <View style={{ justifyContent: 'center', width: '100%', height: 280, backgroundColor: '#FFE55E', }}>
                     <View>
                         <Text style={{ fontSize: 16, width: 300, marginLeft: 10 }}>Tên:</Text>
                         <View style={{ flexDirection: 'row', }}>
@@ -272,7 +273,7 @@ function Profile({ navigation }) {
             </View>
             <View style={{ paddingTop: 20 }}>
                 <View style={{ paddingTop: 10 }}>
-                    <TouchableOpacity style={{ width: '100%', height: 50, backgroundColor: '#669DF0', justifyContent: 'center' }}>
+                    <TouchableOpacity style={{ width: '100%', height: 50, backgroundColor: '#BFB12D', justifyContent: 'center' }}>
                         <View style={{ justifyContent: 'flex-start', flexDirection: 'row' }}>
                             <View style={{ justifyContent: 'flex-start', flexDirection: 'row', width: 100 }}>
                                 <Image style={{ width: 25, height: 25, marginLeft: 10, }} source={require('../image/coupon.png')} />
@@ -285,7 +286,7 @@ function Profile({ navigation }) {
                     </TouchableOpacity>
                 </View>
                 <View style={{ paddingTop: 10 }}>
-                    <TouchableOpacity onPress={() => navigation.navigate('Order_History_Detail')} style={{ width: '100%', height: 50, backgroundColor: '#669DF0', justifyContent: 'center' }}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Order_History_Detail')} style={{ width: '100%', height: 50, backgroundColor: '#BFB12D', justifyContent: 'center' }}>
                         <View style={{ justifyContent: 'flex-start', flexDirection: 'row' }}>
                             <View style={{ justifyContent: 'flex-start', flexDirection: 'row', width: 100 }}>
                                 <Image style={{ width: 25, height: 25, marginLeft: 10, }} source={require('../image/invoice.png')} />
@@ -298,7 +299,7 @@ function Profile({ navigation }) {
                     </TouchableOpacity>
                 </View>
                 <View style={{ paddingTop: 10 }}>
-                    <TouchableOpacity style={{ width: '100%', height: 50, backgroundColor: '#669DF0', justifyContent: 'center' }}>
+                    <TouchableOpacity style={{ width: '100%', height: 50, backgroundColor: '#BFB12D', justifyContent: 'center' }}>
                         <View style={{ justifyContent: 'flex-start', flexDirection: 'row' }}>
                             <View style={{ justifyContent: 'flex-start', flexDirection: 'row', width: 100 }}>
                                 <Image style={{ width: 25, height: 25, marginLeft: 10, }} source={require('../image/customer-service.png')} />
@@ -312,7 +313,7 @@ function Profile({ navigation }) {
                 </View>
             </View>
 
-            <View style={{ alignItems: 'center', paddingTop: 35 }}>
+            <View style={{ alignItems: 'center', paddingTop: 30 }}>
                 <TouchableOpacity style={{ height: 50, width: 160, borderWidth: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F46C6C', borderRadius: 15 }}
                     onPress={() => { firebase.auth().signOut() }}>
                     <Text style={{ fontSize: 22 }}>

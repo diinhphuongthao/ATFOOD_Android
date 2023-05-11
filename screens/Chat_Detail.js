@@ -7,51 +7,58 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 function Chat_Detail({ orderId, route, navigation }) {
   const { itemId } = route.params;
+  const { emailStaff } = route.params;
   // console.log(itemId)
+  // console.log(emailStaff)
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
 
 
-  const currentUser = firebase.auth().currentUser;
+
+
+  // const currentUser = firebase.auth().currentUser;
   const orderRef = firebase.firestore().collection('MessageOrders').doc(itemId);
-  const userRef = firebase.firestore().collection('users').doc(currentUser.uid);
+  const userRef = firebase.firestore().collection('Staff').where('email', '==', emailStaff);
   const handleSend = () => {
     if (message === '') {
       return; // Không làm gì nếu tin nhắn rỗng
     }
-    userRef.get().then((doc) => {
-      if (doc.exists) {
-        const userData = doc.data();
-        const newMessage = {
-          content: message,
-          nvid: currentUser.uid,
-          nvName: userData.name,
-          nvPhone: userData.phone,
-          time: new Date().getTime()
-        };
-        const newMessage2 = {
-          nvid: currentUser.uid,
-          nvName: userData.name,
-          nvPhone: userData.phone,
-        };
-        setMessages([...messages, newMessage, newMessage2]);
-        setMessage('');
+    userRef.get().then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        if (doc.exists) {
+          const userData = doc.data();
+          console.log(userData)
+          const newMessage = {
+            content: message,
+            nvid: doc.id,
+            nvName: userData.name,
+            nvPhone: userData.phone,
+            time: new Date().getTime()
+          };
+          const newMessage2 = {
+            nvid: doc.id,
+            nvName: userData.name,
+            nvPhone: userData.phone,
+          };
+          setMessages([...messages, newMessage, newMessage2]);
+          setMessage('');
 
-        // Lưu tin nhắn mới vào database
-        orderRef.get().then((docSnapshot) => {
-          if (docSnapshot.exists) {
-            orderRef.update(newMessage2);
-          } else {
-            orderRef.set(newMessage2);
-          }
-        }).catch((error) => {
-          console.log("Error getting document:", error);
-        });
-        orderRef.collection('messages').add(newMessage);
+          // Lưu tin nhắn mới vào database
+          orderRef.get().then((docSnapshot) => {
+            if (docSnapshot.exists) {
+              orderRef.update(newMessage2);
+            } else {
+              orderRef.set(newMessage2);
+            }
+          }).catch((error) => {
+            console.log("Error getting document:", error);
+          });
+          orderRef.collection('messages').add(newMessage);
 
-      } else {
-        console.log("No such user document!");
-      }
+        } else {
+          console.log("No such user document!");
+        }
+      });
     }).catch((error) => {
       console.log("Error getting user document:", error);
     });
@@ -119,10 +126,10 @@ function Chat_Detail({ orderId, route, navigation }) {
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
         <View style={{ paddingTop: 15, marginLeft: 15 }}>
           <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+            width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#13625D',
-          }} onPress={() => navigation.navigate('Chat')}>
+            borderWidth: 2, borderColor: '#BFB12D',
+          }} onPress={() => navigation.navigate('Chat',  { EmailStaff: emailStaff })}>
             <Image style={{
               height: 38, width: 38, borderRadius: 360,
             }} source={require('../image/return.png')} />
@@ -175,7 +182,7 @@ function Chat_Detail({ orderId, route, navigation }) {
 };
 const styles = StyleSheet.create({
   container: {
-    height: '100%', backgroundColor: '#DDF0F0'
+    height: '100%', backgroundColor: '#F0F0DD'
   },
   messagesContainer: {
     flexGrow: 1,
@@ -189,7 +196,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignSelf: 'flex-end',
     maxWidth: '50%',
-    marginRight:10
+    marginRight: 10
   },
   messageContainer: {
     backgroundColor: '#A7D0F7',
@@ -198,7 +205,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignSelf: 'flex-start',
     maxWidth: '50%',
-    marginLeft:10
+    marginLeft: 10
   },
   messageText: {
     fontSize: 16,

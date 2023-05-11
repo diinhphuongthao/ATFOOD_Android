@@ -5,7 +5,7 @@ import moment from 'moment-timezone';
 import { collection, doc, getDoc, getFirestore, setDoc, updateDoc, onSnapshot } from 'firebase/firestore'
 import Geocoder from 'react-native-geocoding';
 
-function Shipper_List_Order({ navigation,orderId }) {
+function Shipper_List_Order({ navigation, orderId }) {
 
   const handlePress = () => {
     navigation.goBack();
@@ -78,17 +78,17 @@ function Shipper_List_Order({ navigation,orderId }) {
       }
 
       // Kiểm tra trạng thái đơn hàng
-      if (deliveryData && deliveryData.status === "Chờ shipper nhận đơn") {
+      if (deliveryData && deliveryData.status === "Chờ shipper nhận đơn" || deliveryData.status === "Chờ tài xế xác nhận lại") {
 
-        // Lưu lịch sử đơn hàng
-        const historyRef = firebase.firestore().collection("OrderHistory").doc(orderId);
-        await historyRef.set({
-          ...deliveryData,
-          status: "Đang giao đơn món",
-          imageStatus:
-            "https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/food-delivery-2.png?alt=media&token=26c9e5c1-139a-447c-a33d-ffd214ecfea3",
-          deliveryTime: firebase.firestore.FieldValue.serverTimestamp(),
-        });
+        // // Lưu lịch sử đơn hàng
+        // const historyRef = firebase.firestore().collection("OrderHistory").doc(orderId);
+        // await historyRef.set({
+        //   ...deliveryData,
+        //   status: "Đang giao đơn món",
+        //   imageStatus:
+        //     "https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/food-delivery-2.png?alt=media&token=26c9e5c1-139a-447c-a33d-ffd214ecfea3",
+        //   deliveryTime: firebase.firestore.FieldValue.serverTimestamp(),
+        // });
 
         // Không xóa đơn món khỏi collection Cooking mà chuyển đến collection Delivering
         const deliveringRef = firebase.firestore().collection("Delivering").doc(orderId);
@@ -121,16 +121,16 @@ function Shipper_List_Order({ navigation,orderId }) {
       const deliveryRef = firebase.firestore().collection("Deliverys").doc(orderId);
       const deliverySnapshot = await deliveryRef.get();
       const deliveryData = deliverySnapshot.data();
-  
+
       if (deliveryData) {
         const address = deliveryData.address;
-  
+
         // Get the location of IUH
         const iuhLocation = "Khu phố 6, phường Linh Trung, Thủ Đức, Thành phố Hồ Chí Minh";
-        
+
         // Create URL for Google Maps with directions
         const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}&dir_action=navigate&travelmode=driving&origin=${encodeURIComponent(iuhLocation)}`;
-  
+
         // Open Google Maps app with directions
         Linking.openURL(directionsUrl);
       } else {
@@ -141,20 +141,20 @@ function Shipper_List_Order({ navigation,orderId }) {
       alert("Có lỗi xảy ra khi tìm kiếm địa chỉ đơn hàng!");
     }
   };
-  
-  
 
-  
+
+
+
 
 
   return (
-    <View style={{ backgroundColor: '#DDF0F0', height: '100%' }}>
+    <View style={{ backgroundColor: '#F0F0DD', height: '100%' }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
         <View style={{ paddingTop: 15, marginLeft: 15 }}>
           <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+            width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#13625D',
+            borderWidth: 2, borderColor: '#BFB12D',
           }} onPress={handlePress}>
             <Image style={{
               height: 38, width: 38, borderRadius: 360,
@@ -162,15 +162,15 @@ function Shipper_List_Order({ navigation,orderId }) {
           </TouchableOpacity>
         </View>
         <View style={{ paddingTop: 20, }}>
-          <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ fontSize: 18 }}>List Order</Text>
+          <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ fontSize: 18 }}>Đơn món cần giao</Text>
           </View>
         </View>
         <View style={{ paddingTop: 15, marginRight: 15 }}>
           <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+            width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#13625D',
+            borderWidth: 2, borderColor: '#BFB12D',
           }} onPress={() => navigation.navigate('Order_History_NVPV')}>
             <Image style={{
               height: 30, width: 30
@@ -229,7 +229,7 @@ function Shipper_List_Order({ navigation,orderId }) {
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                   <View style={{ alignItems: 'center', justifyContent: 'center', flexDirection: 'column', height: 100, width: 140, paddingBottom: 2 }}>
                     <View style={{ paddingTop: 10 }}>
-                      <TouchableOpacity onPress={() =>handleDeliveryAddressSearch(item.key)}>
+                      <TouchableOpacity onPress={() => handleDeliveryAddressSearch(item.key)}>
                         <View style={{
                           backgroundColor: '#86D3D3', height: 40, width: 120, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, justifyContent: 'center',
 
@@ -243,14 +243,16 @@ function Shipper_List_Order({ navigation,orderId }) {
                       </TouchableOpacity>
                     </View>
                     <View style={{ paddingTop: 10 }}>
-                      <View style={{
-                        backgroundColor: '#9AE893', height: 40, width: 120, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, justifyContent: 'center',
+                      <TouchableOpacity onPress={() => handleDeliveryStatusUpdate(item.key)}>
+                        <View style={{
+                          backgroundColor: '#9AE893', height: 40, width: 120, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, justifyContent: 'center',
 
-                      }}>
-                        <TouchableOpacity onPress={() => handleDeliveryStatusUpdate(item.key)}>
+                        }}>
+
                           <Text style={{ textAlign: 'center' }}>Nhận đơn</Text>
-                        </TouchableOpacity>
-                      </View>
+
+                        </View>
+                      </TouchableOpacity>
                     </View>
 
                   </View>

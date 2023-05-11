@@ -124,13 +124,13 @@ function Detail_Fish({ route, navigation }) {
 
 
   return (
-    <View style={{ backgroundColor: '#DDF0F0', height: '100%' }}>
+    <View style={{ backgroundColor: '#F0F0DD', height: '100%' }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
         <View style={{ paddingTop: 15, marginLeft: 15 }}>
           <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+            width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#13625D',
+            borderWidth: 2, borderColor: '#BFB12D',
           }} onPress={() => navigation.navigate('Fish_List')}>
             <Image style={{
               height: 38, width: 38, borderRadius: 360,
@@ -138,15 +138,15 @@ function Detail_Fish({ route, navigation }) {
           </TouchableOpacity>
         </View>
         <View style={{ paddingTop: 20, }}>
-          <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
             <Text style={{ fontSize: 18 }}>Chi tiết</Text>
           </View>
         </View>
         <View style={{ paddingTop: 15, marginRight: 15 }}>
           <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+            width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#13625D',
+            borderWidth: 2, borderColor: '#BFB12D',
           }} onPress={() => navigation.navigate('Cart')}>
             <Image style={{
               height: 26, width: 26

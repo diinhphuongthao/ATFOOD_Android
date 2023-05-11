@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { firebase } from '../config'
 import { v4 as uuidv4 } from 'uuid';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { collection, doc, getDoc, getFirestore, setDoc, updateDoc, onSnapshot } from 'firebase/firestore'
+import { collection, doc, getDoc, getFirestore, setDoc, updateDoc, onSnapshot, where } from 'firebase/firestore'
 
 function Table_NVPV_Detail({ navigation, route }) {
     const { TableId } = route.params;
@@ -11,7 +11,7 @@ function Table_NVPV_Detail({ navigation, route }) {
     // const currentUser = firebase.auth().currentUser;
     const [TableDetail, setTableDetail] = useState([]);
     const db = getFirestore();
-    const docRef1 = doc(db, 'users', firebase.auth().currentUser.uid)
+    // const docRef1 = doc(db, 'users', where(''))
     const docRef = doc(db, 'Table', TableId)
     useEffect(() => {
         const LoadDetail = async () => {
@@ -25,20 +25,20 @@ function Table_NVPV_Detail({ navigation, route }) {
         LoadDetail();
     }, [TableId]);
 
-    const docSnap = async () => {
-        try {
-            await getDoc(docRef1).then((doc) => {
-                setUsers(doc.data());
-            });
+    // const docSnap = async () => {
+    //     try {
+    //         await getDoc(docRef1).then((doc) => {
+    //             setUsers(doc.data());
+    //         });
 
-        } catch (error) {
-            alert(error.messgae)
-        }
-    }
+    //     } catch (error) {
+    //         alert(error.messgae)
+    //     }
+    // }
 
-    useEffect(() => {
-        docSnap();
-    }, [])
+    // useEffect(() => {
+    //     docSnap();
+    // }, [])
 
     const getAmountRange = (number) => {
         if (number >= 1 && number <= 6) {
@@ -91,22 +91,33 @@ function Table_NVPV_Detail({ navigation, route }) {
             alert('Bàn chưa có khách đặt')
             return;
         }
+
         const tableRef = firebase.firestore().collection('Table').doc(TableId);
+        const tableHistoryRef = firebase.firestore().collection('TableHistory');
+
+
 
         try {
             if (TableDetail.status === "đã đặt" || TableDetail.status === "đang chờ") {
-              await tableRef.update({
-                status: 'còn trống',
-                name: firebase.firestore.FieldValue.delete(),
-                phone: firebase.firestore.FieldValue.delete(),
-                amount: getAmountDefault(TableDetail.number)
-              });
-              console.log('Table status updated and name & phone fields removed successfully.');
+                await tableRef.update({
+                    status: 'còn trống',
+                    name: firebase.firestore.FieldValue.delete(),
+                    phone: firebase.firestore.FieldValue.delete(),
+                    amount: getAmountDefault(TableDetail.number),
+                    date: firebase.firestore.FieldValue.delete(),
+                });
+                console.log('Table status updated and name & phone fields removed successfully.');
+                // Delete matching documents from the TableHistory collection
+                const querySnapshot = await tableHistoryRef.where('phone', '==', TableDetail.phone).get();
+                querySnapshot.forEach(doc => {
+                    doc.ref.delete();
+                    console.log('TableHistory document deleted successfully.');
+                });
             }
-          } catch (error) {
+        } catch (error) {
             console.error('Error updating table status and removing name & phone fields:', error);
-          }
-          
+        }
+
     };
 
     const handleServeTable = async () => {
@@ -130,9 +141,9 @@ function Table_NVPV_Detail({ navigation, route }) {
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                 <View style={{ paddingTop: 15, marginLeft: 15 }}>
                     <TouchableOpacity style={{
-                        width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+                        width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
                         alignItems: 'center', justifyContent: 'center',
-                        borderWidth: 2, borderColor: '#13625D',
+                        borderWidth: 2, borderColor: '#BFB12D',
                     }} onPress={() => navigation.goBack()}>
                         <Image style={{
                             height: 38, width: 38, borderRadius: 360,
@@ -140,15 +151,15 @@ function Table_NVPV_Detail({ navigation, route }) {
                     </TouchableOpacity>
                 </View>
                 <View style={{ paddingTop: 20, }}>
-                    <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+                    <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
                         <Text style={{ fontSize: 18 }}>Đặt bàn</Text>
                     </View>
                 </View>
                 <View style={{ paddingTop: 15, marginRight: 15 }}>
                     <TouchableOpacity onPress={() => navigation.navigate('Table_Reserve')} style={{
-                        width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+                        width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
                         alignItems: 'center', justifyContent: 'center',
-                        borderWidth: 2, borderColor: '#13625D',
+                        borderWidth: 2, borderColor: '#BFB12D',
                     }}>
                         {/* <Image style={{
               height: 26, width: 26
@@ -342,7 +353,7 @@ function Table_NVPV_Detail({ navigation, route }) {
                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 20 }}>
                     <Text style={{ fontSize: 20 }}>Ngày đặt:</Text>
                     <View style={{ height: 30, width: 200, backgroundColor: 'white', borderWidth: 1, borderRadius: 10, alignItems: 'center', marginLeft: 10 }}>
-                        <TextInput style={{ fontSize: 20 }}></TextInput>
+                        <TextInput style={{ fontSize: 20 }} value={TableDetail.date}></TextInput>
                     </View>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 20 }}>

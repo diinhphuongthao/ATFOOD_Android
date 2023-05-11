@@ -12,6 +12,11 @@ function Banner_Detail({ navigation, route }) {
     const todoRef_01 = firebase.firestore().collection('Discount');
     const todoRef_02 = firebase.firestore().collection('Holiday');
     const todoRef_03 = firebase.firestore().collection('News');
+
+    const goBack = () => {
+        navigation.goBack()
+    }
+
     useEffect(() => {
         todoRef
             .onSnapshot(
@@ -97,17 +102,37 @@ function Banner_Detail({ navigation, route }) {
     }, [])
 
     return (
-        <View>
-           
-            <View style={{ alignItems: 'center', paddingTop:80 }}>
+        <View style={{ backgroundColor: '#F0F0DD', height: '100%' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
+                <View style={{ paddingTop: 15, marginLeft: 15 }}>
+                    <TouchableOpacity style={{
+                        width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
+                        alignItems: 'center', justifyContent: 'center',
+                        borderWidth: 2, borderColor: '#BFB12D',
+                    }} onPress={goBack}>
+                        <Image style={{
+                            height: 38, width: 38, borderRadius: 360,
+                        }} source={require('../image/return.png')} />
+                    </TouchableOpacity>
+                </View>
+                <View style={{ paddingTop: 20, marginRight: 95 }}>
+                    <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 18 }}>Nội dung</Text>
+                    </View>
+                </View>
+            </View>
+            <View style={{ alignItems: 'center', paddingTop: 80 }}>
                 <Image style={{ width: 288, height: 188, }} source={{
                     uri: discount.image || holiday.image || news.image
                 }} />
 
             </View>
-            <View style={{ alignItems: 'center', paddingTop:40 }}>
-                <View style={{ width: 300}}>
-                    <Text style={{ textAlign: 'justify', fontSize:20 }}>{discount.description}</Text>
+            <View style={{ alignItems: 'center', paddingTop: 40 }}>
+                <View style={{ width: 300 }}>
+                    <Text style={{ textAlign: 'center', fontSize: 26, fontWeight:'bold' }}>{discount.name || holiday.name || news.name}</Text>
+                </View>
+                <View style={{ width: 300, paddingTop: 10 }}>
+                    <Text style={{ textAlign: 'justify', fontSize: 20 }}>{discount.description || holiday.description || news.description}</Text>
                 </View>
             </View>
         </View>

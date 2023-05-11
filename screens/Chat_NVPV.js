@@ -95,8 +95,7 @@ function Chat_NVPV({ navigation }) {
     // let sender = item.senderName;
     // let textStyle = styles.messageContainer; // Mặc định là style của senderName
 
-
-
+  
 
     return (
       <View style={textStyle}>
@@ -130,12 +129,13 @@ function Chat_NVPV({ navigation }) {
       })
       .then(() => {
         orderRef.delete().then(() => {
-          navigation.navigate('Home');
+          navigation.goBack();
         });
       })
       .catch(error => {
         console.error("Error deleting conversation: ", error);
       });
+      
   }
 
 
@@ -147,9 +147,9 @@ function Chat_NVPV({ navigation }) {
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
         <View style={{ paddingTop: 15, marginLeft: 15 }}>
           <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+            width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#13625D',
+            borderWidth: 2, borderColor: '#BFB12D',
           }} onPress={handleDeleteConversation}>
             <Image style={{
               height: 38, width: 38, borderRadius: 360,
@@ -157,15 +157,15 @@ function Chat_NVPV({ navigation }) {
           </TouchableOpacity>
         </View>
         <View style={{ paddingTop: 20, }}>
-          <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
             <Text style={{ fontSize: 18 }}>Nhắn tin</Text>
           </View>
         </View>
         <View style={{ paddingTop: 15, marginRight: 15 }}>
           <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+            width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#13625D',
+            borderWidth: 2, borderColor: '#BFB12D',
           }}>
             {/* <Image style={{
               height: 26, width: 26
@@ -193,7 +193,7 @@ function Chat_NVPV({ navigation }) {
             value={message}
             onChangeText={setMessage}
           />
-          <TouchableOpacity style={{ backgroundColor: '#8CD6F6', borderRadius: 360, height: 46, width: 46, alignItems: 'center', justifyContent: 'center' }} onPress={handleSend}>
+          <TouchableOpacity style={{ backgroundColor: '#BFB12D', borderRadius: 360, height: 46, width: 46, alignItems: 'center', justifyContent: 'center' }} onPress={handleSend}>
             <Image style={{
               height: 38, width: 38, marginRight: 5
             }} source={require('../image/Send.png')} />
@@ -206,7 +206,7 @@ function Chat_NVPV({ navigation }) {
 };
 const styles = StyleSheet.create({
   container: {
-    height: '100%', backgroundColor: '#DDF0F0'
+    height: '100%', backgroundColor: '#F0F0DD'
   },
   messagesContainer: {
     flexGrow: 1,
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#DDF0F0',
+    backgroundColor: '#F0F0DD',
     paddingVertical: 10,
     paddingHorizontal: 20,
   },

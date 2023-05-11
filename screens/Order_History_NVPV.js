@@ -26,7 +26,7 @@ function Order_History_NVPV({ navigation}) {
     return () => subscriber();
   }, []);
   return (
-    <View>
+    <View style={{backgroundColor:'#F0F0DD', height:'100%'}}>
       <FlatList
         data={orderHistory}
         renderItem={({ item }) => (

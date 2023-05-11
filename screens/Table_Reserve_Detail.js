@@ -10,6 +10,7 @@ function Table_Reserve_Detail({ navigation, route }) {
     const [users, setUsers] = useState([]);
     // const currentUser = firebase.auth().currentUser;
     const [TableDetail, setTableDetail] = useState([]);
+    const [date, setDate] = useState("");
     const db = getFirestore();
     const docRef1 = doc(db, 'users', firebase.auth().currentUser.uid)
     const docRef = doc(db, 'Table', TableId)
@@ -49,7 +50,7 @@ function Table_Reserve_Detail({ navigation, route }) {
         }
     }
     const tableHistoryRef = collection(db, 'TableHistory')
-  
+
     const handleBookTable = async () => {
         const tableHistoryDocRef = doc(tableHistoryRef, firebase.auth().currentUser.uid)
         const tableHistoryDocSnapshot = await getDoc(tableHistoryDocRef)
@@ -59,6 +60,7 @@ function Table_Reserve_Detail({ navigation, route }) {
             return;
         }
 
+        // convert to Date object
         const newAmount = parseInt(TableDetail.amount);
         const amountRange = getAmountRange(TableDetail.number);
         if (isNaN(newAmount) || newAmount < amountRange[0] || newAmount > amountRange[1]) {
@@ -66,45 +68,62 @@ function Table_Reserve_Detail({ navigation, route }) {
             return;
         }
 
-        await setDoc(tableHistoryDocRef, {amount: newAmount, status: "đang chờ", name: users.name, phone: users.phone, number: TableDetail.number});
+        await setDoc(tableHistoryDocRef, { amount: newAmount, status: "đang chờ", name: users.name, phone: users.phone, number: TableDetail.number, date: date });
 
-        await updateDoc(docRef, { amount: newAmount, status: "đang chờ", name: users.name, phone: users.phone });
-  
+        await updateDoc(docRef, { amount: newAmount, status: "đang chờ", name: users.name, phone: users.phone, date: date  });
+
         // Cập nhật lại state để hiển thị số người mới và status mới
         setTableDetail(prevState => ({ ...prevState, amount: newAmount, status: "đang chờ" }));
         navigation.navigate('Table_Reserve');
     }
 
+    const handleDateChange = (text) => {
+        let formattedDate = "";
+
+        // Người dùng đang nhập ngày
+        if (text.length <= 2) {
+            formattedDate = text.replace(/[^0-9]/g, ""); // Chỉ giữ lại các ký tự số
+            if (formattedDate.length === 2) {
+                formattedDate += "/";
+            }
+        }
+        // Người dùng đang nhập tháng
+        else if (text.length <= 5) {
+            formattedDate = text.replace(/[^0-9/]/g, ""); // Chỉ giữ lại các ký tự số và /
+            formattedDate = formattedDate.replace(/^([0-9]{2})[/-]?/, "$1/"); // Tự động thêm dấu / sau 2 ký tự đầu tiên (nếu chưa có)
+            if (formattedDate.length === 5) {
+                formattedDate += "/";
+            }
+        }
+        // Người dùng đang nhập năm
+        else {
+            formattedDate = text.replace(/[^0-9/]/g, ""); // Chỉ giữ lại các ký tự số và /
+            formattedDate = formattedDate.replace(/^([0-9]{2})[/-]?([0-9]{2})[/-]?([0-9]{4})?$/, "$1/$2/$3"); // Định dạng lại ngày tháng năm
+        }
+
+        setDate(formattedDate);
+    };
+
     return (
-        <View style={{ height: '100%', backgroundColor: '#DDF0F0' }}>
+        <View style={{ height: '100%', backgroundColor: '#F0F0DD' }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                 <View style={{ paddingTop: 15, marginLeft: 15 }}>
                     <TouchableOpacity style={{
-                        width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+                        width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
                         alignItems: 'center', justifyContent: 'center',
-                        borderWidth: 2, borderColor: '#13625D',
+                        borderWidth: 2, borderColor: '#BFB12D',
                     }} onPress={() => navigation.goBack()}>
                         <Image style={{
                             height: 38, width: 38, borderRadius: 360,
                         }} source={require('../image/return.png')} />
                     </TouchableOpacity>
                 </View>
-                <View style={{ paddingTop: 20, }}>
-                    <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+                <View style={{ paddingTop: 20, marginRight:95}}>
+                    <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
                         <Text style={{ fontSize: 18 }}>Đặt bàn</Text>
                     </View>
                 </View>
-                <View style={{ paddingTop: 15, marginRight: 15 }}>
-                    <TouchableOpacity onPress={() => navigation.navigate('Table_Reserve')} style={{
-                        width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
-                        alignItems: 'center', justifyContent: 'center',
-                        borderWidth: 2, borderColor: '#13625D',
-                    }}>
-                        {/* <Image style={{
-              height: 26, width: 26
-            }} source={require('../image/cart.png')} /> */}
-                    </TouchableOpacity>
-                </View>
+
             </View>
             <View style={{ alignItems: 'center', paddingTop: 80 }}>
                 <View style={{
@@ -292,7 +311,7 @@ function Table_Reserve_Detail({ navigation, route }) {
                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 20 }}>
                     <Text style={{ fontSize: 20 }}>Ngày đặt:</Text>
                     <View style={{ height: 30, width: 200, backgroundColor: 'white', borderWidth: 1, borderRadius: 10, alignItems: 'center', marginLeft: 10 }}>
-                        <TextInput style={{ fontSize: 20 }}></TextInput>
+                        <TextInput style={{ fontSize: 20 }} value={date} onChangeText={handleDateChange}></TextInput>
                     </View>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 20 }}>

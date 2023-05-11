@@ -9,7 +9,7 @@ function Shipper_List({ navigation }) {
     navigation.goBack();
   };
   return (
-    <View style={{ alignItems: 'center', paddingTop: 85,backgroundColor: '#DDF0F0', height:'100%' }}>
+    <View style={{ alignItems: 'center', paddingTop: 85,backgroundColor: '#F0F0DD', height:'100%' }}>
       <View style={{ alignItems: 'center' }}>
         <View style={{ paddingTop: 180, flexDirection: 'row' }}>
 
@@ -53,7 +53,7 @@ function Shipper_List({ navigation }) {
       </View>
       <View style={{paddingTop:160}}>
         <TouchableOpacity style={{ height: 50, width: 160, borderWidth: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F46C6C', borderRadius: 15 }}
-          onPress={() => { firebase.auth().signOut() }}>
+          onPress={handlePress}>
           <Text style={{ fontSize: 22 }}>
             Sign Out
           </Text>

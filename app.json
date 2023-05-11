@@ -1,6 +1,11 @@
 {
   "expo": {
     "name": "AppFoodDelivery",
+    // "sdkVersion": "47.0.0",
+    // "platforms": [
+    //   "ios",
+    //   "android"
+    // ],
     "slug": "AppFoodDelivery",
     "version": "1.0.0",
     "orientation": "portrait",

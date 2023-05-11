@@ -34,6 +34,7 @@ function Order_History({ navigation }) {
       .doc(userId)
       .collection('orders');
     const orderSnapshot = await ordersRef.get();
+    // const couponValue = await orderSnapshot.get('coupon');
 
     if (orderSnapshot.empty) {
       console.log('No orders found');
@@ -94,81 +95,100 @@ function Order_History({ navigation }) {
         } else {
           console.log('No matching order document found in Orders collection');
         }
-        await order.ref.update({
+        
+        await order.ref.delete();
+        console.log('Order document deleted from OrderCustomer collection');
+      
+        // Add canceled order to History collection
+        const historyRef = firebase
+          .firestore()
+          .collection('History')
+          .doc(userId)
+          .collection('orders');
+        await historyRef.add({
+          ...orderData,
           status: 'Đã hủy đơn',
           imageStatus:
             'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/cancel.png?alt=media&token=ff491b3f-02a3-4ac4-b31b-4bd30d2d3c2c'
         });
+        console.log('Canceled order added to History collection');
+
+        console.log('Order document deleted from OrderCustomer collection');
+        console.log('Canceled order added to History collection');
+        // Delete order document in the 'OrderCustomer' collection
+
+        orderSnapshot.forEach(async (doc) => {
+          const couponValue = doc.get('coupon');
+
+          if (couponValue) {
+            const couponRef = firebase.firestore().collection('Coupon');
+            const query = couponRef.where('coupon', '==', couponValue);
+            const snapshot = await query.get();
+
+            if (!snapshot.empty) {
+              const docRef = snapshot.docs[0].ref;
+              await docRef.update({ amount: firebase.firestore.FieldValue.increment(1) });
+              console.log('Coupon amount updated successfully');
+            } else {
+              console.log(`Coupon ${couponValue} not found in Coupon collection`);
+            }
+          }
+        });
+
+
         console.log('Order canceled successfully');
       } catch (error) {
         console.log(`Error canceling order: ${error}`);
         return;
       }
-    }
-    try {
-      // Add canceled order to History collection
-      const historyRef = firebase
-        .firestore()
-        .collection('History')
-        .doc(userId)
-        .collection('orders');
-      await historyRef.add(orderData);
-      console.log('Canceled order added to History collection');
-      // Delete order document in the 'OrderCustomer' collection
       try {
-        await order.ref.delete();
-        await historyRef.update({
-          status: 'Đã hủy đơn',
-          imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/cancel.png?alt=media&token=ff491b3f-02a3-4ac4-b31b-4bd30d2d3c2c'
-        });
-        console.log('Order document deleted from OrderCustomer collection');
+
       } catch (error) {
-        console.log(`Error deleting order document from OrderCustomer collection: ${error}`);
+        console.log(`Error adding canceled order to History collection: ${error}`);
+        return;
       }
-    } catch (error) {
-      console.log(`Error adding canceled order to History collection: ${error}`);
-      return;
-    }
-  };
-  const handleDeliveryAddressSearch = async () => {
-    const userId = firebase.auth().currentUser.uid;
-    try {
-      const deliveryRef = firebase.firestore()
-        .collection('OrderCustomer')
-        .doc(userId)
-        .collection('orders');
-      const deliverySnapshot = await deliveryRef.get();
+    };
 
-      if (!deliverySnapshot.empty) {
-        const deliveryData = deliverySnapshot.docs[0].data();
-        const address = deliveryData.address;
+    const handleDeliveryAddressSearch = async () => {
+      const userId = firebase.auth().currentUser.uid;
+      try {
+        const deliveryRef = firebase.firestore()
+          .collection('OrderCustomer')
+          .doc(userId)
+          .collection('orders');
+        const deliverySnapshot = await deliveryRef.get();
 
-        // Get the location of IUH
-        const iuhLocation = "Khu phố 6, phường Linh Trung, Thủ Đức, Thành phố Hồ Chí Minh";
+        if (!deliverySnapshot.empty) {
+          const deliveryData = deliverySnapshot.docs[0].data();
+          const address = deliveryData.address;
 
-        // Create URL for Google Maps with directions
-        const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}&dir_action=navigate&travelmode=driving&origin=${encodeURIComponent(iuhLocation)}`;
+          // Get the location of IUH
+          const iuhLocation = "Khu phố 6, phường Linh Trung, Thủ Đức, Thành phố Hồ Chí Minh";
 
-        // Open Google Maps app with directions
-        Linking.openURL(directionsUrl);
-      } else {
-        alert("Không tìm thấy thông tin địa chỉ của đơn hàng!");
+          // Create URL for Google Maps with directions
+          const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}&dir_action=navigate&travelmode=driving&origin=${encodeURIComponent(iuhLocation)}`;
+
+          // Open Google Maps app with directions
+          Linking.openURL(directionsUrl);
+        } else {
+          alert("Không tìm thấy thông tin địa chỉ của đơn hàng!");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Có lỗi xảy ra khi tìm kiếm địa chỉ đơn hàng!");
       }
-    } catch (error) {
-      console.error(error);
-      alert("Có lỗi xảy ra khi tìm kiếm địa chỉ đơn hàng!");
     }
-  };
 
+  };
 
   return (
-    <View style={{ backgroundColor: '#DDF0F0', height: '100%' }}>
+    <View style={{ backgroundColor: '#F0F0DD', height: '100%' }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
         <View style={{ paddingTop: 15, marginLeft: 15 }}>
           <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+            width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#13625D',
+            borderWidth: 2, borderColor: '#BFB12D',
           }} onPress={() => navigation.navigate('Cart')}>
             <Image style={{
               height: 38, width: 38, borderRadius: 360,
@@ -176,7 +196,7 @@ function Order_History({ navigation }) {
           </TouchableOpacity>
         </View>
         <View style={{ paddingTop: 20, }}>
-          <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginRight: 30 }}>
+          <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginRight: 30 }}>
             <Text style={{ fontSize: 18 }}>Chi tiết</Text>
           </View>
         </View>
@@ -246,8 +266,8 @@ function Order_History({ navigation }) {
                     </View>
                   </TouchableOpacity>
                 </View>
-                <View style={{ alignItems: 'center', paddingTop: 30 }}>
-                  <TouchableOpacity onPress={handleDeliveryAddressSearch}>
+                {/* <View style={{ alignItems: 'center', paddingTop: 30 }}>
+                  <TouchableOpacity onPress={() => navigation.navigate('Map', {orderId: item.key})}>
                     <View style={{
                       height: 60, width: 200, backgroundColor: '#16BB13', justifyContent: 'center', alignItems: 'center',
                       borderRadius: 10
@@ -255,7 +275,7 @@ function Order_History({ navigation }) {
                       <Text style={{ fontSize: 16 }}>Xem bản đồ</Text>
                     </View>
                   </TouchableOpacity>
-                </View>
+                </View> */}
 
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                   <View style={{ paddingTop: 140, alignItems: 'center', justifyContent: 'center' }}>

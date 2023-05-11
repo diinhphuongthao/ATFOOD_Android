@@ -4,7 +4,7 @@ import { firebase } from '../config'
 import moment from 'moment-timezone';
 import { collection, doc, getDoc, getFirestore, setDoc, updateDoc, onSnapshot, writeBatch, getDocs, collectionGroup, } from 'firebase/firestore'
 
-function Order_NVPV({ navigation}) {
+function Order_NVPV({ navigation }) {
   const handlePress = () => {
     navigation.goBack();
   };
@@ -36,7 +36,7 @@ function Order_NVPV({ navigation}) {
   }, []);
 
   const handleOrderStatusUpdate = async (orderId) => {
-    const userId = firebase.auth().currentUser.uid;
+    // const userId = firebase.auth().currentUser.uid;
     const orderRef = doc(firebase.firestore(), 'Orders', orderId);
     const snapshot = await getDoc(orderRef);
     const order = snapshot.data();
@@ -204,11 +204,14 @@ function Order_NVPV({ navigation}) {
         console.log(`Error moving order to history: ${error}`);
         return;
       }
-  
+
       const NotificationRef = firebase.firestore().collection('Notification').doc(orderId).collection('notificate').doc();
       try {
         await NotificationRef.set({
           ...order.data(),
+          NotiStatus: 'chưa xem',
+          status: 'Đã hủy đơn',
+          imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/cancel.png?alt=media&token=ff491b3f-02a3-4ac4-b31b-4bd30d2d3c2c',
           canceledAt: firebase.firestore.FieldValue.serverTimestamp(),
           cancelReason: confirmed
         });
@@ -225,7 +228,7 @@ function Order_NVPV({ navigation}) {
         return;
       }
 
-      try {  
+      try {
         await customerRef.update({
           status: 'Đã hủy đơn',
           imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/cancel.png?alt=media&token=ff491b3f-02a3-4ac4-b31b-4bd30d2d3c2c'
@@ -237,7 +240,7 @@ function Order_NVPV({ navigation}) {
       }
 
       const HisRef = firebase.firestore().collection('History').doc(orderId).collection('orders').doc();
-      try {  
+      try {
         await HisRef.set({
           ...order.data(),
           status: 'Đã hủy đơn',
@@ -272,10 +275,23 @@ function Order_NVPV({ navigation}) {
   };
 
   const handleDeliveryStatusUpdate = async (orderId) => {
+    const orderRef = firebase.firestore().collection("Orders").doc(orderId);
+    const orderSnapshot = await orderRef.get();
+    if (orderSnapshot.data().status === 'Đang chờ') {
+      alert('Đơn hàng đang chế biến, không thể chuyển cho bếp');
+      return;
+    }
+    if (orderSnapshot.data().status === 'Đang chế biến') {
+      alert('Đơn hàng đang chế biến, không thể chuyển cho bếp');
+      return;
+    }
+    if (orderSnapshot.data().status === 'Đang chuyển cho bếp') {
+      alert('Đã chuyển cho bếp, đợi bếp xác nhận đơn');
+      return;
+    }
     try {
       // Đọc dữ liệu đơn hàng từ collection "Orders"
-      const orderRef = firebase.firestore().collection("Orders").doc(orderId);
-      const orderSnapshot = await orderRef.get();
+
       const orderData = orderSnapshot.data();
       const historyRef = firebase.firestore().collection('OrderHistory').doc(orderId);
       const history = await historyRef.get();
@@ -364,16 +380,16 @@ function Order_NVPV({ navigation}) {
   const onPressOrderHistory = () => {
     navigation.navigate('Order_History_NVPV');
   }
-  
+
 
   return (
-    <View style={{ backgroundColor: '#DDF0F0', height: '100%' }}>
+    <View style={{ backgroundColor: '#F0F0DD', height: '100%' }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
         <View style={{ paddingTop: 15, marginLeft: 15 }}>
           <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+            width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#13625D',
+            borderWidth: 2, borderColor: '#BFB12D',
           }} onPress={handlePress}>
             <Image style={{
               height: 38, width: 38, borderRadius: 360,
@@ -381,15 +397,15 @@ function Order_NVPV({ navigation}) {
           </TouchableOpacity>
         </View>
         <View style={{ paddingTop: 20, }}>
-          <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
             <Text style={{ fontSize: 18 }}>List Order</Text>
           </View>
         </View>
         <View style={{ paddingTop: 15, marginRight: 15 }}>
           <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+            width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#13625D',
+            borderWidth: 2, borderColor: '#BFB12D',
           }} onPress={onPressOrderHistory}>
             <Image style={{
               height: 30, width: 30
@@ -471,14 +487,16 @@ function Order_NVPV({ navigation}) {
                       </TouchableOpacity>
                     </View>
                     <View style={{ paddingTop: 10 }}>
-                      <View style={{
-                        backgroundColor: '#9AE893', height: 40, width: 120, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, justifyContent: 'center',
+                      <TouchableOpacity onPress={() => handleDeliveryStatusUpdate(item.key)}>
+                        <View style={{
+                          backgroundColor: '#9AE893', height: 40, width: 120, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, justifyContent: 'center',
 
-                      }}>
-                        <TouchableOpacity onPress={() => handleDeliveryStatusUpdate(item.key)}>
+                        }}>
+
                           <Text style={{ textAlign: 'center' }}>Chuyển cho shipper</Text>
-                        </TouchableOpacity>
-                      </View>
+
+                        </View>
+                      </TouchableOpacity>
                     </View>
 
                   </View>

@@ -1,13 +1,20 @@
-import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Button, FlatList, TextInput } from 'react-native'
+import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Button, FlatList, TextInput, Modal, Linking } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { firebase } from '../config'
 import moment from 'moment-timezone';
-import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore'
+import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore';
+import axios from 'axios';
+import _ from 'lodash';
+
+
 
 function Cart({ navigation }) {
     const [cartItems, setCartItems] = useState([]);
     const [itemPrices, setItemPrices] = useState({});
     const [itemQuantity, setItemQuantity] = useState({});
+    const [coupon, setCoupon] = useState([]);
+    // const [TotalPrice, setTotalPrice] = useState({});
+
 
     useEffect(() => {
         const userId = firebase.auth().currentUser.uid;
@@ -20,7 +27,21 @@ function Cart({ navigation }) {
         });
         return () => unsubscribe();
     }, []);
-
+    useEffect(() => {
+        const subscriber = firebase.firestore()
+            .collection('Coupon')
+            .onSnapshot((querySnapshot) => {
+                const orders = [];
+                querySnapshot.forEach((documentSnapshot) => {
+                    orders.push({
+                        ...documentSnapshot.data(),
+                        key: documentSnapshot.id,
+                    });
+                });
+                setCoupon(orders);
+            });
+        return () => subscriber();
+    }, []);
     useEffect(() => {
         const prices = {};
 
@@ -102,26 +123,99 @@ function Cart({ navigation }) {
                 console.log("Error deleting item:", error);
             });
         }
+        setDeliveryPrice(0);
     };
 
 
     const handlePress = () => {
         navigation.goBack();
     };
+    const [deliveryPrice, setDeliveryPrice] = useState(0);
 
+    const calculateDeliveryPrice = async () => {
+        // if (cartItems.length === 0) {
+        //     return 0;
+        // }
+        try {
+            // Get user address from Firestore
+            const apiKey = 'Amn9jc6ebY9SAWGjrWUkv4SIPBGtADQQjxfJmsxmYzAeqCxkS4VMGVyDn1upfyiY';
+            const userId = firebase.auth().currentUser.uid;
+            const userDoc = await firebase.firestore().collection('users').doc(userId).get();
+            const userAddress = userDoc.data().address;
+            const normalizedAddress = _.deburr(userAddress).toLowerCase();
+
+
+            // Get coordinates of user location and delivery location
+            const iuhLocation = { latitude: 10.822337659582468, longitude: 106.68575779533174 };
+            const response = await axios.get(`http://dev.virtualearth.net/REST/v1/Routes?wayPoint.1=${iuhLocation.latitude},${iuhLocation.longitude}&waypoint.2=${normalizedAddress}&key=${apiKey}`);
+            const resources = response.data.resourceSets[0].resources;
+            const travelDistance = resources[0].travelDistance;
+
+
+            // Calculate delivery price based on distance
+            const deliveryPricePerKm = 5000;
+            const deliveryPrice = travelDistance * deliveryPricePerKm;
+
+
+            setDeliveryPrice(deliveryPrice);
+
+        } catch (error) {
+            console.log(error);
+            setDeliveryPrice(0);
+        }
+        return deliveryPrice;
+    };
+
+    useEffect(() => {
+        if (cartItems.length > 0) {
+            calculateDeliveryPrice();
+        }
+    }, [cartItems]);
 
     const calculateTotalPrice = () => {
         const totalPrice = cartItems.reduce((total, item) => {
             return total + item.price * item.quantity;
         }, 0);
-
-        return totalPrice;
+        // const discount = totalPrice 
+        // const totalPriceWithDiscount = totalPrice - discount;
+        const finalPrice = totalPrice + deliveryPrice;
+        const lastPrice = finalPrice * (getCoupon / 100);
+        const price = finalPrice - lastPrice
+        // setTotalPrice(totalPrice);
+        return price.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
+    const TotalPrice = () => {
+        const totalPrice = cartItems.reduce((total, item) => {
+            return total + item.price * item.quantity;
+        }, 0);
+        return totalPrice.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+    const CouponPrice = () => {
+        const totalPrice = cartItems.reduce((total, item) => {
+            return total + item.price * item.quantity;
+        }, 0);
+        const finalPrice = totalPrice + deliveryPrice;
+        const lastPrice = finalPrice * (getCoupon / 100);
+        return lastPrice.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    const Cash = () => {
+        setPaymentMethod('tiền mặt')
+        setModalVisible(false)
+    }
+
     const sendOrder = async () => {
         if (cartItems.length === 0) {
             alert('Giỏ hàng của bạn đang trống. Vui lòng chọn ít nhất một món để đặt hàng.');
             return;
-          }
+        }
+        if (!paymentMethod) {
+            alert('Chưa chọn hình thức thanh toán');
+            return;
+        }
+        // if (!getCoupon) {
+        //     alert('Bạn chưa thêm mã, bán có chắc sẽ tiếp tục thanh toán chứ');
+        // }
         // Lấy id khách hàng
         const userId = firebase.auth().currentUser.uid;
 
@@ -145,8 +239,16 @@ function Cart({ navigation }) {
             alert('Bạn đã có đơn hàng chưa hoàn thành. Vui lòng đợi trong ít phút trước khi đặt đơn hàng mới.');
             return;
         }
-
-
+        if (getCoupon) {
+            const couponRef = firebase.firestore().collection('Coupon');
+            const query = couponRef.where('coupon', '==', getCoupon);
+            const snapshot = await query.get();
+            if (!snapshot.empty) {
+                // Tìm thấy coupon có giá trị value giống với giá trị của getCoupon
+                const docRef = snapshot.docs[0].ref;
+                await docRef.update({ amount: firebase.firestore.FieldValue.increment(-1) });
+            }
+        }
         // Tạo đơn hàng mới trong Firestore
         const ordersRef = firebase.firestore().collection('Orders');
         const order = {
@@ -158,6 +260,9 @@ function Cart({ navigation }) {
             totalPrice: calculateTotalPrice(),
             status: 'Đang chờ',
             createdAt: new Date(),
+            deliveryPrice: deliveryPrice,
+            payment: paymentMethod,
+            coupon: getCoupon
         };
         order.imageStatus = 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/clockwise.png?alt=media&token=45c770f5-89b3-4f73-96b6-059e549e12b0';
         await ordersRef.doc(userId).set(order);
@@ -175,6 +280,9 @@ function Cart({ navigation }) {
             status: 'Đang chờ',
             items: cartItems,
             createdAt: new Date(),
+            deliveryPrice: deliveryPrice,
+            payment: paymentMethod,
+            coupon: getCoupon
         };
         orders.imageStatus = 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/clockwise.png?alt=media&token=45c770f5-89b3-4f73-96b6-059e549e12b0';
         await ordersCollectionRef.doc(userId).set(orders);
@@ -186,7 +294,62 @@ function Cart({ navigation }) {
             cartRef.doc(item.id).delete();
         });
         alert('Đã tạo đơn hàng thành công!');
+        calculateTotalPrice("")
+        setDeliveryPrice("")
+
     };
+
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisibleCoupon, setModalVisibleCoupon] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState('');
+
+
+    const handleCouponPress = () => {
+        setModalVisibleCoupon(true);
+    }
+    const handlePaymentMethodPress = () => {
+        setModalVisible(true);
+    }
+    const [getCoupon, setGetCoupon] = useState('');
+
+    const Coupon = (item) => {
+        setGetCoupon(item.coupon)
+        setModalVisibleCoupon(false)
+        console.log(getCoupon)
+    }
+    const NoneCoupon = () => {
+        setGetCoupon('')
+        setModalVisibleCoupon(false)
+        console.log(getCoupon)
+    }
+
+
+
+    // const stripe = require('stripe')('sk_test_51N2C0nKCS49TfZ369GxOpOZPnyO8QFfwdHCWIsZrxZQouXPJLHQDG0XZtSlSkjc25XwTtFdoM620RpqZ19TY01kZ00QFYsnHYN');
+    // const handlePayPalCheckout = async () => {
+    //     // Thực hiện thanh toán với Stripe API
+    //     const session = await stripe.checkout.sessions.create({
+    //         payment_method_types: ['paypal'],
+    //         line_items: [
+    //             {
+    //                 price_data: {
+    //                     currency: 'usd',
+    //                     product_data: {
+    //                         name: 'Product Name',
+    //                     },
+    //                     unit_amount: 2000, // Giá của sản phẩm
+    //                 },
+    //                 quantity: 1, // Số lượng sản phẩm
+    //             },
+    //         ],
+    //         mode: 'payment',
+    //         success_url: 'https://example.com/success',
+    //         cancel_url: 'https://example.com/cancel',
+    //     });
+
+    //     // Chuyển hướng người dùng đến trang thanh toán của Stripe
+    //     return { url: session.url };
+    // };
 
 
 
@@ -222,7 +385,7 @@ function Cart({ navigation }) {
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 24, marginRight: 12 }}>
 
                                 <Text style={{ color: '#aaa', fontSize: 16, marginRight: 2, alignItems: 'center', justifyContent: 'center' }}>Giá:</Text>
-                                <Text style={{ color: '#aaa', fontSize: 16, }}>{itemPrices[item.id]}</Text>
+                                <Text style={{ color: '#aaa', fontSize: 16, }}> {itemPrices[item.id]?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</Text>
                                 <Text style={{ color: '#aaa', fontSize: 16, alignItems: 'center', justifyContent: 'center', marginLeft: 3 }}>{item.denominations}</Text>
 
                             </View>
@@ -253,13 +416,13 @@ function Cart({ navigation }) {
 
 
     return (
-        <View style={{ backgroundColor: '#DDF0F0', height: '100%' }}>
+        <View style={{ backgroundColor: '#F0F0DD', height: '100%' }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                 <View style={{ paddingTop: 15, marginLeft: 15 }}>
                     <TouchableOpacity style={{
-                        width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+                        width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
                         alignItems: 'center', justifyContent: 'center',
-                        borderWidth: 2, borderColor: '#13625D',
+                        borderWidth: 2, borderColor: '#BFB12D',
                     }} onPress={handlePress}>
                         <Image style={{
                             height: 38, width: 38, borderRadius: 360,
@@ -267,15 +430,15 @@ function Cart({ navigation }) {
                     </TouchableOpacity>
                 </View>
                 <View style={{ paddingTop: 20, }}>
-                    <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+                    <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
                         <Text style={{ fontSize: 18 }}>Giỏ hàng</Text>
                     </View>
                 </View>
                 <View style={{ paddingTop: 15, marginRight: 15 }}>
                     <TouchableOpacity style={{
-                        width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+                        width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
                         alignItems: 'center', justifyContent: 'center',
-                        borderWidth: 2, borderColor: '#13625D',
+                        borderWidth: 2, borderColor: '#BFB12D',
                     }} onPress={() => navigation.navigate('Order_History')}>
                         <Image style={{
                             height: 30, width: 30
@@ -295,28 +458,140 @@ function Cart({ navigation }) {
                 )}
 
             />
-            <View style={{ alignItems: 'center', backgroundColor: '#89C1CD', }}>
-                <View style={{ width: 380, height: 70, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <View style={{ marginLeft: 20 }}>
-                        <Text style={{ fontSize: 18 }}>Tổng giá tiền:</Text>
-                        <View style={{ flexDirection: 'row' }}>
-                            <Text style={{ fontSize: 18 }}>{calculateTotalPrice()}</Text><Text style={{ marginLeft: 5, fontSize: 18, justifyContent: 'center' }}>vnd</Text>
+            <View style={{ alignItems: 'center', backgroundColor: '#E6CA84', flexDirection: 'row' }}>
+                <TouchableOpacity style={{ borderWidth: 1 }} onPress={handleCouponPress}>
+                    <View style={{ width: 200, height: 60, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 16 }}>Mã giảm giá</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handlePaymentMethodPress} style={{ borderWidth: 1 }}>
+                    <View style={{ width: 200, height: 60, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 16 }}>Hình thức thanh toán</Text>
+                    </View>
+                </TouchableOpacity>
+            </View>
+            <Modal
+                visible={modalVisible}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => {
+                    setModalVisible(false);
+                }}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                    <View style={{ width: 300, height: 200, backgroundColor: 'white', borderRadius: 10, justifyContent: 'center' }}>
+                        <View style={{ alignItems: 'center', }}>
+                            <TouchableOpacity style={{
+                                backgroundColor: '#75D474', height: 50, width: 260, justifyContent: 'center'
+                                , borderRadius: 10
+                            }} onPress={Cash}>
+                                <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                                    <Image style={{ height: 30, width: 30 }} source={require('../image/pay.png')}></Image>
+                                    <Text style={{ fontSize: 16 }}>Thanh toán bằng tiền mặt</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={{ paddingTop: 30, alignItems: 'center' }}>
+
+                            <View>
+
+                                <TouchableOpacity>
+                                    <View style={{
+                                        backgroundColor: '#38BBF4',
+                                        height: 50,
+                                        width: 260,
+                                        justifyContent: 'center',
+                                        borderRadius: 10
+                                    }}>
+                                        <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                                            <Image style={{ height: 30, width: 30 }} source={require('../image/VNPay.png')}></Image>
+                                            <Text style={{ fontSize: 16, marginLeft: 10 }}>Thanh toán bằng Paypal</Text>
+                                        </View>
+                                    </View>
+                                </TouchableOpacity>
+
+                            </View>
+
                         </View>
                     </View>
-                    <View style={{ alignItems: 'center', marginRight: 30 }}>
-                        <TouchableOpacity style={{
-                            width: 180,
-                            height: 40,
-                            backgroundColor: '#E5E92A',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderRadius: 10,
-                            borderWidth: 1,
-
-                        }} onPress={sendOrder}>
-                            <Text style={{ fontSize: 18, }}>Xác nhận đơn</Text>
-                        </TouchableOpacity>
+                </View>
+            </Modal>
+            <Modal
+                visible={modalVisibleCoupon}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => {
+                    setModalVisibleCoupon(false);
+                }}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                    <View style={{ width: 300, height: 200, backgroundColor: 'white', borderRadius: 10, justifyContent: 'center' }}>
+                        <FlatList
+                            data={coupon}
+                            renderItem={({ item }) => (
+                                <View style={{ padding: 10, alignItems: 'center' }}>
+                                    {/* <Text style={{ fontWeight: 'bold' }}>{item.code}</Text>
+                                    <Text>{item.description}</Text> */}
+                                    <TouchableOpacity onPress={() => Coupon(item)}>
+                                        <View style={{ width: 260, height: 60, backgroundColor: '#48d1cc', borderRadius: 10, alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+                                            <Text style={{ fontWeight: 'bold', marginRight: 20, fontSize: 16 }}>{item.name}</Text>
+                                            <Text style={{ color: 'green', fontSize: 16 }}>Giảm: {item.coupon}%</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                </View>
+                            )}
+                            keyExtractor={(item) => item.key}
+                        />
+                        <TouchableOpacity style={{ padding: 10, alignItems: 'center' }} onPress={NoneCoupon}><Text>không áp mã</Text></TouchableOpacity>
                     </View>
+                </View>
+            </Modal>
+            <View style={{ alignItems: 'center', backgroundColor: '#E6AA37', }}>
+                <View style={{ width: 450, height: 160, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={{ flexDirection: 'column', alignItems: 'flex-start', width: 180, marginLeft:75}}>
+                        <View style={{}}>
+                            <Text style={{ fontSize: 18 }}>Tạm tính:</Text>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{TotalPrice().toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</Text><Text style={{ marginLeft: 5, fontSize: 18, justifyContent: 'center', fontWeight: 'bold' }}>vnd</Text>
+                            </View>
+                        </View>
+
+                        <View style={{paddingTop:20}}>
+                            <Text style={{ fontSize: 18, }}>Tiền được giảm:</Text>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{CouponPrice()}</Text><Text style={{ marginLeft: 5, fontSize: 18, justifyContent: 'center', fontWeight: 'bold' }}>vnd</Text>
+                            </View>
+                        </View>
+                    </View>
+
+                        <View style={{ flexDirection: 'column', alignItems: 'flex-start', width: 180,}}>
+                            <View style={{}}>
+                                <Text style={{ fontSize: 18 }}>Tiền giao hàng:</Text>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{deliveryPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</Text><Text style={{ marginLeft: 5, fontSize: 18, justifyContent: 'center', fontWeight: 'bold' }}>vnd</Text>
+                                </View>
+                            </View>
+                            <View style={{paddingTop:20}}>
+                                <Text style={{ fontSize: 18, }}>Tổng giá tiền:</Text>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{calculateTotalPrice()}</Text><Text style={{ marginLeft: 5, fontSize: 18, justifyContent: 'center', fontWeight: 'bold' }}>vnd</Text>
+                                </View>
+                            </View>
+                        </View>
+                   
+
+                </View>
+                <View style={{ alignItems: 'center', paddingBottom: 20 }}>
+                    <TouchableOpacity style={{
+                        width: 180,
+                        height: 40,
+                        backgroundColor: '#E5E92A',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 10,
+                        borderWidth: 1,
+
+                    }} onPress={sendOrder}>
+                        <Text style={{ fontSize: 18, }}>Xác nhận đơn</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         </View>

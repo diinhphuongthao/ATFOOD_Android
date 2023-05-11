@@ -5,9 +5,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore'
 
-function Table_NVPV({navigation}) {
+function Table_NVPV({navigation, route}) {
+  const { EmailStaff } = route.params;
+  // console.log(IdStaff)
   const [tables, setTables] = useState([]);
-
+  const goBack = () => {
+    navigation.goBack()
+  }
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       const tableRef = firebase.firestore().collection('Table').orderBy(firebase.firestore.FieldPath.documentId());
@@ -30,29 +34,29 @@ function Table_NVPV({navigation}) {
 
 
   return (
-    <View style={{ backgroundColor: '#DDF0F0', height: '100%' }}>
+    <View style={{ backgroundColor: '#F0F0DD', height: '100%' }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
         <View style={{ paddingTop: 15, marginLeft: 15 }}>
           <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+            width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#13625D',
-          }} onPress={() => navigation.navigate('Home_NVPV')}>
+            borderWidth: 2, borderColor: '#BFB12D',
+          }} onPress={goBack}>
             <Image style={{
               height: 38, width: 38, borderRadius: 360,
             }} source={require('../image/return.png')} />
           </TouchableOpacity>
         </View>
         <View style={{ paddingTop: 20, }}>
-          <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
             <Text style={{ fontSize: 18 }}>Đặt bàn</Text>
           </View>
         </View>
         <View style={{ paddingTop: 15, marginRight: 15 }}>
           <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+            width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#13625D',
+            borderWidth: 2, borderColor: '#BFB12D',
           }}>
             {/* <Image style={{
               height: 26, width: 26

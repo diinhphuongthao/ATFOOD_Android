@@ -1,40 +1,83 @@
 import { Text, StyleSheet, View, TouchableOpacity, StatusBar, TextInput, Image, } from 'react-native'
 import Checkbox from 'expo-checkbox';
 import React, { useState, useEffect } from 'react'
-import { firebase } from '../config';
+import { firebase, auth } from '../config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 function Login({ navigation }) {
 
   const [isChecked, setChecked] = useState(false);
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [option, setOption] = useState('');
+  const [user, setUser] = useState(null);
 
-  loginUser = async (email, password) => {
-    try {
-      await firebase.auth().signInWithEmailAndPassword(email, password);
-      const currentUser = firebase.auth().currentUser;
-      const emailParts = currentUser.email.split('@');
-      const emailName = emailParts[0];
-      const emailDomain = emailParts[1];
-      const emailNumber = parseInt(emailName.replace('nvship', ''));
-      if (currentUser && currentUser.email === "nvpvmq@gmail.com") {
-        // chuyển hướng đến màn hình Home_NVPV
-        // ví dụ:
-        navigation.navigate("Home_NVPV");
-      } else if (currentUser && currentUser.email === "nvbepmq@gmail.com") {
-        // chuyển hướng đến màn hình Home_NVBep
-        // ví dụ:
-        navigation.navigate("Kitchen_List");
-      } if (emailDomain === 'gmail.com' && emailNumber >= 1 && emailNumber <= 10) {
-        navigation.navigate('Shipper_List');
+
+  const loginUser = async (email, password) => {
+    // Thực hiện đăng nhập và kiểm tra quyền truy cập cho nhân viên (nếu option = 'option1')
+    // hoặc chỉ thực hiện đăng nhập bằng email và password (nếu option = 'option2')
+
+    const staffRef = firebase.firestore().collection('Staff').where('email', '==', email);
+    const staffDoc = await staffRef.get();
+    let loggedIn = false; // Khởi tạo biến boolean cho biết đăng nhập có thành công hay không
+
+    if (staffDoc.size > 0) {
+      const loaiNV = staffDoc.docs[0].data().loaiNV;
+      if (loaiNV === 'nhan vien phuc vu') {
+        console.log('đăng nhập thành công')
+        navigation.navigate("Home_NVPV", { IdStaff: email });
+        loggedIn = true; // Đặt biến loggedIn thành true nếu đăng nhập thành công
+      } else if (loaiNV === 'nhan vien bep') {
+        navigation.navigate("Kitchen_List", { IdStaff: email });
+        loggedIn = true;
+      } else if (loaiNV === 'nhan vien giao hang') {
+        navigation.navigate("Shipper_List", { IdStaff: email });
+        loggedIn = true;
       }
-    } catch (error) {
-      alert(error.message);
+    }
+    if (!loggedIn) { // Nếu không đăng nhập thành công, thực hiện đăng nhập bằng email và password
+      await firebase.auth().signInWithEmailAndPassword(email, password);
+    }
+    if (isChecked) {
+      AsyncStorage.setItem('rememberMe', JSON.stringify(true));
+      AsyncStorage.setItem('email', email);
+      AsyncStorage.setItem('password', password);
+    } else {
+      AsyncStorage.removeItem('rememberMe');
+      AsyncStorage.removeItem('email');
+      AsyncStorage.removeItem('password');
     }
   }
 
+
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+    });
+    AsyncStorage.getItem('rememberMe').then((value) => {
+      if (value !== null) {
+        setChecked(JSON.parse(value));
+      }
+    });
+    AsyncStorage.getItem('email').then((email) => {
+      AsyncStorage.getItem('password').then((password) => {
+        if (email && password) {
+          setEmail(email);
+          setPassword(password);
+        }
+      });
+    });
+    return unsubscribe;
+  }, []);
+
+
+
+
+
   return (
-    <View style={{ backgroundColor: '#41B9B9', height: '100%', }}>
+    <View style={{ backgroundColor: '#F3D051', height: '100%', }}>
       <StatusBar></StatusBar>
 
       <View style={{ flexDirection: 'row', justifyContent: 'center', }}>
@@ -47,10 +90,10 @@ function Login({ navigation }) {
       </View>
 
       <View style={{ alignItems: 'center', paddingTop: 26 }}>
-        <Image style={{ height: 123, width: 254, }} source={require('../image/Logo.png')} />
+        <Image style={{ height: 129, width: 254, }} source={require('../image/ATFOOD.png')} />
       </View>
-      <View style={{ alignItems: 'center', paddingTop: 80 }}>
-        <Image style={{ height: 34, width: 107, }} source={require('../image/SignIn.png')} />
+      <View style={{ alignItems: 'center', paddingTop: 60 }}>
+        <Text style={{ fontSize: 32, fontWeight: 'bold', }}>Sign In</Text>
       </View>
 
       <View style={{ alignItems: 'center', paddingTop: 30 }}>
@@ -63,7 +106,7 @@ function Login({ navigation }) {
               <Image style={{ height: 30, width: 30, marginLeft: 10 }} source={require('../image/mail.png')} />
             </View>
             <TextInput placeholder='Email'
-     
+              value={email}
               onChangeText={(email) => setEmail(email)}
               autoCapitalize="none"
               autoCorrect={false}
@@ -81,6 +124,7 @@ function Login({ navigation }) {
               <Image style={{ height: 30, width: 30, marginLeft: 10, }} source={require('../image/pass.png')} />
             </View>
             <TextInput
+              value={password}
               secureTextEntry={true}
               placeholder='Mật khẩu'
               onChangeText={(password) => setPassword(password)}
@@ -96,17 +140,17 @@ function Login({ navigation }) {
           <Checkbox
             style={{ backgroundColor: 'white' }}
             value={isChecked}
-            onValueChange={setChecked}
+            onValueChange={(isChecked) => setChecked(isChecked)}
             color={isChecked ? '#13625D' : undefined}
           />
           <Text style={{
-            fontSize: 14, fontWeight: 'bold', color: '#CCF0EA', marginLeft: 5
+            fontSize: 14, fontWeight: 'bold', color: 'black', marginLeft: 5
           }}>Nhớ mật khẩu</Text>
         </View>
         <View style={{ alignItems: 'center', paddingTop: 15, marginLeft: 66 }}>
-          <TouchableOpacity><Text style={{
-            fontSize: 14, fontWeight: 'bold', color: '#CCF0EA'
-            , borderBottomWidth: 1, borderColor: '#13625D'
+          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}><Text style={{
+            fontSize: 14, fontWeight: 'bold', color: 'black'
+            , borderBottomWidth: 1, borderColor: 'black'
           }}>Quên mật khẩu?</Text></TouchableOpacity>
         </View>
       </View>
@@ -114,9 +158,9 @@ function Login({ navigation }) {
       <View style={{ alignItems: 'center', paddingTop: 30 }}>
         <TouchableOpacity onPress={() => loginUser(email, password)}>
           <View style={{
-            backgroundColor: '#EAD565', width: 188, height: 47, alignItems: 'center', justifyContent: 'center', borderRadius: 20
+            backgroundColor: '#FFEA2F', width: 188, height: 47, alignItems: 'center', justifyContent: 'center', borderRadius: 20
             , borderWidth: 1
-            , borderColor: '#13625D'
+            , borderColor: '#BFB12D'
           }}>
             <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Đăng nhập</Text>
           </View>
@@ -128,8 +172,8 @@ function Login({ navigation }) {
           <View>
             <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
               <Text style={{
-                fontSize: 16, fontWeight: 'bold', marginLeft: 5, color: '#CCF0EA'
-                , borderBottomWidth: 2, borderColor: '#13625D'
+                fontSize: 16, fontWeight: 'bold', marginLeft: 5, color: 'black'
+                , borderBottomWidth: 2, borderColor: 'black'
               }}>Đăng ký ở đây</Text>
             </TouchableOpacity>
           </View>

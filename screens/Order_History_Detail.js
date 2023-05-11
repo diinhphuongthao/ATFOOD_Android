@@ -6,6 +6,7 @@ import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'fireba
 
 function Order_History_Detail({ navigation }) {
     const [order, setOrder] = useState([]);
+
     const userId = firebase.auth().currentUser.uid;
     useEffect(() => {
         const unsubscribe = firebase
@@ -13,6 +14,7 @@ function Order_History_Detail({ navigation }) {
             .collection('History')
             .doc(userId)
             .collection('orders')
+            .orderBy('createdAt', 'desc')
             .onSnapshot((querySnapshot) => {
                 const ordersData = [];
                 querySnapshot.forEach((doc) => {
@@ -27,10 +29,29 @@ function Order_History_Detail({ navigation }) {
     if (!order) {
         return <ActivityIndicator />;
     }
+    const handlePress = () => {
+        navigation.goBack();
+    };
 
 
     return (
-        <View style={{ alignItems: 'center' }}>
+        <View style={{height: '100%', backgroundColor:'#F0F0DD'}}>
+            <View style={{ flexDirection: 'row', }}>
+                <View style={{ paddingTop: 10, marginLeft: 10 }}>
+                    <TouchableOpacity style={{
+                        width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
+                        alignItems: 'center', justifyContent: 'center',
+                        borderWidth: 2, borderColor: '#BFB12D',
+                    }} onPress={handlePress} >
+                        <Image style={{ width: 40, height: 40, borderRadius: 360 }} source={require('../image/return.png')} />
+                    </TouchableOpacity>
+                </View>
+                <View style={{ paddingTop: 20, }}>
+                    <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginLeft: 50 }}>
+                        <Text style={{ fontSize: 18 }}>Lịch sử đơn món</Text>
+                    </View>
+                </View>
+            </View>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                 <FlatList
                     data={order}
@@ -44,7 +65,7 @@ function Order_History_Detail({ navigation }) {
                                     <View style={{ flexDirection: 'column' }}>
                                         <View style={{ paddingBottom: 10, justifyContent: 'center', alignItems: 'center' }}>
                                             <View style={{
-                                                height: 40, width: 200, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center'
+                                                height: 40, width: 240, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center'
                                                 , borderRadius: 30, borderWidth: 1, flexDirection: 'row'
                                             }}>
                                                 <Image style={{

@@ -4,33 +4,24 @@ import { firebase } from '../config'
 
 function List_Food({ navigation }) {
   return (
-    <View style={{ backgroundColor: '#DDF0F0', height: '100%' }}>
+    <View style={{ backgroundColor: '#F0F0DD', height: '100%' }}>
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
+      <View style={{ flexDirection: 'row', }}>
         <View style={{ paddingTop: 15, marginLeft: 15 }}>
           <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
+            width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#13625D',
+            borderWidth: 2, borderColor: '#BFB12D',
           }} onPress={() => navigation.navigate('Home')}>
             <Image style={{
               height: 38, width: 38, borderRadius: 360,
             }} source={require('../image/return.png')} />
           </TouchableOpacity>
         </View>
-        <View style={{ paddingTop: 20, }}>
-          <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ paddingTop: 20, marginLeft:40 }}>
+          <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
             <Text style={{ fontSize: 18 }}>Loại món ăn</Text>
           </View>
-        </View>
-        <View style={{ paddingTop: 15, marginRight: 15 }}>
-          <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
-            alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#13625D',
-          }}>
-            <Image style={{ width: 35, height: 35 }} source={require('../image/Notification.png')} />
-          </TouchableOpacity>
         </View>
       </View>
       {/* <View style={{alignItems: 'center',paddingTop: 140,}}>
@@ -93,17 +84,17 @@ function List_Food({ navigation }) {
           </View>
         </View>
       </View>
-      <View style={{ paddingTop: 215, marginRight: 15, alignItems: 'flex-end' }}>
+      {/* <View style={{ paddingTop: 215, marginRight: 15, alignItems: 'flex-end' }}>
         <TouchableOpacity style={{
-          width: 50, height: 50, backgroundColor: '#89C1CD', borderRadius: 360,
+          width: 50, height: 50, backgroundColor: '#FFE55E', borderRadius: 360,
           alignItems: 'center', justifyContent: 'center',
-          borderWidth: 2, borderColor: '#13625D',
-        }} onPress={() => navigation.navigate('Home')}>
+          borderWidth: 2, borderColor: '##BFB12D',
+        }} onPress={() => navigation.navigate('Chat_NVPV')}>
           <Image style={{
             height: 38, width: 38,
           }} source={require('../image/chat_box.png')} />
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   )
 }
