@@ -37,12 +37,16 @@ import Shipper_List_Detail from "../screens/Shipper_List_Detail";
 import Shipper_List_Order from "../screens/Shipper_List_Order";
 import Shipper_List_Delivering from "../screens/Shipper_List_Delivering";
 import Map from "../screens/Map";
-import Chat_Shipper from "../screens/Chat_Shipper";
 import Table_Reserve from "../screens/Table_Reserve";
 import Table_Reserve_Detail from "../screens/Table_Reserve_Detail";
 import Banner_Detail from "../screens/Banner_Detail";
 import Notification from "../screens/Notification";
 import ForgotPassword from "../screens/ForgotPassword";
+import List_Food_NVPV from "../screens/List_Food_NVPV";
+import Soup_List_NVPV from "../screens/Soup_List_NVPV";
+import Meat_List_NVPV from "../screens/Meat_List_NVPV";
+import Fish_List_NVPV from "../screens/Fish_List_NVPV";
+import Drink_List_NVPV from "../screens/Drink_List_NVPV";
 
 import { firebase } from '../config'
 import { useState, useEffect } from 'react';
@@ -99,6 +103,12 @@ function StackNavigator() {
                 <Stack.Screen name='Order_Detail' component={Order_Detail} options={{ headerShown: false }} />
                 <Stack.Screen name='Order_History_NVPV' component={Order_History_NVPV} options={{ headerShown: false }} />
                 <Stack.Screen name='Chat_Detail' component={Chat_Detail} options={{ headerShown: false }} />
+                <Stack.Screen name='List_Food_NVPV' component={List_Food_NVPV} options={{ headerShown: false }} />
+                <Stack.Screen name='Soup_List_NVPV' component={Soup_List_NVPV} options={{ headerShown: false }} />
+                <Stack.Screen name='Meat_List_NVPV' component={Meat_List_NVPV} options={{ headerShown: false }} />
+                <Stack.Screen name='Fish_List_NVPV' component={Fish_List_NVPV} options={{ headerShown: false }} />
+                <Stack.Screen name='Drink_List_NVPV' component={Drink_List_NVPV} options={{ headerShown: false }} />
+
 
                 <Stack.Screen name='Kitchen_List' component={Kitchen_List} options={{ headerShown: false }} />
                 <Stack.Screen name='Kitchen_List_Detail' component={Kitchen_List_Detail} options={{ headerShown: false }} />
@@ -112,7 +122,6 @@ function StackNavigator() {
                 <Stack.Screen name='Shipper_List_Order' component={Shipper_List_Order} options={{ headerShown: false }} />
                 <Stack.Screen name='Shipper_List_Delivering' component={Shipper_List_Delivering} options={{ headerShown: false }} />
                 <Stack.Screen name='Map' component={Map} options={{ headerShown: false }} />
-                <Stack.Screen name='Chat_Shipper' component={Chat_Shipper} options={{ headerShown: false }} />
                 {/* <Stack.Screen name='Order_Detail' component={Order_Detail} options={{ headerShown: false }} /> */}
 
             </Stack.Navigator>

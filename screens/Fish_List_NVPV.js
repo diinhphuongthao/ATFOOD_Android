@@ -1,10 +1,48 @@
 import { Text, StyleSheet, View, TouchableOpacity, Image, TextInput, FlatList } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { firebase } from '../config'
-
-function Drink_List({ navigation }) {
+function Fish_List_NVPV({ navigation, route }) {
+    const { Staff } = route.params;
+    console.log("Staff:" + Staff)
     const [drink, setDrink] = useState([]);
-    const todoRef = firebase.firestore().collection('Drink');
+    const todoRef = firebase.firestore().collection('Fish')
+    // Function để cập nhật món ăn
+    const updateDrinkStatus = async (drinkId) => {
+        const drinkRef = firebase.firestore().collection('Fish').doc(drinkId);
+
+        try {
+            // Cập nhật trường "status" của tài liệu
+            await drinkRef.update({ status: "Còn món" });
+            console.log("Cập nhật thành công.");
+            alert('cập nhật trạng thái thành công')
+        } catch (error) {
+            console.log("Lỗi khi cập nhật:", error);
+        }
+    }
+
+    // Gọi hàm cập nhật khi người dùng bấm nút hoặc xảy ra sự kiện khác
+    const handleUpdateClick = (drinkId) => {
+        updateDrinkStatus(drinkId);
+    }
+
+    const updateOverStatus = async (drinkId) => {
+        const drinkRef = firebase.firestore().collection('Fish').doc(drinkId);
+
+        try {
+            // Cập nhật trường "status" của tài liệu
+            await drinkRef.update({ status: "Hết món" });
+            console.log("Cập nhật thành công.");
+            alert('cập nhật trạng thái thành công')
+        } catch (error) {
+            console.log("Lỗi khi cập nhật:", error);
+        }
+    }
+
+    // Gọi hàm cập nhật khi người dùng bấm nút hoặc xảy ra sự kiện khác
+    const handleOverClick = (drinkId) => {
+        updateOverStatus(drinkId);
+    }
+
     useEffect(() => {
         todoRef
             .onSnapshot(
@@ -27,26 +65,12 @@ function Drink_List({ navigation }) {
     }, [])
     const [cartItems, setCartItems] = useState([]);
 
-    // Lấy số lượng item trong giỏ hàng từ sub collection "cartItems"
-    useEffect(() => {
-        const userId = firebase.auth().currentUser.uid;
-        const cartRef = firebase.firestore().collection('Cart').doc(userId).collection('cartItems');
-        const unsubscribe = cartRef.onSnapshot((querySnapshot) => {
-            const cartItemsCount = querySnapshot.size;
-            setCartItems(cartItemsCount);
-
-        }, (error) => {
-            console.log('Error getting cart items: ', error);
-        });
-        return () => unsubscribe();
-    }, []);
-
     const [lastDrink, setLastDrink] = useState(null);
 
     const searchFishes = (text) => {
         text = text.toLowerCase();
         const query = firebase.firestore()
-            .collection('Drink')
+            .collection('Fish')
             .where('name', '>=', text)
             .where('name', '<=', text + '\uf8ff')
             .orderBy('name')
@@ -69,7 +93,7 @@ function Drink_List({ navigation }) {
     const loadMoreFishes = (text) => {
         if (!lastDrink) return;
         const query = firebase.firestore()
-            .collection('Drink')
+            .collection('Fish')
             .where('name', '>=', text)
             .where('name', '<=', text + '\uf8ff')
             .orderBy('name')
@@ -90,7 +114,6 @@ function Drink_List({ navigation }) {
         });
     };
 
-
     return (
         <View style={{ backgroundColor: '#F0F0DD', height: '100%' }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
@@ -99,37 +122,18 @@ function Drink_List({ navigation }) {
                         width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
                         alignItems: 'center', justifyContent: 'center',
                         borderWidth: 2, borderColor: '#BFB12D',
-                    }} onPress={() => navigation.navigate('List_Food')}>
+                    }} onPress={() => navigation.navigate('List_Food_NVPV', { EStaff: Staff })}>
                         <Image style={{
                             height: 38, width: 38, borderRadius: 360,
                         }} source={require('../image/return.png')} />
                     </TouchableOpacity>
                 </View>
-                <View style={{ paddingTop: 20, }}>
+                <View style={{ paddingTop: 20, marginRight: 95 }}>
                     <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
                         <Text style={{ fontSize: 18 }}>Thức uống</Text>
                     </View>
                 </View>
-                <View style={{ paddingTop: 15, marginRight: 15 }}>
-                    <TouchableOpacity style={{
-                        width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
-                        alignItems: 'center', justifyContent: 'center',
-                        borderWidth: 2, borderColor: '#BFB12D',
-                    }} onPress={() => navigation.navigate('Cart')}>
-                        <Image style={{
-                            height: 26, width: 26
-                        }} source={require('../image/cart.png')} />
-                        {cartItems > 0 && (
-                            <View style={{
-                                position: 'absolute', top: 30, right: -6, backgroundColor: '#DA2121',
-                                width: 18, height: 18, borderRadius: 9,
-                                alignItems: 'center', justifyContent: 'center'
-                            }}>
-                                <Text style={{ color: 'white', fontSize: 12 }}>{cartItems}</Text>
-                            </View>
-                        )}
-                    </TouchableOpacity>
-                </View>
+
             </View>
             <View style={{ paddingTop: 18, alignItems: 'center' }}>
                 <View style={{ backgroundColor: '#f5f5f5', width: 280, height: 36, borderWidth: 1, justifyContent: 'center', borderRadius: 10 }}>
@@ -145,7 +149,7 @@ function Drink_List({ navigation }) {
             </View>
             <View style={{ paddingTop: 20 }}>
                 <View style={{ width: '100%', height: 600, alignItems: 'center', }}>
-                <FlatList
+                    <FlatList
                         style={{}}
                         onEndReached={loadMoreFishes}
                         onEndReachedThreshold={0.1}
@@ -154,50 +158,37 @@ function Drink_List({ navigation }) {
                         numColumns={2}
                         renderItem={({ item }) => (
                             <View style={{ justifyContent: 'center', paddingTop: 40, alignItems: 'center', marginRight: 15 }}>
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        if (item.status === "Còn món") {
-                                            navigation.navigate('Detail_Drink', { foodID: item.id });
-                                        }
-                                    }}
-                                    style={{
-                                        marginLeft: 15,
-                                        justifyContent: 'center',
-                                        borderWidth: 1,
-                                        borderRadius: 10,
-                                        marginLeft: 15,
-                                        opacity: item.status === "Hết món" ? 0.5 : 1, // Đặt độ mờ (opacity) của nút khi trạng thái là "Hết món"
-                                    }}
-                                    disabled={item.status === "Hết món"} // Vô hiệu hóa nút khi trạng thái là "Hết món"
-                                >
+                                <View style={{ marginLeft: 15, justifyContent: 'center', borderWidth: 1, borderRadius: 10, marginLeft: 15, }}>
                                     <View style={{}}>
-                                        <Image style={{ width: 130, height: 92, borderTopRightRadius: 10, borderTopLeftRadius: 10 }} source={{ uri: item.image }}/>
-                                        {item.status === "Hết món" && (
-                                                <View style={{ backgroundColor: 'red', width:70,height:25, position:'absolute', alignItems:'center'
-                                                , borderTopLeftRadius:10, borderBottomRightRadius:10, justifyContent:'center'  }}>
-                                                    <Text style={{ fontSize: 13, color: "black",fontWeight:'bold' }}>{item.status}</Text>
-                                                </View>
-                                            )}
+                                        <Image style={{ width: 150, height: 92, borderTopRightRadius: 10, borderTopLeftRadius: 10 }} source={{
+                                            uri: item.image
+                                        }} />
                                     </View>
-                                    <View
-                                        style={{
-                                            backgroundColor: '#EBE5AB',
-                                            height: 60,
-                                            borderBottomLeftRadius: 10,
-                                            borderBottomRightRadius: 10,
-                                            borderTopWidth: 1,
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                        }}
-                                    >
+                                    <View style={{
+                                        backgroundColor: '#EBE5AB', height: 90, borderBottomLeftRadius: 10, borderBottomRightRadius: 10, borderTopWidth: 1
+                                        , alignItems: 'center', justifyContent: 'center'
+                                    }}>
                                         <Text style={{ fontSize: 16 }}>{item.name}</Text>
                                         <View style={{ flexDirection: 'row' }}>
                                             <Text style={{ fontSize: 15 }}>{item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</Text>
                                             <Text style={{ marginLeft: 2, fontSize: 15 }}>{item.denominations}</Text>
                                         </View>
-
+                                        <View style={{ flexDirection: 'row', paddingTop: 10 }}>
+                                        <TouchableOpacity onPress={() => handleUpdateClick(item.id)} style={{ backgroundColor: item.status === "Còn món" ? "gray" : '#16BB13', borderRadius: 5 }}
+                                                  disabled={item.status === "Còn món"}
+                                                >
+                                                    <Text> Còn món </Text>
+                                                </TouchableOpacity>
+                                           
+                                                <TouchableOpacity onPress={() => handleOverClick(item.id)} style={{ backgroundColor: item.status === "Hết món" ? "gray" : '#F54E4E', marginLeft: 10, borderRadius: 5 }}
+                                                  disabled={item.status === "Hết món"}
+                                                >
+                                                    <Text> Hết món </Text>
+                                                </TouchableOpacity>
+                                        </View>
                                     </View>
-                                </TouchableOpacity>
+                                   
+                                </View>
                             </View>
                         )}
                     />
@@ -206,6 +197,7 @@ function Drink_List({ navigation }) {
 
         </View>
     )
+
 }
 
-export default Drink_List;
+export default Fish_List_NVPV;

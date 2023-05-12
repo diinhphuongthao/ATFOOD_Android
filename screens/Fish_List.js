@@ -12,13 +12,14 @@ function Fish_List({ navigation }) {
                 querySnapshot => {
                     const fish = []
                     querySnapshot.forEach((doc) => {
-                        const { image, name, price, denominations } = doc.data()
+                        const { image, name, price, denominations, status } = doc.data()
                         fish.push({
                             id: doc.id,
                             image,
                             name,
                             price,
                             denominations,
+                            status
                         })
                     })
                     setFish(fish)
@@ -146,7 +147,7 @@ function Fish_List({ navigation }) {
             </View>
             <View style={{ paddingTop: 20 }}>
                 <View style={{ width: '100%', height: 600, alignItems: 'center', }}>
-                    <FlatList
+                <FlatList
                         style={{}}
                         onEndReached={loadMoreFishes}
                         onEndReachedThreshold={0.1}
@@ -155,21 +156,48 @@ function Fish_List({ navigation }) {
                         numColumns={2}
                         renderItem={({ item }) => (
                             <View style={{ justifyContent: 'center', paddingTop: 40, alignItems: 'center', marginRight: 15 }}>
-                                <TouchableOpacity onPress={() => navigation.navigate('Detail_Fish', { foodID: item.id })} style={{ marginLeft: 15, justifyContent: 'center', borderWidth: 1, borderRadius: 10, marginLeft: 15, }}>
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        if (item.status === "Còn món") {
+                                            navigation.navigate('Detail_Soup', { foodID: item.id });
+                                        }
+                                    }}
+                                    style={{
+                                        marginLeft: 15,
+                                        justifyContent: 'center',
+                                        borderWidth: 1,
+                                        borderRadius: 10,
+                                        marginLeft: 15,
+                                        opacity: item.status === "Hết món" ? 0.5 : 1, // Đặt độ mờ (opacity) của nút khi trạng thái là "Hết món"
+                                    }}
+                                    disabled={item.status === "Hết món"} // Vô hiệu hóa nút khi trạng thái là "Hết món"
+                                >
                                     <View style={{}}>
-                                        <Image style={{ width: 130, height: 92, borderTopRightRadius: 10, borderTopLeftRadius: 10 }} source={{
-                                            uri: item.image
-                                        }} />
+                                        <Image style={{ width: 130, height: 92, borderTopRightRadius: 10, borderTopLeftRadius: 10 }} source={{ uri: item.image }}/>
+                                        {item.status === "Hết món" && (
+                                                <View style={{ backgroundColor: 'red', width:70,height:25, position:'absolute', alignItems:'center'
+                                                , borderTopLeftRadius:10, borderBottomRightRadius:10, justifyContent:'center'  }}>
+                                                    <Text style={{ fontSize: 13, color: "black",fontWeight:'bold' }}>{item.status}</Text>
+                                                </View>
+                                            )}
                                     </View>
-                                    <View style={{
-                                        backgroundColor: '#EBE5AB', height: 60, borderBottomLeftRadius: 10, borderBottomRightRadius: 10, borderTopWidth: 1
-                                        , alignItems: 'center', justifyContent: 'center'
-                                    }}>
+                                    <View
+                                        style={{
+                                            backgroundColor: '#EBE5AB',
+                                            height: 60,
+                                            borderBottomLeftRadius: 10,
+                                            borderBottomRightRadius: 10,
+                                            borderTopWidth: 1,
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
                                         <Text style={{ fontSize: 16 }}>{item.name}</Text>
                                         <View style={{ flexDirection: 'row' }}>
                                             <Text style={{ fontSize: 15 }}>{item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</Text>
                                             <Text style={{ marginLeft: 2, fontSize: 15 }}>{item.denominations}</Text>
                                         </View>
+
                                     </View>
                                 </TouchableOpacity>
                             </View>

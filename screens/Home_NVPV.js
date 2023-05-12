@@ -4,11 +4,14 @@ import { firebase } from '../config'
 
 function Home_NVPV({ navigation, route }) {
   const { IdStaff } = route.params;
+  const { Staff } = route.params;
+  console.log("idStaff:" + IdStaff)
+  console.log("Staff:" + Staff)
   const handlePress = () => {
     navigation.goBack();
   };
   const [email, setEmail] = useState('');
-  const userRef = firebase.firestore().collection('Staff').where('email', '==', IdStaff);
+  const userRef = firebase.firestore().collection('Staff').where('email', '==', IdStaff || Staff);
   userRef.get().then((querySnapshot) => {
     querySnapshot.forEach((doc) => {
       console.log(doc.id, " => ", doc.data());
@@ -62,7 +65,7 @@ function Home_NVPV({ navigation, route }) {
               </TouchableOpacity>
             </View>
             <View style={{ paddingTop: 20 }}>
-              <TouchableOpacity onPress={() => navigation.navigate('Menu_NVPV')} style={{
+              <TouchableOpacity onPress={() => navigation.navigate('List_Food_NVPV', { EmailStaff: IdStaff || Staff })} style={{
                 width: 160, height: 100, backgroundColor: '#ffffff', alignItems: 'center', justifyContent: 'center'
                 , borderRadius: 20
                 , borderWidth: 1
