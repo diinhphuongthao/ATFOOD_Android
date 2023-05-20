@@ -22,14 +22,14 @@ function Detail_Meat({ route, navigation }) {
     setNote(text); // Cập nhật giá trị của note khi người dùng nhập liệu vào TextInput
   };
   const [cartItems, setCartItems] = useState([]);
-   // Lấy số lượng item trong giỏ hàng từ sub collection "cartItems"
-   useEffect(() => {
+  // Lấy số lượng item trong giỏ hàng từ sub collection "cartItems"
+  useEffect(() => {
     const userId = firebase.auth().currentUser.uid;
     const cartRef = firebase.firestore().collection('Cart').doc(userId).collection('cartItems');
     const unsubscribe = cartRef.onSnapshot((querySnapshot) => {
       const cartItemsCount = querySnapshot.size;
       setCartItems(cartItemsCount);
-      
+
     }, (error) => {
       console.log('Error getting cart items: ', error);
     });
@@ -60,15 +60,15 @@ function Detail_Meat({ route, navigation }) {
       const orderRef = firebase.firestore().collection('Orders').where('uid', '==', userId);
       const orderSnapshot = await orderRef.get();
       if (!orderSnapshot.empty) {
-          alert('Bạn đã có đơn hàng chưa hoàn thành. Vui lòng đợi trong ít phút trước khi đặt đơn hàng mới.');
-          return;
+        alert('Bạn đã có đơn hàng chưa hoàn thành. Vui lòng đợi trong ít phút trước khi đặt đơn hàng mới.');
+        return;
       }
       // Kiểm tra nếu đã có đơn hàng chưa hoàn thành thì không cho đặt thêm
       const deliverRef = firebase.firestore().collection('Delivering').where('uid', '==', userId);
       const deliverSnapshot = await deliverRef.get();
       if (!deliverSnapshot.empty) {
-          alert('Bạn đã có đơn hàng chưa hoàn thành. Vui lòng đợi trong ít phút trước khi đặt đơn hàng mới.');
-          return;
+        alert('Bạn đã có đơn hàng chưa hoàn thành. Vui lòng đợi trong ít phút trước khi đặt đơn hàng mới.');
+        return;
       }
       const cartDocRef = cartRef.collection('cartItems').doc();
       const foodItem = {
@@ -142,11 +142,17 @@ function Detail_Meat({ route, navigation }) {
             width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
             borderWidth: 2, borderColor: '#BFB12D',
-          }} onPress={() => navigation.navigate('Cart')}>
+          }} onPress={() => {
+            if (cartItems > 0) {
+              navigation.navigate('Cart');
+            } else {
+              alert('Chưa thêm món vào giỏ hàng');
+            }
+          }}>
             <Image style={{
               height: 26, width: 26
             }} source={require('../image/cart.png')} />
-             {cartItems > 0 && (
+            {cartItems > 0 && (
               <View style={{
                 position: 'absolute', top: 30, right: -6, backgroundColor: '#DA2121',
                 width: 18, height: 18, borderRadius: 9,
@@ -207,7 +213,7 @@ function Detail_Meat({ route, navigation }) {
                     width: 310,
                     height: 90,
                     paddingTop: 10, // căn lề trên
-                    textAlignVertical:'top'
+                    textAlignVertical: 'top'
                   }}
                   placeholder='ghi chú cho món ăn...'
                   multiline={true} // đa dòng

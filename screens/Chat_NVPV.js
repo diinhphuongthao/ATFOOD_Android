@@ -29,6 +29,7 @@ function Chat_NVPV({ navigation }) {
           senderId: currentUser.uid,
           senderName: userData.name,
           senderPhone: userData.phone,
+          status: 'chưa xem',
           time: new Date().getTime()
         };
         const newMessage2 = {
@@ -65,6 +66,9 @@ function Chat_NVPV({ navigation }) {
     });
   }
 
+  const goBack = () => {
+    navigation.goBack()
+  }
 
   const renderItem = ({ item }) => {
     const timestamp = item.time;
@@ -76,10 +80,10 @@ function Chat_NVPV({ navigation }) {
     const minutes = ('0' + date.getMinutes()).slice(-2);
     const seconds = ('0' + date.getSeconds()).slice(-2);
     const dateString = `${hours}:${minutes}:${seconds}`;
-    
+
     let sender = item.senderName;
     let textStyle = styles.messageContainerRight;
-    
+
     if (item.nvName) {
       sender = item.nvName;
       textStyle = styles.messageContainer; // Style của nvName
@@ -95,14 +99,18 @@ function Chat_NVPV({ navigation }) {
     // let sender = item.senderName;
     // let textStyle = styles.messageContainer; // Mặc định là style của senderName
 
-  
+
 
     return (
       <View style={textStyle}>
         <Text style={styles.messageText}>{item.content}</Text>
-        <Text style={styles.messageInfo}>{`${sender}  
-        ${dateString}`}</Text>
+        {item.status !== undefined ? (
+          <Text style={styles.messageInfo}>{`${sender} • ${dateString} • ${item.status}`}</Text>
+        ) : (
+          <Text style={styles.messageInfo}>{`${sender} • ${dateString}`}</Text>
+        )}
       </View>
+
     );
   };
 
@@ -114,9 +122,35 @@ function Chat_NVPV({ navigation }) {
       .onSnapshot((querySnapshot) => {
         const messages = querySnapshot.docs.map((doc) => doc.data()).reverse();
         setMessages(messages);
+
+        orderRef.get().then((documentSnapshot) => {
+          const orderData = documentSnapshot.data();
+          const nvid = orderData?.nvid;
+
+          const batch = firebase.firestore().batch();
+          querySnapshot.docs.forEach((documentSnapshot) => {
+            const messageData = documentSnapshot.data();
+            const messageId = documentSnapshot.id;
+            const senderId = messageData.senderId;
+
+            if (nvid || senderId === nvid) {
+              const docRef = orderRef.collection('messages').doc(messageId);
+              batch.update(docRef, { status: 'đã xem' });
+            }
+          });
+
+          batch.commit().catch((error) => {
+            console.error('Error updating message statuses:', error);
+          });
+        });
       });
-    return () => unsubscribe();
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
+
+
 
   const handleDeleteConversation = () => {
     orderRef.collection('messages').get()
@@ -135,7 +169,7 @@ function Chat_NVPV({ navigation }) {
       .catch(error => {
         console.error("Error deleting conversation: ", error);
       });
-      
+
   }
 
 
@@ -150,27 +184,16 @@ function Chat_NVPV({ navigation }) {
             width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
             borderWidth: 2, borderColor: '#BFB12D',
-          }} onPress={handleDeleteConversation}>
+          }} onPress={goBack}>
             <Image style={{
               height: 38, width: 38, borderRadius: 360,
             }} source={require('../image/return.png')} />
           </TouchableOpacity>
         </View>
-        <View style={{ paddingTop: 20, }}>
+        <View style={{ paddingTop: 20, marginRight: 95 }}>
           <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
             <Text style={{ fontSize: 18 }}>Nhắn tin</Text>
           </View>
-        </View>
-        <View style={{ paddingTop: 15, marginRight: 15 }}>
-          <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
-            alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#BFB12D',
-          }}>
-            {/* <Image style={{
-              height: 26, width: 26
-            }} source={require('../image/cart.png')} /> */}
-          </TouchableOpacity>
         </View>
       </View>
       <KeyboardAvoidingView
@@ -193,9 +216,9 @@ function Chat_NVPV({ navigation }) {
             value={message}
             onChangeText={setMessage}
           />
-          <TouchableOpacity style={{ backgroundColor: '#BFB12D', borderRadius: 360, height: 46, width: 46, alignItems: 'center', justifyContent: 'center' }} onPress={handleSend}>
+          <TouchableOpacity style={{ borderRadius: 360, height: 46, width: 46, alignItems: 'center', justifyContent: 'center' }} onPress={handleSend}>
             <Image style={{
-              height: 38, width: 38, marginRight: 5
+              height: 38, width: 38, marginLeft: 5
             }} source={require('../image/Send.png')} />
           </TouchableOpacity>
         </View>

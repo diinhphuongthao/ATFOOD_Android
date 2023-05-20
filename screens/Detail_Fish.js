@@ -31,7 +31,7 @@ function Detail_Fish({ route, navigation }) {
     const unsubscribe = cartRef.onSnapshot((querySnapshot) => {
       const cartItemsCount = querySnapshot.size;
       setCartItems(cartItemsCount);
-      
+
     }, (error) => {
       console.log('Error getting cart items: ', error);
     });
@@ -147,7 +147,13 @@ function Detail_Fish({ route, navigation }) {
             width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
             borderWidth: 2, borderColor: '#BFB12D',
-          }} onPress={() => navigation.navigate('Cart')}>
+          }} onPress={() => {
+            if (cartItems > 0) {
+              navigation.navigate('Cart');
+            } else {
+              alert('Chưa thêm món vào giỏ hàng');
+            }
+          }}>
             <Image style={{
               height: 26, width: 26
             }} source={require('../image/cart.png')} />

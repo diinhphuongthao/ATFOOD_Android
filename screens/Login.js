@@ -36,8 +36,13 @@ function Login({ navigation }) {
         loggedIn = true;
       }
     }
-    if (!loggedIn) { // Nếu không đăng nhập thành công, thực hiện đăng nhập bằng email và password
-      await firebase.auth().signInWithEmailAndPassword(email, password);
+    try {
+      if (!loggedIn) {
+        // Nếu không đăng nhập thành công, thực hiện đăng nhập bằng email và password
+        await firebase.auth().signInWithEmailAndPassword(email, password);
+      }
+    } catch (error) {
+      alert('Đăng nhập không thành công, sai mật khẩu hoặc tài khoản');
     }
     if (isChecked) {
       AsyncStorage.setItem('rememberMe', JSON.stringify(true));

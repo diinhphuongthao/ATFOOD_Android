@@ -33,7 +33,8 @@ function Chat_Detail({ orderId, route, navigation }) {
             nvid: doc.id,
             nvName: userData.name,
             nvPhone: userData.phone,
-            time: new Date().getTime()
+            time: new Date().getTime(),
+            status: 'chưa xem',
           };
           const newMessage2 = {
             nvid: doc.id,
@@ -85,7 +86,11 @@ function Chat_Detail({ orderId, route, navigation }) {
     return (
       <View style={textStyle}>
         <Text style={styles.messageText}>{item.content}</Text>
-        <Text style={styles.messageInfo}>{`${sender} • ${dateString}`}</Text>
+        {item.status !== undefined ? (
+          <Text style={styles.messageInfo}>{`${sender} • ${dateString} • ${item.status}`}</Text>
+        ) : (
+          <Text style={styles.messageInfo}>{`${sender} • ${dateString}`}</Text>
+        )}
       </View>
     );
   };
@@ -97,8 +102,14 @@ function Chat_Detail({ orderId, route, navigation }) {
         const messages = querySnapshot.docs.map((doc) => doc.data()).reverse();
         setMessages(messages);
       });
-    return () => unsubscribe();
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
+
+
+
 
   const handleDeleteConversation = () => {
     orderRef.collection('messages').get()
@@ -119,6 +130,21 @@ function Chat_Detail({ orderId, route, navigation }) {
       });
   }
 
+  const handleReturn = () => {
+    orderRef.update({
+      statusRoom: 'Chưa có',
+      nvid: firebase.firestore.FieldValue.delete(),
+      nvName: firebase.firestore.FieldValue.delete(),
+      nvPhone: firebase.firestore.FieldValue.delete()
+    }).then(() => {
+      console.log("Successfully removed nvid field.");
+    }).catch((error) => {
+      console.error("Error removing nvid field:", error);
+    });
+    navigation.navigate('Chat', { EmailStaff: emailStaff });
+  };
+
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -129,28 +155,18 @@ function Chat_Detail({ orderId, route, navigation }) {
             width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
             alignItems: 'center', justifyContent: 'center',
             borderWidth: 2, borderColor: '#BFB12D',
-          }} onPress={() => navigation.navigate('Chat',  { EmailStaff: emailStaff })}>
+          }} onPress={handleReturn}>
             <Image style={{
               height: 38, width: 38, borderRadius: 360,
             }} source={require('../image/return.png')} />
           </TouchableOpacity>
         </View>
-        <View style={{ paddingTop: 20, }}>
-          <View style={{ backgroundColor: '#86D3D3', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ paddingTop: 20, marginRight: 95 }}>
+          <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
             <Text style={{ fontSize: 18 }}>Nhắn tin</Text>
           </View>
         </View>
-        <View style={{ paddingTop: 15, marginRight: 15 }}>
-          <TouchableOpacity style={{
-            width: 46, height: 47, backgroundColor: '#89C1CD', borderRadius: 360,
-            alignItems: 'center', justifyContent: 'center',
-            borderWidth: 2, borderColor: '#13625D',
-          }} onPress={handleDeleteConversation}>
-            {/* <Image style={{
-              height: 26, width: 26
-            }} source={require('../image/cart.png')} /> */}
-          </TouchableOpacity>
-        </View>
+
       </View>
       <KeyboardAvoidingView
         style={{ height: 700 }}
@@ -170,7 +186,7 @@ function Chat_Detail({ orderId, route, navigation }) {
             value={message}
             onChangeText={setMessage}
           />
-          <TouchableOpacity style={{ backgroundColor: '#8CD6F6', borderRadius: 360, height: 46, width: 46, alignItems: 'center', justifyContent: 'center' }} onPress={handleSend}>
+          <TouchableOpacity style={{ borderRadius: 360, height: 46, width: 46, alignItems: 'center', justifyContent: 'center' }} onPress={handleSend}>
             <Image style={{
               height: 38, width: 38, marginRight: 5
             }} source={require('../image/Send.png')} />
@@ -219,7 +235,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#DDF0F0',
+    backgroundColor: '#F0F0DD',
     paddingVertical: 10,
     paddingHorizontal: 20,
   },

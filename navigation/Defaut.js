@@ -31,7 +31,7 @@ import Kitchen_List from "../screens/Kitchen_List";
 import Kitchen_List_Detail from "../screens/Kitchen_List_Detail";
 import Kitchen_List_Order from "../screens/Kitchen_List_Order";
 import Kitchen_List_Cooking from "../screens/Kitchen_List_Cooking";
-import Chat_Kitchen from "../screens/Chat_Kitchen";
+
 import Shipper_List from "../screens/Shipper_List";
 import Shipper_List_Detail from "../screens/Shipper_List_Detail";
 import Shipper_List_Order from "../screens/Shipper_List_Order";
@@ -47,6 +47,7 @@ import Soup_List_NVPV from "../screens/Soup_List_NVPV";
 import Meat_List_NVPV from "../screens/Meat_List_NVPV";
 import Fish_List_NVPV from "../screens/Fish_List_NVPV";
 import Drink_List_NVPV from "../screens/Drink_List_NVPV";
+
 
 import { firebase } from '../config'
 import { useState, useEffect } from 'react';
@@ -82,7 +83,7 @@ function StackNavigator() {
     // const docRef = staffRef.get()
     // docRef.forEach((doc) => {
     //     const loaiNV = doc.data().loaiNV;
-    //     // setNhanVien(loaiNV);
+    //     setNhanVien(loaiNV);
     // });
 
     if (!user) {
@@ -114,7 +115,7 @@ function StackNavigator() {
                 <Stack.Screen name='Kitchen_List_Detail' component={Kitchen_List_Detail} options={{ headerShown: false }} />
                 <Stack.Screen name='Kitchen_List_Order' component={Kitchen_List_Order} options={{ headerShown: false }} />
                 <Stack.Screen name='Kitchen_List_Cooking' component={Kitchen_List_Cooking} options={{ headerShown: false }} />
-                <Stack.Screen name='Chat_Kitchen' component={Chat_Kitchen} options={{ headerShown: false }} />
+
                 {/* <Stack.Screen name='Order_Detail' component={Order_Detail} options={{ headerShown: false }} /> */}
 
                 <Stack.Screen name='Shipper_List' component={Shipper_List} options={{ headerShown: false }} />
@@ -128,48 +129,6 @@ function StackNavigator() {
 
         );
     }
-
-    // if (loaiNV === 'nhan vien phuc vu') {
-    //     return (
-    //         <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#daa520', } }}>
-    //             <Stack.Screen name='Home_NVPV' component={Home_NVPV} options={{ headerShown: false }} />
-    //             <Stack.Screen name='Order_NVPV' component={Order_NVPV} options={{ headerShown: false }} />
-    //             <Stack.Screen name='Table_NVPV' component={Table_NVPV} options={{ headerShown: false }} />
-    //             <Stack.Screen name='Table_NVPV_Detail' component={Table_NVPV_Detail} options={{ headerShown: false }} />
-    //             <Stack.Screen name='Chat' component={Chat} options={{ headerShown: false }} />
-    //             <Stack.Screen name='Menu_NVPV' component={Menu_NVPV} options={{ headerShown: false }} />
-    //             <Stack.Screen name='Order_Detail' component={Order_Detail} options={{ headerShown: false }} />
-    //             <Stack.Screen name='Order_History_NVPV' component={Order_History_NVPV} options={{ headerShown: false }} />
-    //             <Stack.Screen name='Chat_Detail' component={Chat_Detail} options={{ headerShown: false }} />
-    //         </Stack.Navigator>
-
-
-    //     );
-    // } if (loaiNV === 'nhan vien bep') {
-    //     return (
-
-    //         <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#daa520', } }}>
-    //             <Stack.Screen name='Kitchen_List' component={Kitchen_List} options={{ headerShown: false }} />
-    //             <Stack.Screen name='Kitchen_List_Detail' component={Kitchen_List_Detail} options={{ headerShown: false }} />
-    //             <Stack.Screen name='Kitchen_List_Order' component={Kitchen_List_Order} options={{ headerShown: false }} />
-    //             <Stack.Screen name='Kitchen_List_Cooking' component={Kitchen_List_Cooking} options={{ headerShown: false }} />
-    //             <Stack.Screen name='Chat_Kitchen' component={Chat_Kitchen} options={{ headerShown: false }} />
-    //             <Stack.Screen name='Order_Detail' component={Order_Detail} options={{ headerShown: false }} />
-    //         </Stack.Navigator>
-
-
-    //     );
-    // }
-    // if (loaiNV === 'nhan vien giao hang') {
-    //     return (
-
-    //         <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#daa520', } }}>
-
-    //         </Stack.Navigator>
-
-
-    //     );
-    // }
 
     return (
         <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#daa520', } }}>
@@ -198,7 +157,93 @@ function StackNavigator() {
             <Stack.Screen name='Map' component={Map} options={{ headerShown: false }} />
         </Stack.Navigator>
     );
+    // if (!user) {
+    //     if (nhanvien === 'nhan vien phuc vu') {
+    //         return (
+    //             <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#daa520' } }}>
+    //                 <Stack.Screen name='Home_NVPV' component={Home_NVPV} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Order_NVPV' component={Order_NVPV} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Table_NVPV' component={Table_NVPV} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Table_NVPV_Detail' component={Table_NVPV_Detail} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Chat' component={Chat} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Menu_NVPV' component={Menu_NVPV} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Order_Detail' component={Order_Detail} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Order_History_NVPV' component={Order_History_NVPV} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Chat_Detail' component={Chat_Detail} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='List_Food_NVPV' component={List_Food_NVPV} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Soup_List_NVPV' component={Soup_List_NVPV} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Meat_List_NVPV' component={Meat_List_NVPV} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Fish_List_NVPV' component={Fish_List_NVPV} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Drink_List_NVPV' component={Drink_List_NVPV} options={{ headerShown: false }} />
+    //             </Stack.Navigator>
+    //         );
+    //     } else if (nhanvien === 'nhan vien bep') {
+    //         return (
+    //             <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#daa520' } }}>
+    //                 <Stack.Screen name='Kitchen_List' component={Kitchen_List} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Kitchen_List_Detail' component={Kitchen_List_Detail} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Kitchen_List_Order' component={Kitchen_List_Order} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Kitchen_List_Cooking' component={Kitchen_List_Cooking} options={{ headerShown: false }} />
+    //             </Stack.Navigator>
+    //         );
+    //     } else if (nhanvien === 'nhan vien giao hang') {
+    //         return (
+    //             <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#daa520' } }}>
+    //                 <Stack.Screen name='Shipper_List' component={Shipper_List} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Shipper_List_Detail' component={Shipper_List_Detail} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Shipper_List_Order' component={Shipper_List_Order} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Shipper_List_Delivering' component={Shipper_List_Delivering} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Map' component={Map} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Chat_Kitchen' component={Chat_Kitchen} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Chat_Kitchen_Detail' component={Chat_Kitchen_Detail} options={{ headerShown: false }} />
+    //             </Stack.Navigator>
+    //         );
+    //     } else {
+    //         // Default screens for non-logged in users
+    //         return (
+    //             <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#daa520' } }}>
+    //                 <Stack.Screen name='StartedApp' component={StartedApp} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='Login' component={Login} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='SignUp' component={SignUp} options={{ headerShown: false }} />
+    //                 <Stack.Screen name='ForgotPassword' component={ForgotPassword} options={{ headerShown: false }} />
+    //             </Stack.Navigator>
+    //         );
+    //     }
+    // } else {
+    //     // Screens for logged-in users
+    //     return (
+    //         <Stack.Navigator screenOptions={{ headerStyle: { backgroundColor: '#daa520', } }}>
+    //             <Stack.Screen name='Home' component={Home} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Banner_Detail' component={Banner_Detail} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Profile' component={Profile} options={{ headerShown: false }} />
+    //             <Stack.Screen name='List_Food' component={List_Food} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Meat_List' component={Meat_List} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Fish_List' component={Fish_List} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Soup_List' component={Soup_List} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Drink_List' component={Drink_List} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Detail_Meat' component={Detail_Meat} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Detail_Soup' component={Detail_Soup} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Detail_Fish' component={Detail_Fish} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Detail_Drink' component={Detail_Drink} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Order_History' component={Order_History} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Order_Detail' component={Order_Detail} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Order_History_Detail' component={Order_History_Detail} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Cart' component={Cart} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Chat_NVPV' component={Chat_NVPV} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Table_Reserve' component={Table_Reserve} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Table_Reserve_Detail' component={Table_Reserve_Detail} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Shipper_List_Detail' component={Shipper_List_Detail} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Notification' component={Notification} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Kitchen_List_Detail' component={Kitchen_List_Detail} options={{ headerShown: false }} />
+    //             <Stack.Screen name='Map' component={Map} options={{ headerShown: false }} />
+    //         </Stack.Navigator>
+    //     );
+    // }
 }
+
+
+
+
 const MainNavigator = () => {
     return (
 

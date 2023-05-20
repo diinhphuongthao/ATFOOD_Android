@@ -266,17 +266,7 @@ function Order_History({ navigation }) {
                     </View>
                   </TouchableOpacity>
                 </View>
-                {/* <View style={{ alignItems: 'center', paddingTop: 30 }}>
-                  <TouchableOpacity onPress={() => navigation.navigate('Map', {orderId: item.key})}>
-                    <View style={{
-                      height: 60, width: 200, backgroundColor: '#16BB13', justifyContent: 'center', alignItems: 'center',
-                      borderRadius: 10
-                    }}>
-                      <Text style={{ fontSize: 16 }}>Xem bản đồ</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View> */}
-
+  
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                   <View style={{ paddingTop: 140, alignItems: 'center', justifyContent: 'center' }}>
                     <TouchableOpacity onPress={() => cancelOrder(item.key)}>

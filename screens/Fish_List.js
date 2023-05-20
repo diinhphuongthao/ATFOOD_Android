@@ -117,7 +117,13 @@ function Fish_List({ navigation }) {
                         width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
                         alignItems: 'center', justifyContent: 'center',
                         borderWidth: 2, borderColor: '#BFB12D',
-                    }} onPress={() => navigation.navigate('Cart')}>
+                    }} onPress={() => {
+                        if (cartItems > 0) {
+                            navigation.navigate('Cart');
+                        } else {
+                            alert('Chưa thêm món vào giỏ hàng');
+                        }
+                    }}>
                         <Image style={{
                             height: 26, width: 26
                         }} source={require('../image/cart.png')} />
@@ -140,14 +146,14 @@ function Fish_List({ navigation }) {
                             <Image style={{ width: 22, height: 22 }} source={require('../image/search.png')} />
                         </View>
                         <View style={{ paddingLeft: 10, }}>
-                            <TextInput placeholder='Tên món...' style={{ fontSize: 16, width:280 }} onChangeText={searchFishes}></TextInput>
+                            <TextInput placeholder='Tên món...' style={{ fontSize: 16, width: 280 }} onChangeText={searchFishes}></TextInput>
                         </View>
                     </View>
                 </View>
             </View>
             <View style={{ paddingTop: 20 }}>
                 <View style={{ width: '100%', height: 600, alignItems: 'center', }}>
-                <FlatList
+                    <FlatList
                         style={{}}
                         onEndReached={loadMoreFishes}
                         onEndReachedThreshold={0.1}
@@ -159,7 +165,7 @@ function Fish_List({ navigation }) {
                                 <TouchableOpacity
                                     onPress={() => {
                                         if (item.status === "Còn món") {
-                                            navigation.navigate('Detail_Soup', { foodID: item.id });
+                                            navigation.navigate('Detail_Fish', { foodID: item.id });
                                         }
                                     }}
                                     style={{
@@ -173,13 +179,15 @@ function Fish_List({ navigation }) {
                                     disabled={item.status === "Hết món"} // Vô hiệu hóa nút khi trạng thái là "Hết món"
                                 >
                                     <View style={{}}>
-                                        <Image style={{ width: 130, height: 92, borderTopRightRadius: 10, borderTopLeftRadius: 10 }} source={{ uri: item.image }}/>
+                                        <Image style={{ width: 130, height: 92, borderTopRightRadius: 10, borderTopLeftRadius: 10 }} source={{ uri: item.image }} />
                                         {item.status === "Hết món" && (
-                                                <View style={{ backgroundColor: 'red', width:70,height:25, position:'absolute', alignItems:'center'
-                                                , borderTopLeftRadius:10, borderBottomRightRadius:10, justifyContent:'center'  }}>
-                                                    <Text style={{ fontSize: 13, color: "black",fontWeight:'bold' }}>{item.status}</Text>
-                                                </View>
-                                            )}
+                                            <View style={{
+                                                backgroundColor: 'red', width: 70, height: 25, position: 'absolute', alignItems: 'center'
+                                                , borderTopLeftRadius: 10, borderBottomRightRadius: 10, justifyContent: 'center'
+                                            }}>
+                                                <Text style={{ fontSize: 13, color: "black", fontWeight: 'bold' }}>{item.status}</Text>
+                                            </View>
+                                        )}
                                     </View>
                                     <View
                                         style={{

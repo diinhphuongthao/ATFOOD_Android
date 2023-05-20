@@ -25,7 +25,7 @@ function Soup_List_NVPV({ navigation, route }) {
         updateDrinkStatus(drinkId);
     }
 
-    const updateOverStatus = async (drinkId) => {
+    const handleOverClick = async (drinkId) => {
         const drinkRef = firebase.firestore().collection('Soup').doc(drinkId);
 
         try {
@@ -39,9 +39,9 @@ function Soup_List_NVPV({ navigation, route }) {
     }
 
     // Gọi hàm cập nhật khi người dùng bấm nút hoặc xảy ra sự kiện khác
-    const handleOverClick = (drinkId) => {
-        updateOverStatus(drinkId);
-    }
+    // const handleOverClick = (drinkId) => {
+    //     // updateOverStatus(drinkId);
+    // }
 
     useEffect(() => {
         todoRef
@@ -174,20 +174,20 @@ function Soup_List_NVPV({ navigation, route }) {
                                             <Text style={{ marginLeft: 2, fontSize: 15 }}>{item.denominations}</Text>
                                         </View>
                                         <View style={{ flexDirection: 'row', paddingTop: 10 }}>
-                                        <TouchableOpacity onPress={() => handleUpdateClick(item.id)} style={{ backgroundColor: item.status === "Còn món" ? "gray" : '#16BB13', borderRadius: 5 }}
-                                                  disabled={item.status === "Còn món"}
-                                                >
-                                                    <Text> Còn món </Text>
-                                                </TouchableOpacity>
-                                           
-                                                <TouchableOpacity onPress={() => handleOverClick(item.id)} style={{ backgroundColor: item.status === "Hết món" ? "gray" : '#F54E4E', marginLeft: 10, borderRadius: 5 }}
-                                                  disabled={item.status === "Hết món"}
-                                                >
-                                                    <Text> Hết món </Text>
-                                                </TouchableOpacity>
+                                            <TouchableOpacity onPress={() => handleUpdateClick(item.id)} style={{ backgroundColor: item.status === "Còn món" ? "gray" : '#16BB13', borderRadius: 5 }}
+                                                disabled={item.status === "Còn món"}
+                                            >
+                                                <Text> Còn món </Text>
+                                            </TouchableOpacity>
+
+                                            <TouchableOpacity onPress={() => handleOverClick(item.id)} style={{ backgroundColor: item.status === "Hết món" ? "gray" : '#F54E4E', marginLeft: 10, borderRadius: 5 }}
+                                                disabled={item.status === "Hết món"}
+                                            >
+                                                <Text> Hết món </Text>
+                                            </TouchableOpacity>
                                         </View>
                                     </View>
-                                   
+
                                 </View>
                             </View>
                         )}

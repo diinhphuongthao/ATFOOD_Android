@@ -39,17 +39,6 @@ function Kitchen_List({ navigation }) {
             </View>
           </View>
 
-          <View style={{ marginLeft: 10 }}>
-              <TouchableOpacity onPress={() => navigation.navigate('Chat_Kitchen')} style={{
-                width: 180, height: 100, backgroundColor: '#ffffff', alignItems: 'center', justifyContent: 'center'
-                , borderRadius: 20
-                , borderWidth: 1
-                ,
-              }}>
-                <Image style={{ height: 50, width: 50, marginLeft: 6 }} source={require('../image/chat_Res.png')} />
-                <Text style={{ fontSize: 18, paddingTop: 5 }}>Nhắn tin</Text>
-              </TouchableOpacity>
-          </View>
         </View>
       </View>
       <View style={{paddingTop:160}}>

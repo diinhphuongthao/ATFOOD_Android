@@ -11,7 +11,7 @@ function Meat_List({ navigation }) {
                 querySnapshot => {
                     const meat = []
                     querySnapshot.forEach((doc) => {
-                        const { image, name, price, denominations, describe, status} = doc.data()
+                        const { image, name, price, denominations, describe, status } = doc.data()
                         meat.push({
                             id: doc.id,
                             image,
@@ -30,16 +30,16 @@ function Meat_List({ navigation }) {
 
     // Lấy số lượng item trong giỏ hàng từ sub collection "cartItems"
     useEffect(() => {
-      const userId = firebase.auth().currentUser.uid;
-      const cartRef = firebase.firestore().collection('Cart').doc(userId).collection('cartItems');
-      const unsubscribe = cartRef.onSnapshot((querySnapshot) => {
-        const cartItemsCount = querySnapshot.size;
-        setCartItems(cartItemsCount);
-        
-      }, (error) => {
-        console.log('Error getting cart items: ', error);
-      });
-      return () => unsubscribe();
+        const userId = firebase.auth().currentUser.uid;
+        const cartRef = firebase.firestore().collection('Cart').doc(userId).collection('cartItems');
+        const unsubscribe = cartRef.onSnapshot((querySnapshot) => {
+            const cartItemsCount = querySnapshot.size;
+            setCartItems(cartItemsCount);
+
+        }, (error) => {
+            console.log('Error getting cart items: ', error);
+        });
+        return () => unsubscribe();
     }, []);
 
     const [lastMeat, setLastMeat] = useState(null);
@@ -90,7 +90,7 @@ function Meat_List({ navigation }) {
             console.log('Error loading more fishes:', error);
         });
     };
-  
+
 
 
     return (
@@ -117,7 +117,13 @@ function Meat_List({ navigation }) {
                         width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
                         alignItems: 'center', justifyContent: 'center',
                         borderWidth: 2, borderColor: '#BFB12D',
-                    }} onPress={() => navigation.navigate('Cart')}>
+                    }} onPress={() => {
+                        if (cartItems > 0) {
+                            navigation.navigate('Cart');
+                        } else {
+                            alert('Chưa thêm món vào giỏ hàng');
+                        }
+                    }}>
                         <Image style={{
                             height: 26, width: 26
                         }} source={require('../image/cart.png')} />
@@ -147,7 +153,7 @@ function Meat_List({ navigation }) {
             </View>
             <View style={{ paddingTop: 20 }}>
                 <View style={{ width: '100%', height: 600, alignItems: 'center', }}>
-                <FlatList
+                    <FlatList
                         style={{}}
                         onEndReached={loadMoreFishes}
                         onEndReachedThreshold={0.1}
@@ -173,13 +179,15 @@ function Meat_List({ navigation }) {
                                     disabled={item.status === "Hết món"} // Vô hiệu hóa nút khi trạng thái là "Hết món"
                                 >
                                     <View style={{}}>
-                                        <Image style={{ width: 130, height: 92, borderTopRightRadius: 10, borderTopLeftRadius: 10 }} source={{ uri: item.image }}/>
+                                        <Image style={{ width: 130, height: 92, borderTopRightRadius: 10, borderTopLeftRadius: 10 }} source={{ uri: item.image }} />
                                         {item.status === "Hết món" && (
-                                                <View style={{ backgroundColor: 'red', width:70,height:25, position:'absolute', alignItems:'center'
-                                                , borderTopLeftRadius:10, borderBottomRightRadius:10, justifyContent:'center'  }}>
-                                                    <Text style={{ fontSize: 13, color: "black",fontWeight:'bold' }}>{item.status}</Text>
-                                                </View>
-                                            )}
+                                            <View style={{
+                                                backgroundColor: 'red', width: 70, height: 25, position: 'absolute', alignItems: 'center'
+                                                , borderTopLeftRadius: 10, borderBottomRightRadius: 10, justifyContent: 'center'
+                                            }}>
+                                                <Text style={{ fontSize: 13, color: "black", fontWeight: 'bold' }}>{item.status}</Text>
+                                            </View>
+                                        )}
                                     </View>
                                     <View
                                         style={{

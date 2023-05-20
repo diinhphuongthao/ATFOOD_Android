@@ -58,7 +58,7 @@ function Table_Reserve({ navigation }) {
         <Text style={{fontSize:18, fontWeight:'bold'}}>Ghi chú</Text>
       </View>
 
-      <View style={{ flexDirection: 'row', paddingTop:20 }}>
+      <View style={{ flexDirection: 'row', paddingTop:10 }}>
         <View style={{ flexDirection: 'column', marginLeft: 30 }}>
           <View style={{ justifyContent: 'center', flexDirection: 'row' }}>
             <View style={{ width: 30, height: 30, backgroundColor: '#16BB13', marginRight: 5, borderWidth:1 }}>

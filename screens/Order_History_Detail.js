@@ -6,6 +6,7 @@ import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'fireba
 
 function Order_History_Detail({ navigation }) {
     const [order, setOrder] = useState([]);
+    console.log(order);
 
     const userId = firebase.auth().currentUser.uid;
     useEffect(() => {
@@ -20,7 +21,9 @@ function Order_History_Detail({ navigation }) {
                 querySnapshot.forEach((doc) => {
                     ordersData.push({ ...doc.data(), id: doc.id });
                 });
+                console.log(ordersData);
                 setOrder(ordersData);
+              
             });
 
         return () => unsubscribe();
@@ -57,7 +60,7 @@ function Order_History_Detail({ navigation }) {
                     data={order}
                     renderItem={({ item }) => (
                         <TouchableOpacity onPress={() =>
-                            navigation.navigate('Shipper_List_Detail', {
+                            navigation.navigate('Kitchen_List_Detail', {
                                 orderId: item.id,
                             })}>
                             <View style={{ paddingTop: 20, alignItems: 'center', justifyContent: 'center', }}>

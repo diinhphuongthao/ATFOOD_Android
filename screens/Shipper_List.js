@@ -4,7 +4,11 @@ import { firebase } from '../config'
 import moment from 'moment-timezone';
 import { collection, doc, getDoc, getFirestore, setDoc, updateDoc, onSnapshot } from 'firebase/firestore'
 
-function Shipper_List({ navigation }) {
+function Shipper_List({ navigation, route }) {
+  const { IdStaff } = route.params;
+  console.log(IdStaff);
+  const { Staff } = route.params;
+  console.log(Staff);
   const handlePress = () => {
     navigation.goBack();
   };
@@ -36,18 +40,6 @@ function Shipper_List({ navigation }) {
                 <Text style={{ fontSize: 18, paddingTop: 5, textAlign:'center' }}>Đơn món đang vận chuyển</Text>
               </TouchableOpacity>
             </View>
-          </View>
-
-          <View style={{ marginLeft: 10 }}>
-              <TouchableOpacity onPress={() => navigation.navigate('Menu_NVPV')} style={{
-                width: 180, height: 100, backgroundColor: '#ffffff', alignItems: 'center', justifyContent: 'center'
-                , borderRadius: 20
-                , borderWidth: 1
-                ,
-              }}>
-                <Image style={{ height: 50, width: 50, marginLeft: 6 }} source={require('../image/chat_Res.png')} />
-                <Text style={{ fontSize: 18, paddingTop: 5 }}>Nhắn tin</Text>
-              </TouchableOpacity>
           </View>
         </View>
       </View>

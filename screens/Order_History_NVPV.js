@@ -38,7 +38,7 @@ function Order_History_NVPV({ navigation}) {
             <View style={{ height: 240, width: 380, backgroundColor: '#FBF5DE', flexDirection: 'row', alignItems: 'center', borderRadius: 10, borderWidth: 1 }}>
                   <View style={{ flexDirection: 'column' }}>
                     <View style={{ paddingBottom: 10, justifyContent:'center', alignItems:'center' }}>
-                      <View style={{ height: 40, width: 160, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center'
+                      <View style={{ height: 40, width: 240, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center'
                       , borderRadius: 30, borderWidth:1, flexDirection:'row' }}>
                        <Image style={{
                             height: 25, width:25, marginRight:5

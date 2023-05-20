@@ -137,7 +137,7 @@ function Table_NVPV_Detail({ navigation, route }) {
 
 
     return (
-        <View style={{ height: '100%', backgroundColor: '#DDF0F0' }}>
+        <View style={{ height: '100%', backgroundColor: '#F0F0DD' }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                 <View style={{ paddingTop: 15, marginLeft: 15 }}>
                     <TouchableOpacity style={{

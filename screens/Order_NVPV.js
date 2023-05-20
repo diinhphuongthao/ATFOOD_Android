@@ -1,4 +1,4 @@
-import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Button, FlatList, TextInput, Alert, query, where } from 'react-native'
+import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Button, FlatList, TextInput, Alert, query, where, Switch } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { firebase } from '../config'
 import moment from 'moment-timezone';
@@ -382,6 +382,10 @@ function Order_NVPV({ navigation }) {
   }
 
 
+
+
+
+
   return (
     <View style={{ backgroundColor: '#F0F0DD', height: '100%' }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
@@ -413,6 +417,8 @@ function Order_NVPV({ navigation }) {
           </TouchableOpacity>
         </View>
       </View>
+
+      
 
       <FlatList
         data={orders}

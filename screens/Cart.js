@@ -323,38 +323,6 @@ function Cart({ navigation }) {
         console.log(getCoupon)
     }
 
-
-
-    // const stripe = require('stripe')('sk_test_51N2C0nKCS49TfZ369GxOpOZPnyO8QFfwdHCWIsZrxZQouXPJLHQDG0XZtSlSkjc25XwTtFdoM620RpqZ19TY01kZ00QFYsnHYN');
-    // const handlePayPalCheckout = async () => {
-    //     // Thực hiện thanh toán với Stripe API
-    //     const session = await stripe.checkout.sessions.create({
-    //         payment_method_types: ['paypal'],
-    //         line_items: [
-    //             {
-    //                 price_data: {
-    //                     currency: 'usd',
-    //                     product_data: {
-    //                         name: 'Product Name',
-    //                     },
-    //                     unit_amount: 2000, // Giá của sản phẩm
-    //                 },
-    //                 quantity: 1, // Số lượng sản phẩm
-    //             },
-    //         ],
-    //         mode: 'payment',
-    //         success_url: 'https://example.com/success',
-    //         cancel_url: 'https://example.com/cancel',
-    //     });
-
-    //     // Chuyển hướng người dùng đến trang thanh toán của Stripe
-    //     return { url: session.url };
-    // };
-
-
-
-
-
     // Render each cart item as a FlatList item
     const renderCartItem = ({ item }) => {
         return (

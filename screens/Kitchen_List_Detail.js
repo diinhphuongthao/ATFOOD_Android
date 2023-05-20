@@ -6,6 +6,7 @@ import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'fireba
 
 function Kitchen_List_Detail({ route, navigation }) {
   const { orderId } = route.params;
+  console.log(orderId)
   const userId = firebase.auth().currentUser.uid;
   const [deliverys, setDeliverys] = useState(null);
 
@@ -15,6 +16,24 @@ function Kitchen_List_Detail({ route, navigation }) {
       .collection('Notification')
       .doc(userId)
       .collection('notificate')
+      .doc(orderId)
+      .onSnapshot((doc) => {
+        if (doc.exists) {
+          const orderData = doc.data();
+          setDeliverys(orderData);
+        }
+      }, (error) => {
+        console.log('Error getting order document:', error);
+      });
+
+    return () => unsubscribe();
+  }, [orderId]);
+  useEffect(() => {
+    const unsubscribe = firebase
+      .firestore()
+      .collection('History')
+      .doc(userId)
+      .collection('orders')
       .doc(orderId)
       .onSnapshot((doc) => {
         if (doc.exists) {

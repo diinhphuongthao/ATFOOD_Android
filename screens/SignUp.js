@@ -1,50 +1,39 @@
 import { Text, StyleSheet, View, Image, TouchableOpacity, TextInput, ImageBackground, SafeAreaView, KeyboardAvoidingView } from 'react-native'
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { firebase } from '../config'
 
-
 function SignUp({ navigation }) {
+
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
-  const auth = firebase.auth;
 
 
 
   const registerUser = async (name, phone, email, password) => {
-    await firebase.auth().createUserWithEmailAndPassword(email, password)
-      .then(() => {
-        firebase.auth().currentUser.sendEmailVerification({
-          handleCodeInApp: true,
-          url: 'https://fooddelivery-844c4.firebaseapp.com/',
-        })
-          .then(() => {
-            alert('Verification emmail sent')
-          }).catch((error) => {
-            alert(error.message)
-          })
-          .then(() => {
-            firebase.firestore().collection('users')
-              .doc(firebase.auth().currentUser.uid)
-              .set({
-                uid: auth().currentUser.uid,
-                name,
-                phone,
-                email,
-              })
-          })
-          .catch((error) => {
-            alert(error.message)
-          })
-      })
-      .catch((error) => {
-        alert(error.message)
-      })
+    try {
+      const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+      const user = userCredential.user;
+      // Lưu thông tin người dùng vào Firestore
+      await firebase.firestore().collection('users').doc(user.uid).set({
+        uid: user.uid,
+        name,
+        phone,
+        email,
+      });
 
-  }
+      console.log('User registered successfully:', user);
+      // Hiển thị thông báo hoặc chuyển hướng đến trang xác thực thành công
+    } catch (error) {
+      console.error('Error registering user:', error);
+      // Hiển thị thông báo lỗi cho người dùng
+    }
+  };
+
+ 
 
   return (
     <View style={{ backgroundColor: '#F3D051', height: '100%', }}>
@@ -97,6 +86,7 @@ function SignUp({ navigation }) {
             <TextInput placeholder='Phone'
               onChangeText={(phone) => setPhone(phone)}
               autoCorrect={false}
+              keyboardType='phone-pad'
               style={{ marginLeft: 10, width: 270 }}
 
             ></TextInput>

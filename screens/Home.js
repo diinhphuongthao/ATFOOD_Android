@@ -1,4 +1,4 @@
-import { Text, StyleSheet, View, TouchableOpacity, StatusBar, TextInput, Image, FlatList, Pressable, ActivityIndicator } from 'react-native'
+import { Text, StyleSheet, View, TouchableOpacity, StatusBar, TextInput, Image, FlatList, Pressable, ActivityIndicator, Modal, Button, Alert } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import moment from 'moment-timezone';
 import { firebase } from '../config'
@@ -14,6 +14,67 @@ function Home({ navigation }) {
   const todoRef_03 = firebase.firestore().collection('News');
 
   const [showNotification, setShowNotification] = useState(false);
+
+  const [showEmailVerificationView, setShowEmailVerificationView] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+
+  useEffect(() => {
+    const checkEmailVerification = async () => {
+      const user = firebase.auth().currentUser;
+      if (user) {
+        await user.reload();
+
+        if (user.emailVerified) {
+          setIsEmailVerified(true);
+        } else {
+          setIsEmailVerified(false);
+          setShowEmailVerificationView(true);
+        }
+      }
+    };
+
+    checkEmailVerification();
+  }, []);
+
+  const handleEmailVerification = async () => {
+    const user = firebase.auth().currentUser;
+    if (user) {
+      try {
+        setIsCheckingEmail(true);
+        await user.sendEmailVerification();
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const handleVerifyButton = async () => {
+    setIsCheckingEmail(true);
+
+    const user = firebase.auth().currentUser;
+    if (user) {
+      try {
+        await user.reload();
+        setIsEmailVerified(user.emailVerified);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const handleCloseModal = () => {
+    if (isEmailVerified) {
+      setShowEmailVerificationView(false);
+    } else {
+      // Hiển thị thông báo cho người dùng rằng email chưa được xác thực
+      // Hoặc bạn có thể thực hiện các hành động khác tùy theo yêu cầu của bạn
+      alert('Email chưa được xác thực');
+    }
+  };
+
+
+
 
   const handlePress = () => {
 
@@ -140,10 +201,63 @@ function Home({ navigation }) {
     return <ActivityIndicator />;
   }
 
+  const handleUpdateStatus = () => {
+    const messageOrdersRef = firebase.firestore().collection('MessageOrders');
 
+    messageOrdersRef
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((documentSnapshot) => {
+          const orderId = documentSnapshot.id;
+          const messagesRef = messageOrdersRef.doc(orderId).collection('messages');
+
+          messagesRef
+            .where('status', '==', 'chưa xem')
+            .get()
+            .then((messageQuerySnapshot) => {
+              const batch = firebase.firestore().batch();
+
+              messageQuerySnapshot.forEach((messageDocumentSnapshot) => {
+                const messageDocRef = messagesRef.doc(messageDocumentSnapshot.id);
+                batch.update(messageDocRef, { status: 'đã xem' });
+              });
+
+              return batch.commit();
+            })
+            .catch((error) => {
+              console.error('Error updating message status:', error);
+            });
+        });
+      })
+      .catch((error) => {
+        console.error('Error retrieving message orders:', error);
+      });
+
+    navigation.navigate('Chat_NVPV');
+  };
 
   return (
     <View style={{ backgroundColor: '#F0F0DD', height: '100%' }}>
+      <Modal
+        visible={showEmailVerificationView}
+        animationType="slide"
+        transparent={true}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text>Yêu cầu xác thực email</Text>
+            {isEmailVerified ? (
+              <Button title="Đóng" onPress={handleCloseModal} />
+            ) : (
+              <>
+                <Button title="Gửi email xác thực" onPress={handleEmailVerification} />
+                <Button title="Kiểm tra" onPress={handleVerifyButton} />
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
+
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
         <View style={{ paddingTop: 10, marginLeft: 10 }}>
           <TouchableOpacity style={{
@@ -311,7 +425,7 @@ function Home({ navigation }) {
           width: 102, height: 54, backgroundColor: '#ffffff', marginLeft: 20, alignItems: 'center', justifyContent: 'center'
           , borderRadius: 10
           , borderWidth: 1
-        }} onPress={() => navigation.navigate('Chat_NVPV')}>
+        }} onPress={handleUpdateStatus}>
           <Image style={{ height: 28, width: 28, }} source={require('../image/chat_box.png')} />
           <Text style={{ fontSize: 11, marginRight: 3 }}>Nhắn tin</Text>
         </TouchableOpacity>
@@ -332,7 +446,7 @@ function Home({ navigation }) {
             renderItem={({ item }) => (
               <View style={{ justifyContent: 'center' }}>
                 <TouchableOpacity onPress={() => navigation.navigate('Banner_Detail', { bannerId: item.id })} style={{ marginLeft: 15, justifyContent: 'center', borderWidth: 1, borderRadius: 10 }}>
-                  <Image style={{ width: 138, height: 92, borderRadius:10 }} source={{
+                  <Image style={{ width: 138, height: 92, borderRadius: 10 }} source={{
                     uri: item.image
                   }} />
                 </TouchableOpacity>
@@ -357,7 +471,7 @@ function Home({ navigation }) {
             renderItem={({ item }) => (
               <View style={{ justifyContent: 'center' }}>
                 <TouchableOpacity onPress={() => navigation.navigate('Banner_Detail', { bannerId: item.id })} style={{ marginLeft: 15, justifyContent: 'center', borderWidth: 1, borderRadius: 10 }}>
-                  <Image style={{ width: 138, height: 92, borderRadius:10  }} source={{
+                  <Image style={{ width: 138, height: 92, borderRadius: 10 }} source={{
                     uri: item.image
                   }} />
                 </TouchableOpacity>
@@ -382,7 +496,7 @@ function Home({ navigation }) {
             renderItem={({ item }) => (
               <View style={{ justifyContent: 'center' }}>
                 <TouchableOpacity onPress={() => navigation.navigate('Banner_Detail', { bannerId: item.id })} style={{ marginLeft: 15, justifyContent: 'center', borderWidth: 1, borderRadius: 10 }}>
-                  <Image style={{ width: 138, height: 92, borderRadius:10  }} source={{
+                  <Image style={{ width: 138, height: 92, borderRadius: 10 }} source={{
                     uri: item.image
                   }} />
                 </TouchableOpacity>
@@ -396,5 +510,19 @@ function Home({ navigation }) {
     </View>
   )
 }
+const styles = StyleSheet.create({
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+  },
+});
+
 
 export default Home;
