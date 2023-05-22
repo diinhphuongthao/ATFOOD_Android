@@ -1,4 +1,4 @@
-import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Button, FlatList, TextInput, Modal, Linking } from 'react-native'
+import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Button, FlatList, TextInput, Modal, Linking, Alert } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { firebase } from '../config'
 import moment from 'moment-timezone';
@@ -14,6 +14,41 @@ function Cart({ navigation }) {
     const [itemQuantity, setItemQuantity] = useState({});
     const [coupon, setCoupon] = useState([]);
     // const [TotalPrice, setTotalPrice] = useState({});
+
+    const [hasNewOrders, setHasNewOrders] = useState(false);
+
+    useEffect(() => {
+        const checkNewOrders = () => {
+            try {
+                const userId = firebase.auth().currentUser.uid;
+                const ordersRef = firebase.firestore().collection('OrderCustomer').doc(userId).collection('orders');
+                const unsubscribe = ordersRef.onSnapshot((querySnapshot) => {
+                    const hasNewOrders = !querySnapshot.empty;
+                    setHasNewOrders(hasNewOrders);
+                });
+
+                return unsubscribe;
+            } catch (error) {
+                console.error('Error checking new orders:', error);
+            }
+        };
+
+        const unsubscribe = checkNewOrders();
+
+        return () => {
+            unsubscribe();
+        };
+    }, []);
+
+
+    const handlePressOrder = () => {
+        if (hasNewOrders) {
+            navigation.navigate('Order_History');
+        } else {
+            alert("Phải xác nhận đơn món")
+            // Handle case when there are no new orders
+        }
+    };
 
 
     useEffect(() => {
@@ -408,7 +443,7 @@ function Cart({ navigation }) {
                         width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
                         alignItems: 'center', justifyContent: 'center',
                         borderWidth: 2, borderColor: '#BFB12D',
-                    }} onPress={() => navigation.navigate('Order_History')}>
+                    }} onPress={handlePressOrder}>
                         <Image style={{
                             height: 30, width: 30
                         }} source={require('../image/order_history.png')} />

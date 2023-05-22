@@ -17,6 +17,8 @@ function Detail_Meat({ route, navigation }) {
 
   const [quantity, setQuantity] = useState(1);
   const [cart, setCart] = useState([]);
+  const [hasOrders, setHasOrders] = useState(false);
+  const currentUser = firebase.auth().currentUser;
 
   useEffect(() => {
     const unsubscribe = firebase

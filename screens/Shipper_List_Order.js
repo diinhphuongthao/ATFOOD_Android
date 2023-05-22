@@ -204,7 +204,7 @@ function Shipper_List_Order({ navigation, orderId }) {
                     </View>
                   </View>
                   <View style={{
-                    marginLeft: 4, backgroundColor: 'white', borderRadius: 10, width: 240, height: 110, justifyContent: 'center',
+                    marginLeft: 4, backgroundColor: 'white', borderRadius: 10, width: 240, height: 140, justifyContent: 'center',
                     borderWidth: 1
                   }}>
                     <View style={{ marginLeft: 10 }}>
@@ -215,6 +215,10 @@ function Shipper_List_Order({ navigation, orderId }) {
                       <View style={{ flexDirection: 'row', paddingTop: 8 }}>
                         <Text>SĐT khách hàng:</Text>
                         <Text style={{ marginLeft: 5 }}>{item.customerPhone}</Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', paddingTop: 8 }}>
+                        <Text>Tiền giao đơn món:</Text>
+                        <Text style={{ marginLeft: 5 }}>{item.deliveryPrice} vnd</Text>
                       </View>
                       <View style={{ flexDirection: 'row', paddingTop: 8 }}>
                         <Text>Thời gian:</Text>

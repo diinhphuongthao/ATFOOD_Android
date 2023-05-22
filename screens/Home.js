@@ -12,6 +12,8 @@ function Home({ navigation }) {
   const todoRef_01 = firebase.firestore().collection('Discount');
   const todoRef_02 = firebase.firestore().collection('Holiday');
   const todoRef_03 = firebase.firestore().collection('News');
+  const currentUser = firebase.auth().currentUser;
+  console.log(currentUser);
 
   const [showNotification, setShowNotification] = useState(false);
 

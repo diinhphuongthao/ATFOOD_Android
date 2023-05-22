@@ -149,35 +149,35 @@ function Order_History({ navigation }) {
       }
     };
 
-    const handleDeliveryAddressSearch = async () => {
-      const userId = firebase.auth().currentUser.uid;
-      try {
-        const deliveryRef = firebase.firestore()
-          .collection('OrderCustomer')
-          .doc(userId)
-          .collection('orders');
-        const deliverySnapshot = await deliveryRef.get();
+    // const handleDeliveryAddressSearch = async () => {
+    //   const userId = firebase.auth().currentUser.uid;
+    //   try {
+    //     const deliveryRef = firebase.firestore()
+    //       .collection('OrderCustomer')
+    //       .doc(userId)
+    //       .collection('orders');
+    //     const deliverySnapshot = await deliveryRef.get();
 
-        if (!deliverySnapshot.empty) {
-          const deliveryData = deliverySnapshot.docs[0].data();
-          const address = deliveryData.address;
+    //     if (!deliverySnapshot.empty) {
+    //       const deliveryData = deliverySnapshot.docs[0].data();
+    //       const address = deliveryData.address;
 
-          // Get the location of IUH
-          const iuhLocation = "Khu phố 6, phường Linh Trung, Thủ Đức, Thành phố Hồ Chí Minh";
+    //       // Get the location of IUH
+    //       const iuhLocation = "Khu phố 6, phường Linh Trung, Thủ Đức, Thành phố Hồ Chí Minh";
 
-          // Create URL for Google Maps with directions
-          const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}&dir_action=navigate&travelmode=driving&origin=${encodeURIComponent(iuhLocation)}`;
+    //       // Create URL for Google Maps with directions
+    //       const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}&dir_action=navigate&travelmode=driving&origin=${encodeURIComponent(iuhLocation)}`;
 
-          // Open Google Maps app with directions
-          Linking.openURL(directionsUrl);
-        } else {
-          alert("Không tìm thấy thông tin địa chỉ của đơn hàng!");
-        }
-      } catch (error) {
-        console.error(error);
-        alert("Có lỗi xảy ra khi tìm kiếm địa chỉ đơn hàng!");
-      }
-    }
+    //       // Open Google Maps app with directions
+    //       Linking.openURL(directionsUrl);
+    //     } else {
+    //       alert("Không tìm thấy thông tin địa chỉ của đơn hàng!");
+    //     }
+    //   } catch (error) {
+    //     console.error(error);
+    //     alert("Có lỗi xảy ra khi tìm kiếm địa chỉ đơn hàng!");
+    //   }
+    // }
 
   };
 
