@@ -273,7 +273,7 @@ function Profile({ navigation }) {
             </View>
             <View style={{ paddingTop: 20 }}>
                 <View style={{ paddingTop: 10 }}>
-                    <TouchableOpacity style={{ width: '100%', height: 50, backgroundColor: '#BFB12D', justifyContent: 'center' }}>
+                    <TouchableOpacity  onPress={() => navigation.navigate('Coupon')} style={{ width: '100%', height: 50, backgroundColor: '#BFB12D', justifyContent: 'center' }}>
                         <View style={{ justifyContent: 'flex-start', flexDirection: 'row' }}>
                             <View style={{ justifyContent: 'flex-start', flexDirection: 'row', width: 100 }}>
                                 <Image style={{ width: 25, height: 25, marginLeft: 10, }} source={require('../image/coupon.png')} />

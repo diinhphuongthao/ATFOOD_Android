@@ -18,6 +18,27 @@ function Detail_Meat({ route, navigation }) {
   const [quantity, setQuantity] = useState(1);
   const [cart, setCart] = useState([]);
 
+  useEffect(() => {
+    const unsubscribe = firebase
+      .firestore()
+      .collection("OrderCustomer")
+      .doc(currentUser.uid)
+      .collection("orders")
+      .where(firebase.firestore.FieldPath.documentId(), "==", currentUser.uid)
+      .onSnapshot((snapshot) => {
+        const orderDocuments = snapshot.docs;
+        if (orderDocuments.length > 0) {
+          setCartItems(orderDocuments.length);
+          setHasOrders(true);
+        } else {
+          setCartItems(0);
+          setHasOrders(false);
+        }
+      });
+
+    return unsubscribe;
+  }, []);
+
   const handleNoteChange = (text) => {
     setNote(text); // Cập nhật giá trị của note khi người dùng nhập liệu vào TextInput
   };
@@ -144,6 +165,8 @@ function Detail_Meat({ route, navigation }) {
             borderWidth: 2, borderColor: '#BFB12D',
           }} onPress={() => {
             if (cartItems > 0) {
+              navigation.navigate('Cart');
+            } else if (hasOrders) {
               navigation.navigate('Cart');
             } else {
               alert('Chưa thêm món vào giỏ hàng');

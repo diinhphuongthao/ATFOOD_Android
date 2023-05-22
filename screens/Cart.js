@@ -163,7 +163,7 @@ function Cart({ navigation }) {
             console.log(error);
             setDeliveryPrice(0);
         }
-        return deliveryPrice;
+        return parseFloat(deliveryPrice.toFixed(0).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, "."));
     };
 
     useEffect(() => {
@@ -176,19 +176,20 @@ function Cart({ navigation }) {
         const totalPrice = cartItems.reduce((total, item) => {
             return total + item.price * item.quantity;
         }, 0);
-        // const discount = totalPrice 
-        // const totalPriceWithDiscount = totalPrice - discount;
+
         const finalPrice = totalPrice + deliveryPrice;
         const lastPrice = finalPrice * (getCoupon / 100);
-        const price = finalPrice - lastPrice
-        // setTotalPrice(totalPrice);
-        return price.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
+        const price = finalPrice - lastPrice;
+
+        return parseFloat(price.toFixed(0).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, "."));
+    };
+
+
     const TotalPrice = () => {
         const totalPrice = cartItems.reduce((total, item) => {
             return total + item.price * item.quantity;
         }, 0);
-        return totalPrice.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return totalPrice.toFixed(0);
     }
     const CouponPrice = () => {
         const totalPrice = cartItems.reduce((total, item) => {
@@ -196,7 +197,7 @@ function Cart({ navigation }) {
         }, 0);
         const finalPrice = totalPrice + deliveryPrice;
         const lastPrice = finalPrice * (getCoupon / 100);
-        return lastPrice.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return lastPrice.toFixed(0);
     }
 
     const Cash = () => {
@@ -260,7 +261,7 @@ function Cart({ navigation }) {
             totalPrice: calculateTotalPrice(),
             status: 'Đang chờ',
             createdAt: new Date(),
-            deliveryPrice: deliveryPrice,
+            deliveryPrice: parseFloat(deliveryPrice.toFixed(0).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")),
             payment: paymentMethod,
             coupon: getCoupon
         };
@@ -280,7 +281,7 @@ function Cart({ navigation }) {
             status: 'Đang chờ',
             items: cartItems,
             createdAt: new Date(),
-            deliveryPrice: deliveryPrice,
+            deliveryPrice: parseFloat(deliveryPrice.toFixed(0).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")),
             payment: paymentMethod,
             coupon: getCoupon
         };
@@ -514,7 +515,7 @@ function Cart({ navigation }) {
             </Modal>
             <View style={{ alignItems: 'center', backgroundColor: '#E6AA37', }}>
                 <View style={{ width: 450, height: 160, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                    <View style={{ flexDirection: 'column', alignItems: 'flex-start', width: 180, marginLeft:75}}>
+                    <View style={{ flexDirection: 'column', alignItems: 'flex-start', width: 180, marginLeft: 75 }}>
                         <View style={{}}>
                             <Text style={{ fontSize: 18 }}>Tạm tính:</Text>
                             <View style={{ flexDirection: 'row' }}>
@@ -522,29 +523,29 @@ function Cart({ navigation }) {
                             </View>
                         </View>
 
-                        <View style={{paddingTop:20}}>
+                        <View style={{ paddingTop: 20 }}>
                             <Text style={{ fontSize: 18, }}>Tiền được giảm:</Text>
                             <View style={{ flexDirection: 'row' }}>
-                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{CouponPrice()}</Text><Text style={{ marginLeft: 5, fontSize: 18, justifyContent: 'center', fontWeight: 'bold' }}>vnd</Text>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{CouponPrice().toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</Text><Text style={{ marginLeft: 5, fontSize: 18, justifyContent: 'center', fontWeight: 'bold' }}>vnd</Text>
                             </View>
                         </View>
                     </View>
 
-                        <View style={{ flexDirection: 'column', alignItems: 'flex-start', width: 180,}}>
-                            <View style={{}}>
-                                <Text style={{ fontSize: 18 }}>Tiền giao hàng:</Text>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{deliveryPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</Text><Text style={{ marginLeft: 5, fontSize: 18, justifyContent: 'center', fontWeight: 'bold' }}>vnd</Text>
-                                </View>
-                            </View>
-                            <View style={{paddingTop:20}}>
-                                <Text style={{ fontSize: 18, }}>Tổng giá tiền:</Text>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{calculateTotalPrice()}</Text><Text style={{ marginLeft: 5, fontSize: 18, justifyContent: 'center', fontWeight: 'bold' }}>vnd</Text>
-                                </View>
+                    <View style={{ flexDirection: 'column', alignItems: 'flex-start', width: 180, }}>
+                        <View style={{}}>
+                            <Text style={{ fontSize: 18 }}>Tiền giao hàng:</Text>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{deliveryPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</Text><Text style={{ marginLeft: 5, fontSize: 18, justifyContent: 'center', fontWeight: 'bold' }}>vnd</Text>
                             </View>
                         </View>
-                   
+                        <View style={{ paddingTop: 20 }}>
+                            <Text style={{ fontSize: 18, }}>Tổng giá tiền:</Text>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{calculateTotalPrice().toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</Text><Text style={{ marginLeft: 5, fontSize: 18, justifyContent: 'center', fontWeight: 'bold' }}>vnd</Text>
+                            </View>
+                        </View>
+                    </View>
+
 
                 </View>
                 <View style={{ alignItems: 'center', paddingBottom: 20 }}>

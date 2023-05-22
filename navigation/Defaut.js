@@ -21,7 +21,7 @@ import Order_NVPV from "../screens/Order_NVPV";
 import Table_NVPV from "../screens/Table_NVPV";
 import Table_NVPV_Detail from "../screens/Table_NVPV_Detail";
 import Chat_NVPV from "../screens/Chat_NVPV";
-import Menu_NVPV from "../screens/Menu_NVPV";
+import Coupon from "../screens/Coupon";
 import Order_History_Detail from "../screens/Order_History_Detail";
 import Order_Detail from "../screens/Order_Detail";
 import Order_History_NVPV from "../screens/Order_History_NVPV";
@@ -100,7 +100,6 @@ function StackNavigator() {
                 <Stack.Screen name='Table_NVPV' component={Table_NVPV} options={{ headerShown: false }} />
                 <Stack.Screen name='Table_NVPV_Detail' component={Table_NVPV_Detail} options={{ headerShown: false }} />
                 <Stack.Screen name='Chat' component={Chat} options={{ headerShown: false }} />
-                <Stack.Screen name='Menu_NVPV' component={Menu_NVPV} options={{ headerShown: false }} />
                 <Stack.Screen name='Order_Detail' component={Order_Detail} options={{ headerShown: false }} />
                 <Stack.Screen name='Order_History_NVPV' component={Order_History_NVPV} options={{ headerShown: false }} />
                 <Stack.Screen name='Chat_Detail' component={Chat_Detail} options={{ headerShown: false }} />
@@ -155,6 +154,7 @@ function StackNavigator() {
             <Stack.Screen name='Notification' component={Notification} options={{ headerShown: false }} />
             <Stack.Screen name='Kitchen_List_Detail' component={Kitchen_List_Detail} options={{ headerShown: false }} />
             <Stack.Screen name='Map' component={Map} options={{ headerShown: false }} />
+            <Stack.Screen name='Coupon' component={Coupon} options={{ headerShown: false }} />
         </Stack.Navigator>
     );
     // if (!user) {

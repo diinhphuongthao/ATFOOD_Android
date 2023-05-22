@@ -1,4 +1,4 @@
-import { Text, StyleSheet, View, TouchableOpacity, StatusBar, TextInput, Image, } from 'react-native'
+import { Text, StyleSheet, View, TouchableOpacity, StatusBar, TextInput, Image, Alert } from 'react-native'
 import Checkbox from 'expo-checkbox';
 import React, { useState, useEffect } from 'react'
 import { firebase, auth } from '../config';
@@ -17,6 +17,10 @@ function Login({ navigation }) {
   const loginUser = async (email, password) => {
     // Thực hiện đăng nhập và kiểm tra quyền truy cập cho nhân viên (nếu option = 'option1')
     // hoặc chỉ thực hiện đăng nhập bằng email và password (nếu option = 'option2')
+    if (!email || !password) {
+      Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
+      return;
+    }
 
     const staffRef = firebase.firestore().collection('Staff').where('email', '==', email);
     const staffDoc = await staffRef.get();

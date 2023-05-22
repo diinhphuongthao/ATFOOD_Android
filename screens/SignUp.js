@@ -1,4 +1,4 @@
-import { Text, StyleSheet, View, Image, TouchableOpacity, TextInput, ImageBackground, SafeAreaView, KeyboardAvoidingView } from 'react-native'
+import { Text, StyleSheet, View, Image, TouchableOpacity, TextInput, ImageBackground, SafeAreaView, KeyboardAvoidingView, Alert } from 'react-native'
 import React, { useState, useRef, useEffect } from 'react'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { firebase } from '../config'
@@ -14,6 +14,10 @@ function SignUp({ navigation }) {
 
 
   const registerUser = async (name, phone, email, password) => {
+    if (!name || !phone || !email || !password) {
+      Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
+      return;
+    }
     try {
       const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
       const user = userCredential.user;
@@ -33,7 +37,68 @@ function SignUp({ navigation }) {
     }
   };
 
- 
+  const validatePhoneNumber = () => {
+    const phoneNumberRegex = /^\d{9,10}$/; // Regex: đúng 9-10 số
+    return phoneNumberRegex.test(phone);
+  };
+
+  const checkDuplicatePhoneNumber = () => {
+    const usersCollection = firebase.firestore().collection("users");
+    const duplicatePhoneQuery = usersCollection.where("phone", "==", phone).limit(1);
+
+    return duplicatePhoneQuery.get().then((querySnapshot) => {
+      if (!querySnapshot.empty) {
+        return true; // Có số điện thoại trùng
+      }
+      return false; // Không có số điện thoại trùng
+    });
+  };
+
+  const handlePhoneInputChange = (text) => {
+    setPhone(text);
+  };
+
+  const handlePhoneInputBlur = () => {
+    if (!validatePhoneNumber()) {
+      Alert.alert("Lỗi", "Số điện thoại không hợp lệ. Vui lòng nhập lại!");
+      setPhone('');
+      return;
+    }
+
+    checkDuplicatePhoneNumber().then((isDuplicate) => {
+      if (isDuplicate) {
+        Alert.alert("Lỗi", "Số điện thoại đã được sử dụng. Vui lòng nhập lại!");
+        setPhone('');
+      }
+    });
+  };
+
+  const checkDuplicateEmail = () => {
+    const usersCollection = firebase.firestore().collection("users");
+    const duplicateEmailQuery = usersCollection.where("email", "==", email).limit(1);
+
+    return duplicateEmailQuery.get().then((querySnapshot) => {
+      if (!querySnapshot.empty) {
+        return true; // Có email trùng
+      }
+      return false; // Không có email trùng
+    });
+  };
+
+  const handleEmailInputChange = (text) => {
+    setEmail(text);
+  };
+
+  const handleEmailInputBlur = () => {
+    checkDuplicateEmail().then((isDuplicate) => {
+      if (isDuplicate) {
+        Alert.alert("Lỗi", "Email đã được sử dụng. Vui lòng nhập lại!");
+        setEmail('');
+      }
+    });
+  };
+
+
 
   return (
     <View style={{ backgroundColor: '#F3D051', height: '100%', }}>
@@ -79,32 +144,36 @@ function SignUp({ navigation }) {
 
 
           <View style={{
-            backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start'
-            , borderRadius: 20, flexDirection: 'row', alignItems: 'center'
+            backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start',
+            borderRadius: 20, flexDirection: 'row', alignItems: 'center'
           }}>
             <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/phone.png')} />
-            <TextInput placeholder='Phone'
-              onChangeText={(phone) => setPhone(phone)}
+            <TextInput
+              placeholder='Phone'
+              onChangeText={handlePhoneInputChange}
+              onBlur={handlePhoneInputBlur}
+              value={phone}
               autoCorrect={false}
               keyboardType='phone-pad'
               style={{ marginLeft: 10, width: 270 }}
-
-            ></TextInput>
+            />
           </View>
 
           <View style={{
-            backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start'
-            , borderRadius: 20, flexDirection: 'row', alignItems: 'center'
+            backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start',
+            borderRadius: 20, flexDirection: 'row', alignItems: 'center'
           }}>
             <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/mail.png')} />
-            <TextInput placeholder='Email'
-              onChangeText={(email) => setEmail(email)}
+            <TextInput
+              placeholder='Email'
+              onChangeText={handleEmailInputChange}
+              onBlur={handleEmailInputBlur}
+              value={email}
               autoCorrect={false}
               autoCapitalize="none"
               keyboardType='email-address'
               style={{ marginLeft: 10, width: 270 }}
-
-            ></TextInput>
+            />
           </View>
 
           <View style={{
@@ -121,13 +190,7 @@ function SignUp({ navigation }) {
 
             ></TextInput>
           </View>
-
-
         </View>
-
-
-
-
         <View style={{ alignItems: 'center', paddingTop: 30, }}>
           <TouchableOpacity onPress={() => registerUser(name, phone, email, password)}
             style={{ paddingBottom: 80 }}>

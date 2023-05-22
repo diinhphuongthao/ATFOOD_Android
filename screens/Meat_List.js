@@ -4,6 +4,32 @@ import { firebase } from '../config'
 
 function Meat_List({ navigation }) {
     const [meat, setMeat] = useState([]);
+
+    const [hasOrders, setHasOrders] = useState(false);
+    const currentUser = firebase.auth().currentUser;
+
+    useEffect(() => {
+        const unsubscribe = firebase
+            .firestore()
+            .collection("OrderCustomer")
+            .doc(currentUser.uid)
+            .collection("orders")
+            .where(firebase.firestore.FieldPath.documentId(), "==", currentUser.uid)
+            .onSnapshot((snapshot) => {
+                const orderDocuments = snapshot.docs;
+                if (orderDocuments.length > 0) {
+                    setCartItems(orderDocuments.length);
+                    setHasOrders(true);
+                } else {
+                    setCartItems(0);
+                    setHasOrders(false);
+                }
+            });
+
+        return unsubscribe;
+    }, []);
+
+
     const todoRef = firebase.firestore().collection('Meat');
     useEffect(() => {
         todoRef
@@ -119,6 +145,8 @@ function Meat_List({ navigation }) {
                         borderWidth: 2, borderColor: '#BFB12D',
                     }} onPress={() => {
                         if (cartItems > 0) {
+                            navigation.navigate('Cart');
+                        } else if (hasOrders) {
                             navigation.navigate('Cart');
                         } else {
                             alert('Chưa thêm món vào giỏ hàng');

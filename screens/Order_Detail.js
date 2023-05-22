@@ -3,10 +3,12 @@ import React, { useState, useEffect } from 'react'
 import { firebase } from '../config'
 import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore'
 
-function Order_Detail({ route }) {
+function Order_Detail({ route, navigation }) {
     const { orderId } = route.params;
     const [order, setOrder] = useState(null);
-
+    const handlePress = () => {
+        navigation.goBack();
+    };
     useEffect(() => {
         const subscriber = firebase.firestore()
             .collection('Orders')
@@ -33,7 +35,7 @@ function Order_Detail({ route }) {
         // Unsubscribe from events when no longer in use
         return () => subscriber();
     }, [orderId]);
-    
+
 
     if (!order) {
         return <ActivityIndicator />;
@@ -42,15 +44,17 @@ function Order_Detail({ route }) {
 
     const renderCartItem = ({ item }) => {
         return (
+
             <View
                 style={{
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'center',
-                   paddingTop:20,
+                    paddingTop: 20,
                     borderBottomWidth: 1,
                     borderBottomColor: '#eee',
                 }}>
+
                 <View style={{
                     flexDirection: 'row', justifyContent: 'space-between', height: 160, backgroundColor: '#EBE5AB', width: 380
                     , alignItems: 'center',
@@ -75,8 +79,8 @@ function Order_Detail({ route }) {
                             </View>
                         </View>
                     </View>
-                    <View style={{ backgroundColor: 'white', borderRadius: 10, height: 100, width: 120, alignItems:'center', marginRight:10 }}>
-                        <Text style={{width:100}}>{item.note}</Text>
+                    <View style={{ backgroundColor: 'white', borderRadius: 10, height: 100, width: 120, alignItems: 'center', marginRight: 10 }}>
+                        <Text style={{ width: 100 }}>{item.note}</Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
                         <View style={{ backgroundColor: 'white', width: 40, alignItems: 'center', borderRadius: 20 }}>
@@ -95,12 +99,30 @@ function Order_Detail({ route }) {
     };
 
     return (
-        <View style={{ alignItems: 'center' }}>
+        <View style={{ height: '100%', backgroundColor: '#F0F0DD' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
+                <View style={{ paddingTop: 15, marginLeft: 15 }}>
+                    <TouchableOpacity style={{
+                        width: 46, height: 47, backgroundColor: '#FFE55E', borderRadius: 360,
+                        alignItems: 'center', justifyContent: 'center',
+                        borderWidth: 2, borderColor: '#BFB12D',
+                    }} onPress={handlePress}>
+                        <Image style={{
+                            height: 38, width: 38, borderRadius: 360,
+                        }} source={require('../image/return.png')} />
+                    </TouchableOpacity>
+                </View>
+                <View style={{ paddingTop: 20, marginRight: 95 }}>
+                    <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 18 }}>Chi tiết món ăn</Text>
+                    </View>
+                </View>
+            </View>
             {/* <FlatList
                 data={order.items}
                 renderItem={({ item }) => <Text>{item.name}</Text>}
             /> */}
-            <View style={{alignItems:'center', justifyContent:'center'}}>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                 <FlatList
                     data={order.items}
                     renderItem={renderCartItem}

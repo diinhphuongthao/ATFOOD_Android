@@ -347,12 +347,12 @@ function Order_NVPV({ navigation }) {
           imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/wait-time.png?alt=media&token=b3a9697a-f32b-4f81-8764-cb1ba9b1fe09'
         });
         // Lưu lịch sử đơn hàng
-        const historyRef = firebase.firestore().collection('OrderHistory').doc(orderId);
-        await historyRef.update({
-          status: "Chờ shipper nhận đơn",
-          imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/wait-time.png?alt=media&token=b3a9697a-f32b-4f81-8764-cb1ba9b1fe09',
-          deliveryTime: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        // const historyRef = firebase.firestore().collection('OrderHistory').doc(orderId);
+        // await historyRef.update({
+        //   status: "Chờ shipper nhận đơn",
+        //   imageStatus: 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/wait-time.png?alt=media&token=b3a9697a-f32b-4f81-8764-cb1ba9b1fe09',
+        //   deliveryTime: firebase.firestore.FieldValue.serverTimestamp()
+        // });
 
         alert("Chuyển đơn hàng thành công!");
 

@@ -43,6 +43,7 @@ function Home({ navigation }) {
       try {
         setIsCheckingEmail(true);
         await user.sendEmailVerification();
+        alert('Đã gửi xác thực về mail')
       } catch (error) {
         console.log(error);
       }
@@ -57,11 +58,15 @@ function Home({ navigation }) {
       try {
         await user.reload();
         setIsEmailVerified(user.emailVerified);
+        if (!user.emailVerified) {
+          alert('Email chưa được xác thực, vui lòng kiểm tra lại hộp thư');
+        }
       } catch (error) {
         console.log(error);
       }
     }
   };
+
 
   const handleCloseModal = () => {
     if (isEmailVerified) {
@@ -245,13 +250,36 @@ function Home({ navigation }) {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text>Yêu cầu xác thực email</Text>
+
             {isEmailVerified ? (
-              <Button title="Đóng" onPress={handleCloseModal} />
+              <>
+                <View style={{ alignItems: 'center' }}>
+                  <Text style={{ fontSize: 16 }}>Email xác thực thành công</Text>
+                  <View style={{ paddingTop: 10 }}>
+                    <TouchableOpacity style={{
+                      backgroundColor: "#68D1F2", width: 100, height: 30, alignItems: 'center'
+                      , justifyContent: 'center', borderRadius: 10
+                    }} onPress={handleCloseModal} ><Text>Đóng</Text></TouchableOpacity>
+                  </View>
+                </View>
+              </>
             ) : (
               <>
-                <Button title="Gửi email xác thực" onPress={handleEmailVerification} />
-                <Button title="Kiểm tra" onPress={handleVerifyButton} />
+                <View style={{ alignItems: 'center' }}>
+                  <Text style={{ fontSize: 16 }}>Yêu cầu xác thực email</Text>
+                  <View style={{ paddingTop: 10 }}>
+                    <TouchableOpacity style={{
+                      backgroundColor: "#75D474", width: 100, height: 30, alignItems: 'center'
+                      , justifyContent: 'center', borderRadius: 10
+                    }} onPress={handleEmailVerification} ><Text>Gửi xác thực</Text></TouchableOpacity>
+                  </View>
+                  <View style={{ paddingTop: 10 }}>
+                    <TouchableOpacity style={{
+                      backgroundColor: "#F1F54E", width: 100, height: 30, alignItems: 'center'
+                      , justifyContent: 'center', borderRadius: 10
+                    }} onPress={handleVerifyButton} ><Text>Kiểm tra</Text></TouchableOpacity>
+                  </View>
+                </View>
               </>
             )}
           </View>
@@ -519,8 +547,10 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#fff',
-    padding: 20,
+    height: 150,
+    width: 200,
     borderRadius: 10,
+    justifyContent: 'center'
   },
 });
 
