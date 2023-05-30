@@ -145,7 +145,7 @@ function Detail_Drink({ route, navigation }) {
   }
 
   return (
-    <View style={{ backgroundColor: '#F0F0DD', height: '100%' }}>
+    <View style={{ backgroundColor: '#F0F0DD',  flex: 1}}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
         <View style={{ paddingTop: 15, marginLeft: 15 }}>
           <TouchableOpacity style={{

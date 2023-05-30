@@ -1,11 +1,6 @@
 {
   "expo": {
     "name": "AppFoodDelivery",
-    // "sdkVersion": "47.0.0",
-    // "platforms": [
-    //   "ios",
-    //   "android"
-    // ],
     "slug": "AppFoodDelivery",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -29,10 +24,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.luis311001.AppFoodDelivery"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "72ddaa99-589a-4408-ad28-1ff5bb43a640"
+      }
     }
   }
 }

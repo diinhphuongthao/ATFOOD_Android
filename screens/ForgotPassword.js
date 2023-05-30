@@ -18,7 +18,7 @@ function ForgotPassword({ navigation }) {
     };
 
     return (
-        <View style={{ height: '100%', backgroundColor: '#F3D051' }}>
+        <View style={{ height: '100%', backgroundColor: '#F3D051', flex: 1 }}>
             <View style={{ paddingTop: 15, marginLeft: 15 }}>
                 <TouchableOpacity style={{
                     width: 46, height: 47, backgroundColor: '#FFEA2F', borderRadius: 360,
@@ -33,7 +33,7 @@ function ForgotPassword({ navigation }) {
             <View style={{ alignItems: 'center', paddingTop: 60 }}>
                 <Image style={{ height: 129, width: 254, }} source={require('../image/ATFOOD.png')} />
             </View>
-            <View style={{alignItems:'center'}}>
+            <View style={{ flex: 1, alignItems: 'center' }}>
                 <Text style={{ fontSize: 26, marginTop: 120, paddingBottom: 30, fontWeight: 'bold' }}>Quên mật khẩu</Text>
                 <TextInput
                     placeholder="Nhập email vào"
@@ -44,7 +44,7 @@ function ForgotPassword({ navigation }) {
                     autoCompleteType="email"
                     keyboardType="email-address"
                 />
-                <TouchableOpacity style={{ paddingTop: 20 }} onPress={handleResetPassword}>
+                <TouchableOpacity onPress={handleResetPassword}>
                     <View style={{
                         backgroundColor: '#FFEA2F', borderWidth: 1, borderRadius: 10, alignItems: 'center', justifyContent: 'center'
                         , height: 40, width: 160
@@ -54,7 +54,6 @@ function ForgotPassword({ navigation }) {
                 </TouchableOpacity>
             </View>
         </View>
-    )
-
+    );
 }
 export default ForgotPassword;

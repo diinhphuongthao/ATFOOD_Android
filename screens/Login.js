@@ -3,6 +3,8 @@ import Checkbox from 'expo-checkbox';
 import React, { useState, useEffect } from 'react'
 import { firebase, auth } from '../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+
 
 
 function Login({ navigation }) {
@@ -86,51 +88,53 @@ function Login({ navigation }) {
 
 
   return (
-    <View style={{ backgroundColor: '#F3D051', height: '100%', }}>
-      <StatusBar></StatusBar>
+    <KeyboardAwareScrollView
+      contentContainerStyle={{ flexGrow: 1, backgroundColor: '#F3D051' }}
+      keyboardShouldPersistTaps="handled"
+      enableOnAndroid={true}
+      enableAutomaticScroll={true}
+      extraScrollHeight={100}
+      keyboardDismissMode='interactive'
+    >
+      <StatusBar />
 
-      <View style={{ flexDirection: 'row', justifyContent: 'center', }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'center', flex: 1 }}>
         <View style={{ alignItems: 'center', marginRight: 200 }}>
-          <Image style={{ height: 100, width: 100, }} source={require('../image/Sun.png')} />
+          <Image style={{ height: 100, width: 100 }} source={require('../image/Sun.png')} />
         </View>
         <View style={{ alignItems: 'center', marginLeft: 10 }}>
-          <Image style={{ height: 100, width: 100, }} source={require('../image/Cloud.png')} />
+          <Image style={{ height: 100, width: 100 }} source={require('../image/Cloud.png')} />
         </View>
       </View>
 
-      <View style={{ alignItems: 'center', paddingTop: 26 }}>
-        <Image style={{ height: 129, width: 254, }} source={require('../image/ATFOOD.png')} />
+      <View style={{ alignItems: 'center' }}>
+        <Image style={{ height: 129, width: 254 }} source={require('../image/ATFOOD.png')} />
       </View>
       <View style={{ alignItems: 'center', paddingTop: 60 }}>
-        <Text style={{ fontSize: 32, fontWeight: 'bold', }}>Sign In</Text>
+        <Text style={{ fontSize: 32, fontWeight: 'bold' }}>Sign In</Text>
       </View>
 
       <View style={{ alignItems: 'center', paddingTop: 30 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
-          <View style={{
-            height: 40, width: 320, backgroundColor: '#ffffff', justifyContent: 'flex-start', borderRadius: 20, marginLeft: 10
-            , flexDirection: 'row'
-          }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '80%' }}>
+          <View style={{ flex: 1, height: 40, backgroundColor: '#ffffff', justifyContent: 'flex-start', borderRadius: 20, marginRight: 10, flexDirection: 'row' }}>
             <View style={{ justifyContent: 'center' }}>
               <Image style={{ height: 30, width: 30, marginLeft: 10 }} source={require('../image/mail.png')} />
             </View>
-            <TextInput placeholder='Email'
+            <TextInput
+              placeholder='Email'
               value={email}
               onChangeText={(email) => setEmail(email)}
               autoCapitalize="none"
               autoCorrect={false}
-
-              style={{ fontSize: 16, marginLeft: 10, width: 250, }}></TextInput>
+              style={{ fontSize: 16, marginLeft: 10, flex: 1 }}
+            />
           </View>
         </View>
 
-        <View style={{ paddingTop: 10, flexDirection: 'row', justifyContent: 'space-between' }}>
-          <View style={{
-            height: 40, width: 320, backgroundColor: '#ffffff', justifyContent: 'flex-start', borderRadius: 20, marginLeft: 10
-            , flexDirection: 'row'
-          }}>
+        <View style={{ paddingTop: 10, flexDirection: 'row', justifyContent: 'space-between', width: '80%' }}>
+          <View style={{ flex: 1, height: 40, backgroundColor: '#ffffff', justifyContent: 'flex-start', borderRadius: 20, marginRight: 10, flexDirection: 'row' }}>
             <View style={{ paddingTop: 2, justifyContent: 'center' }}>
-              <Image style={{ height: 30, width: 30, marginLeft: 10, }} source={require('../image/pass.png')} />
+              <Image style={{ height: 30, width: 30, marginLeft: 10 }} source={require('../image/pass.png')} />
             </View>
             <TextInput
               value={password}
@@ -139,7 +143,8 @@ function Login({ navigation }) {
               onChangeText={(password) => setPassword(password)}
               autoCapitalize="none"
               autoCorrect={false}
-              style={{ fontSize: 16, marginLeft: 10, width: 250 }}></TextInput>
+              style={{ fontSize: 16, marginLeft: 10, flex: 1 }}
+            />
           </View>
         </View>
       </View>
@@ -152,56 +157,46 @@ function Login({ navigation }) {
             onValueChange={(isChecked) => setChecked(isChecked)}
             color={isChecked ? '#13625D' : undefined}
           />
-          <Text style={{
-            fontSize: 14, fontWeight: 'bold', color: 'black', marginLeft: 5
-          }}>Nhớ mật khẩu</Text>
+          <Text style={{ fontSize: 14, fontWeight: 'bold', color: 'black', marginLeft: 5 }}>Nhớ mật khẩu</Text>
         </View>
         <View style={{ alignItems: 'center', paddingTop: 15, marginLeft: 66 }}>
-          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}><Text style={{
-            fontSize: 14, fontWeight: 'bold', color: 'black'
-            , borderBottomWidth: 1, borderColor: 'black'
-          }}>Quên mật khẩu?</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+            <Text style={{ fontSize: 14, fontWeight: 'bold', color: 'black', borderBottomWidth: 1, borderColor: 'black' }}>Quên mật khẩu?</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
       <View style={{ alignItems: 'center', paddingTop: 30 }}>
         <TouchableOpacity onPress={() => loginUser(email, password)}>
-          <View style={{
-            backgroundColor: '#FFEA2F', width: 188, height: 47, alignItems: 'center', justifyContent: 'center', borderRadius: 20
-            , borderWidth: 1
-            , borderColor: '#BFB12D'
-          }}>
+          <View style={{ backgroundColor: '#FFEA2F', width: 188, height: 47, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: 1, borderColor: '#BFB12D' }}>
             <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Đăng nhập</Text>
           </View>
         </TouchableOpacity>
       </View>
-      <View style={{ alignItems: 'center', paddingTop: 25, }}>
+      <View style={{ alignItems: 'center', paddingTop: 25 }}>
         <View style={{ flexDirection: 'row' }}>
-          <View><Text style={{ fontSize: 16, }}>Bạn chưa có tài khoản?</Text></View>
+          <View>
+            <Text style={{ fontSize: 16 }}>Bạn chưa có tài khoản?</Text>
+          </View>
           <View>
             <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-              <Text style={{
-                fontSize: 16, fontWeight: 'bold', marginLeft: 5, color: 'black'
-                , borderBottomWidth: 2, borderColor: 'black'
-              }}>Đăng ký ở đây</Text>
+              <Text style={{ fontSize: 16, fontWeight: 'bold', marginLeft: 5, color: 'black', borderBottomWidth: 2, borderColor: 'black' }}>Đăng ký ở đây</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'center', marginRight: 14 }}>
         <View style={{ alignItems: 'center', paddingTop: 4, marginRight: 232 }}>
-          <Image style={{ height: 118, width: 117, }} source={require('../image/tree.png')} />
+          <Image style={{ height: 118, width: 117 }} source={require('../image/tree.png')} />
         </View>
         <View style={{ alignItems: 'center', paddingTop: 4, marginLeft: 10 }}>
-          <Image style={{ height: 118, width: 117, }} source={require('../image/hello.png')} />
+          <Image style={{ height: 118, width: 117 }} source={require('../image/hello.png')} />
         </View>
-        {/* <TouchableOpacity onPress={() => navigation.navigate('StartedApp')}>
-          <Text>Started</Text>
-        </TouchableOpacity> */}
       </View>
-    </View>
+    </KeyboardAwareScrollView>
 
-  )
+  );
+
 
 }
 export default Login;

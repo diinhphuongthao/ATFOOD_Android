@@ -140,13 +140,25 @@ function Soup_List({ navigation }) {
                         alignItems: 'center', justifyContent: 'center',
                         borderWidth: 2, borderColor: '#BFB12D',
                     }} onPress={() => {
-                        if (cartItems > 0) {
-                            navigation.navigate('Cart');
-                        } else if (hasOrders) {
-                            navigation.navigate('Cart');
-                        } else {
-                            alert('Chưa thêm món vào giỏ hàng');
-                        }
+                        const userId = firebase.auth().currentUser.uid;
+                        const orderRef = firebase
+                            .firestore()
+                            .collection('OrderCustomer')
+                            .doc(userId)
+                            .collection('orders');
+
+                        orderRef
+                            .get()
+                            .then((querySnapshot) => {
+                                if (!querySnapshot.empty || cartItems > 0) {
+                                    navigation.navigate('Cart');
+                                } else {
+                                    alert('Chưa thêm món vào giỏ hàng');
+                                }
+                            })
+                            .catch((error) => {
+                                console.error('Error checking orders:', error);
+                            });
                     }}>
                         <Image style={{
                             height: 26, width: 26

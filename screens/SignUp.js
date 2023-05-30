@@ -101,9 +101,9 @@ function SignUp({ navigation }) {
 
 
   return (
-    <View style={{ backgroundColor: '#F3D051', height: '100%', }}>
-
-      <KeyboardAwareScrollView>
+    <View style={{ backgroundColor: '#F3D051', flex: 1 }}>
+  
+      <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={{ paddingTop: 15, marginLeft: 15 }}>
           <TouchableOpacity style={{
             width: 46, height: 47, backgroundColor: '#FFEA2F', borderRadius: 360,
@@ -115,98 +115,98 @@ function SignUp({ navigation }) {
             }} source={require('../image/return.png')} />
           </TouchableOpacity>
         </View>
-
+  
         <View style={{ alignItems: 'center', paddingTop: 66 }}>
           <Image style={{ height: 129, width: 254, }} source={require('../image/ATFOOD.png')} />
         </View>
-
+  
         <View style={{ alignItems: 'center', paddingTop: 46 }}>
           <Text style={{ fontSize: 32, fontWeight: 'bold', }}>Sign Up</Text>
         </View>
-
-
-
-        <View style={{ flexDirection: 'column', paddingTop: 20, alignItems: 'center' }}>
-
+  
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <View style={{
-            backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start'
-            , borderRadius: 20, flexDirection: 'row', alignItems: 'center'
+            flexDirection: 'column', paddingTop: 20, alignItems: 'center',
+            width: '80%', maxWidth: 320,
           }}>
-            <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/name.png')} />
-            <TextInput placeholder='Name'
-              onChangeText={(name) => setName(name)}
-              autoCorrect={false}
-              style={{ marginLeft: 10, width: 270 }}
-
-            ></TextInput>
-          </View>
-
-
-
-          <View style={{
-            backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start',
-            borderRadius: 20, flexDirection: 'row', alignItems: 'center'
-          }}>
-            <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/phone.png')} />
-            <TextInput
-              placeholder='Phone'
-              onChangeText={handlePhoneInputChange}
-              onBlur={handlePhoneInputBlur}
-              value={phone}
-              autoCorrect={false}
-              keyboardType='phone-pad'
-              style={{ marginLeft: 10, width: 270 }}
-            />
-          </View>
-
-          <View style={{
-            backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start',
-            borderRadius: 20, flexDirection: 'row', alignItems: 'center'
-          }}>
-            <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/mail.png')} />
-            <TextInput
-              placeholder='Email'
-              onChangeText={handleEmailInputChange}
-              onBlur={handleEmailInputBlur}
-              value={email}
-              autoCorrect={false}
-              autoCapitalize="none"
-              keyboardType='email-address'
-              style={{ marginLeft: 10, width: 270 }}
-            />
-          </View>
-
-          <View style={{
-            backgroundColor: '#ffffff', width: 320, height: 40, margin: 10, justifyContent: 'flex-start'
-            , borderRadius: 20, flexDirection: 'row', alignItems: 'center'
-          }}>
-            <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/pass.png')} />
-            <TextInput placeholder='Password'
-              onChangeText={(password) => setPassword(password)}
-              autoCorrect={false}
-              autoCapitalize="none"
-              secureTextEntry={true}
-              style={{ marginLeft: 10, width: 270 }}
-
-            ></TextInput>
-          </View>
-        </View>
-        <View style={{ alignItems: 'center', paddingTop: 30, }}>
-          <TouchableOpacity onPress={() => registerUser(name, phone, email, password)}
-            style={{ paddingBottom: 80 }}>
+  
             <View style={{
-              backgroundColor: '#FFEA2F', width: 160, height: 46, justifyContent: 'center', alignItems: 'center', borderRadius: 20,
-              borderWidth: 1, borderColor: 'black'
+              backgroundColor: '#ffffff', height: 40, margin: 10, justifyContent: 'flex-start'
+              , borderRadius: 20, flexDirection: 'row', alignItems: 'center'
             }}>
-              <Text style={{ fontSize: 18, color: '#000000' }}>Sign Up</Text>
+              <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/name.png')} />
+              <TextInput placeholder='Name'
+                onChangeText={(name) => setName(name)}
+                autoCorrect={false}
+                style={{ marginLeft: 10, flex: 1 }}
+  
+              ></TextInput>
             </View>
-          </TouchableOpacity>
+  
+            <View style={{
+              backgroundColor: '#ffffff', height: 40, margin: 10, justifyContent: 'flex-start',
+              borderRadius: 20, flexDirection: 'row', alignItems: 'center'
+            }}>
+              <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/phone.png')} />
+              <TextInput
+                placeholder='Phone'
+                onChangeText={handlePhoneInputChange}
+                onBlur={handlePhoneInputBlur}
+                value={phone}
+                autoCorrect={false}
+                keyboardType='phone-pad'
+                style={{ marginLeft: 10, flex: 1 }}
+              />
+            </View>
+  
+            <View style={{
+              backgroundColor: '#ffffff', height: 40, margin: 10, justifyContent: 'flex-start',
+              borderRadius: 20, flexDirection: 'row', alignItems: 'center'
+            }}>
+              <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/mail.png')} />
+              <TextInput
+                placeholder='Email'
+                onChangeText={handleEmailInputChange}
+                onBlur={handleEmailInputBlur}
+                value={email}
+                autoCorrect={false}
+                autoCapitalize="none"
+                keyboardType='email-address'
+                style={{ marginLeft: 10, flex: 1 }}
+              />
+            </View>
+  
+            <View style={{
+              backgroundColor: '#ffffff', height: 40, margin: 10, justifyContent: 'flex-start'
+              , borderRadius: 20, flexDirection: 'row', alignItems: 'center'
+            }}>
+              <Image style={{ height: 22, width: 22, marginLeft: 5 }} source={require('../image/pass.png')} />
+              <TextInput placeholder='Password'
+                onChangeText={(password) => setPassword(password)}
+                autoCorrect={false}
+                autoCapitalize="none"
+                secureTextEntry={true}
+                style={{ marginLeft: 10, flex: 1 }}
+  
+              ></TextInput>
+            </View>
+          </View>
+  
+          <View style={{ alignItems: 'center', paddingTop: 30 }}>
+            <TouchableOpacity onPress={() => registerUser(name, phone, email, password)}>
+              <View style={{
+                backgroundColor: '#FFEA2F', width: 160, height: 46, justifyContent: 'center', alignItems: 'center', borderRadius: 20,
+                borderWidth: 1, borderColor: 'black'
+              }}>
+                <Text style={{ fontSize: 18, color: '#000000' }}>Sign Up</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
       </KeyboardAwareScrollView>
-
     </View>
-
-  )
+  );
+  
 
 }
 
