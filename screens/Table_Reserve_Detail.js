@@ -4,6 +4,7 @@ import { firebase } from '../config'
 import { v4 as uuidv4 } from 'uuid';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore'
+import RNPickerSelect from 'react-native-picker-select';
 
 function Table_Reserve_Detail({ navigation, route }) {
     const { TableId } = route.params;
@@ -68,9 +69,15 @@ function Table_Reserve_Detail({ navigation, route }) {
             return;
         }
 
-        await setDoc(tableHistoryDocRef, { amount: newAmount, status: "đang chờ", name: users.name, phone: users.phone, number: TableDetail.number, date: date });
+        await setDoc(tableHistoryDocRef, {
+            amount: newAmount, status: "đang chờ", name: users.name, phone: users.phone, number: TableDetail.number, date: date,
+            hour: selectedHour, minutes: selectedMinute,
+        });
 
-        await updateDoc(docRef, { amount: newAmount, status: "đang chờ", name: users.name, phone: users.phone, date: date  });
+        await updateDoc(docRef, {
+            amount: newAmount, status: "đang chờ", name: users.name, phone: users.phone, date: date,
+            hour: selectedHour, minutes: selectedMinute,
+        });
 
         // Cập nhật lại state để hiển thị số người mới và status mới
         setTableDetail(prevState => ({ ...prevState, amount: newAmount, status: "đang chờ" }));
@@ -104,6 +111,42 @@ function Table_Reserve_Detail({ navigation, route }) {
         setDate(formattedDate);
     };
 
+    const [selectedHour, setSelectedHour] = useState('');
+    const [selectedMinute, setSelectedMinute] = useState('');
+
+    const renderHours = () => {
+        const hours = [];
+        for (let i = 8; i <= 20; i++) {
+            hours.push({
+                label: String(i),
+                value: String(i),
+            });
+        }
+        return hours;
+    };
+
+    const renderMinutes = () => {
+        const minutes = [];
+        for (let i = 0; i <= 59; i++) {
+            minutes.push({
+                label: String(i).padStart(2, '0'),
+                value: String(i),
+            });
+        }
+        return minutes;
+    };
+
+    // const [timeString, setTimeString] = useState('');
+    // const formatTime = () => {
+    //     const hour = selectedHour ? selectedHour : '00';
+    //     const minute = selectedMinute ? selectedMinute : '00';
+    //     const formattedTime = `${hour}:${minute}`;
+    //     setTimeString(formattedTime);
+    //     formatTime();
+    // };
+
+
+
     return (
         <View style={{ height: '100%', backgroundColor: '#F0F0DD' }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
@@ -118,7 +161,7 @@ function Table_Reserve_Detail({ navigation, route }) {
                         }} source={require('../image/return.png')} />
                     </TouchableOpacity>
                 </View>
-                <View style={{ paddingTop: 20, marginRight:95}}>
+                <View style={{ paddingTop: 20, marginRight: 95 }}>
                     <View style={{ backgroundColor: '#F3D051', width: 194, height: 36, borderRadius: 20, justifyContent: 'center', alignItems: 'center' }}>
                         <Text style={{ fontSize: 18 }}>Đặt bàn</Text>
                     </View>
@@ -313,6 +356,25 @@ function Table_Reserve_Detail({ navigation, route }) {
                     <View style={{ height: 30, width: 200, backgroundColor: 'white', borderWidth: 1, borderRadius: 10, alignItems: 'center', marginLeft: 10 }}>
                         <TextInput style={{ fontSize: 20 }} value={date} onChangeText={handleDateChange}></TextInput>
                     </View>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 20 }}>
+                    <Text style={{ fontSize: 20 }}>Giờ đặt:</Text>
+                    <View style={{ height: 50, width: 90, backgroundColor: 'white', borderWidth: 1, borderRadius: 10, justifyContent: 'center', alignItems: 'center', marginLeft: 10 }}>
+                        <RNPickerSelect
+                            value={selectedHour}
+                            onValueChange={(value) => setSelectedHour(value)}
+                            items={renderHours()}
+                        />
+                    </View>
+                    <Text style={{ marginLeft: 5, fontSize: 18 }}>Giờ</Text>
+                    <View style={{ height: 50, width: 90, backgroundColor: 'white', borderWidth: 1, borderRadius: 10, justifyContent: 'center', alignItems: 'center', marginLeft: 10 }}>
+                        <RNPickerSelect
+                            value={selectedMinute}
+                            onValueChange={(value) => setSelectedMinute(value)}
+                            items={renderMinutes()}
+                        />
+                    </View>
+                    <Text style={{ marginLeft: 5, fontSize: 18 }}>Phút</Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 20 }}>
                     <Text style={{ fontSize: 20 }}>Tên khách hàng:</Text>

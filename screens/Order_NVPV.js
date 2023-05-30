@@ -132,10 +132,10 @@ function Order_NVPV({ navigation }) {
       alert('Đơn hàng đang chế biến, không thể chuyển cho bếp');
       return;
     }
-    if (order.data().status === 'Đang chuyển cho bếp') {
-      alert('Đã chuyển cho bếp, đợi bếp xác nhận đơn');
-      return;
-    }
+    // if (order.data().status === 'Đang chuyển cho bếp') {
+    //   alert('Đã chuyển cho bếp, đợi bếp xác nhận đơn');
+    //   return;
+    // }
     if (order.data().status === 'Hoàn thành đơn món') {
       alert('Đã hoàn thành đơn món, đợi chuyển cho shipper');
       return;
