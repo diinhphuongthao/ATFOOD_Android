@@ -56,14 +56,6 @@ function Order_History({ navigation }) {
       alert('Đã hoàn thành đơn món, không thể hủy đơn');
       return;
     }
-    if (orderData.status === 'Đang giao đơn món') {
-      alert('Đang giao đơn món, không thể hủy đơn');
-      return;
-    }
-    if (orderData.status === 'Chờ shipper nhận đơn') {
-      alert('Đanng chờ shipper nhận đơn không thể hủy đơn');
-      return;
-    }
 
     // Show confirmation modal
     const confirmed = await new Promise((resolve) => {

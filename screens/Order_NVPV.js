@@ -132,10 +132,10 @@ function Order_NVPV({ navigation }) {
       alert('Đơn hàng đang chế biến, không thể chuyển cho bếp');
       return;
     }
-    if (order.data().status === 'Đang chuyển cho bếp') {
-      alert('Đã chuyển cho bếp, đợi bếp xác nhận đơn');
-      return;
-    }
+    // if (order.data().status === 'Đang chuyển cho bếp') {
+    //   alert('Đã chuyển cho bếp, đợi bếp xác nhận đơn');
+    //   return;
+    // }
     if (order.data().status === 'Hoàn thành đơn món') {
       alert('Đã hoàn thành đơn món, đợi chuyển cho shipper');
       return;
@@ -163,11 +163,6 @@ function Order_NVPV({ navigation }) {
             onPress: () => resolve('tài xế đều bận'),
             style: 'destructive'
           },
-          {
-            text: 'Hủy đơn vì nhà hàng đóng cửa',
-            onPress: () => resolve('nhà hàng đóng cửa'),
-            style: 'destructive'
-          }
         ],
         { cancelable: true }
       );
@@ -381,7 +376,7 @@ function Order_NVPV({ navigation }) {
     navigation.navigate('Order_History_NVPV');
   }
 
-
+  
 
 
 
@@ -417,9 +412,6 @@ function Order_NVPV({ navigation }) {
           </TouchableOpacity>
         </View>
       </View>
-
-      
-
       <FlatList
         data={orders}
         renderItem={({ item }) => (
@@ -445,11 +437,15 @@ function Order_NVPV({ navigation }) {
                     </View>
                   </View>
                   <View style={{
-                    marginLeft: 4, backgroundColor: 'white', borderRadius: 10, width: 240, height: 110, justifyContent: 'center',
+                    marginLeft: 4, backgroundColor: 'white', borderRadius: 10, width: 240, height: 140, justifyContent: 'center',
                     borderWidth: 1
                   }}>
                     <View style={{ marginLeft: 10 }}>
                       <View style={{ flexDirection: 'row' }}>
+                        <Text>Mã đơn:</Text>
+                        <Text style={{ marginLeft: 5 }}>{item.orderId}</Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', paddingTop: 8 }}>
                         <Text>Tên khách hàng:</Text>
                         <Text style={{ marginLeft: 5 }}>{item.customerName}</Text>
                       </View>

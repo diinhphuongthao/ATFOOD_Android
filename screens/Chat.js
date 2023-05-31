@@ -14,87 +14,134 @@ function Chat({ navigation, route }) {
 
 
   useEffect(() => {
-    const subscriber = firebase
-      .firestore()
-      .collection('MessageOrders')
-      .onSnapshot(async (querySnapshot) => {
-        const orders = [];
-  
-        for (const documentSnapshot of querySnapshot.docs) {
-          const orderData = documentSnapshot.data();
-  
-          // Fetch the message documents from the subcollection
-          const messageSnapshot = await documentSnapshot.ref.collection('messages').get();
-          const messageDocuments = messageSnapshot.docs;
-  
-          // Get the status and senderId from each message document
-          const messageDetails = messageDocuments.map((messageDoc) => {
+    const findOrderId = async (documentId) => {
+      try {
+        const orderSnapshot = await firebase.firestore().collection('Orders').doc(documentId).get();
+        if (orderSnapshot.exists) {
+          return orderSnapshot.data().orderId;
+        }
+      } catch (error) {
+        console.error('Lỗi khi tìm orderId:', error);
+      }
+      return null;
+    };
+
+    const subscriber = firebase.firestore().collection('MessageOrders').onSnapshot(async (querySnapshot) => {
+      const orders = [];
+
+      for (const documentSnapshot of querySnapshot.docs) {
+        const orderData = documentSnapshot.data();
+
+        // Fetch the message documents from the subcollection
+        const messageSnapshot = await documentSnapshot.ref.collection('messages').get();
+        const messageDocuments = messageSnapshot.docs;
+
+        // Get the status and senderId from each message document
+        const messageDetails = messageDocuments.map((messageDoc) => {
+          const messageData = messageDoc.data();
+          const status = messageData.status;
+          const senderId = messageData.senderId;
+          return { status, senderId };
+        });
+
+        const unreadCustomerMessages = messageDetails.filter((message) => {
+          return message.status === 'chưa xem' && message.senderId;
+        });
+
+        const unreadCustomerMessageCount = unreadCustomerMessages.length;
+        const isCustomerOrder = !!orderData.senderId;
+
+        const order = {
+          ...orderData,
+          key: documentSnapshot.id,
+          messageCount: messageDocuments.length,
+          unreadMessageCount: unreadCustomerMessageCount,
+          status: unreadCustomerMessageCount > 0 ? 'chưa xem' : 'đã xem',
+          isCustomerOrder: isCustomerOrder,
+        };
+
+        orders.push(order);
+
+        // Listen for changes in the 'messages' subcollection
+        documentSnapshot.ref.collection('messages').onSnapshot((messageQuerySnapshot) => {
+          const updatedMessageDocuments = messageQuerySnapshot.docs;
+
+          // Process the updated message documents or update the state accordingly
+          const updatedMessageDetails = updatedMessageDocuments.map((messageDoc) => {
             const messageData = messageDoc.data();
             const status = messageData.status;
             const senderId = messageData.senderId;
             return { status, senderId };
           });
-  
-          const unreadCustomerMessages = messageDetails.filter((message) => {
+
+          const updatedUnreadCustomerMessages = updatedMessageDetails.filter((message) => {
             return message.status === 'chưa xem' && message.senderId;
           });
-  
-          const unreadCustomerMessageCount = unreadCustomerMessages.length;
-          const isCustomerOrder = !!orderData.senderId;
-  
-          const order = {
-            ...orderData,
-            key: documentSnapshot.id,
-            messageCount: messageDocuments.length,
-            unreadMessageCount: unreadCustomerMessageCount,
-            status: unreadCustomerMessageCount > 0 ? 'chưa xem' : 'đã xem',
-            isCustomerOrder: isCustomerOrder,
-          };
-  
-          orders.push(order);
-  
-          // Listen for changes in the 'messages' subcollection
-          documentSnapshot.ref.collection('messages').onSnapshot((messageQuerySnapshot) => {
-            const updatedMessageDocuments = messageQuerySnapshot.docs;
-  
-            // Process the updated message documents or update the state accordingly
-            const updatedMessageDetails = updatedMessageDocuments.map((messageDoc) => {
-              const messageData = messageDoc.data();
-              const status = messageData.status;
-              const senderId = messageData.senderId;
-              return { status, senderId };
-            });
-  
-            const updatedUnreadCustomerMessages = updatedMessageDetails.filter((message) => {
-              return message.status === 'chưa xem' && message.senderId;
-            });
-  
-            const updatedUnreadCustomerMessageCount = updatedUnreadCustomerMessages.length;
-  
-            const updatedOrders = orders.map((existingOrder) => {
-              if (existingOrder.key === documentSnapshot.id) {
-                return {
-                  ...existingOrder,
-                  messageCount: updatedMessageDocuments.length,
-                  unreadMessageCount: updatedUnreadCustomerMessageCount,
-                  status: updatedUnreadCustomerMessageCount > 0 ? 'chưa xem' : 'đã xem',
-                };
-              }
-              return existingOrder;
-            });
-  
-            // Update the state with the updated orders
-            setOrderCustomer(updatedOrders);
+
+          const updatedUnreadCustomerMessageCount = updatedUnreadCustomerMessages.length;
+
+          const updatedOrders = orders.map((existingOrder) => {
+            if (existingOrder.key === documentSnapshot.id) {
+              return {
+                ...existingOrder,
+                messageCount: updatedMessageDocuments.length,
+                unreadMessageCount: updatedUnreadCustomerMessageCount,
+                status: updatedUnreadCustomerMessageCount > 0 ? 'chưa xem' : 'đã xem',
+              };
+            }
+            return existingOrder;
           });
-        }
-  
-        // Update the state with the current orders after the loop
-        setOrderCustomer(orders);
-      });
-  
+
+          // Update the state with the updated orders
+          setOrderCustomer(updatedOrders);
+        });
+      }
+
+      // Find and update the orderId for each order
+      const updatedOrdersWithOrderId = await Promise.all(
+        orders.map(async (order) => {
+          if (order.key) {
+            const orderId = await findOrderId(order.key);
+            if (orderId) {
+              return {
+                ...order,
+                orderId: orderId,
+              };
+            }
+          }
+          return order;
+        })
+      );
+
+      setOrderCustomer(updatedOrdersWithOrderId);
+    });
+
     return () => subscriber();
   }, []);
-  
+
+
+  // const [orderId, setOrderIds] = useState([]);
+  // const findOrderIds = async () => {
+  //   try {
+  //     const ordersSnapshot = await firebase.firestore().collection('Orders').get();
+  //     const messageOrdersSnapshot = await firebase.firestore().collection('MessageOrders').get();
+
+  //     const messageOrdersIds = messageOrdersSnapshot.docs.map((doc) => doc.id);
+  //     const matchedOrders = ordersSnapshot.docs.filter((doc) => messageOrdersIds.includes(doc.id));
+
+  //     const orderIds = matchedOrders.map((doc) => doc.data().orderId);
+  //     console.log('OrderIds:', orderIds);
+  //     // Đồng bộ hóa với state để hiển thị trong View
+  //     setOrderIds(orderIds);
+  //   } catch (error) {
+  //     console.error('Lỗi khi tìm các orderId:', error);
+  //   }
+  // };
+
+  // useEffect(() => {
+
+  // }, []);
+
 
 
 
@@ -169,14 +216,24 @@ function Chat({ navigation, route }) {
 
     return (
       <TouchableOpacity style={{ paddingTop: 30 }} onPress={() => handleItemPress(item)} disabled={item.statusRoom === 'Đã có'}>
-        <View style={{ height: 100, width: 260, backgroundColor: buttonColor, borderRadius: 20, justifyContent: 'center', borderWidth: 1 }}>
-          <View style={{ flexDirection: 'row', marginLeft: 30, paddingTop: 10 }}>
-            <Text style={{ fontWeight: 'bold' }}>Số điện thoại:</Text>
-            <Text style={{}}>{item.senderPhone}</Text>
-          </View>
-          <View style={{ flexDirection: 'row', marginLeft: 30, paddingTop: 10 }}>
-            <Text style={{ fontWeight: 'bold' }}>Khách hàng:</Text>
-            <Text style={{}}>{item.senderName}</Text>
+        <View style={{ height: 100, width: 320, backgroundColor: buttonColor, borderRadius: 20, justifyContent: 'center', borderWidth: 1 }}>
+          <View style={{ flexDirection: 'row', paddingTop: 10  }}>
+            <View style={{ flexDirection: 'row', marginLeft: 20, paddingTop: 10 }}>
+              <View style={{ alignItems: 'center', backgroundColor: "white", justifyContent: 'center', width: 60,borderRadius:10 }}>
+                <Text style={{}}>Mã đơn:</Text>
+                <Text style={{fontWeight:'bold'}}>{item.orderId}</Text>
+              </View>
+            </View>
+            <View>
+              <View style={{ flexDirection: 'row', marginLeft: 15, paddingTop: 10 }}>
+                <Text style={{ fontWeight: 'bold' }}>Số điện thoại:</Text>
+                <Text style={{}}>{item.senderPhone}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', marginLeft: 15, paddingTop: 10 }}>
+                <Text style={{ fontWeight: 'bold' }}>Khách hàng:</Text>
+                <Text style={{}}>{item.senderName}</Text>
+              </View>
+            </View>
           </View>
           <Text>{item.lastMessage}</Text>
           {unreadMessageCount > 0 && <View style={{ position: 'absolute', top: 35, right: 10, backgroundColor: 'red', borderRadius: 360, width: 30, height: 30, justifyContent: 'center', alignItems: 'center' }}>

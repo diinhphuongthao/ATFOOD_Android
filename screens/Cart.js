@@ -195,7 +195,7 @@ function Cart({ navigation }) {
             setDeliveryPrice(deliveryPrice);
 
         } catch (error) {
-            console.log(error);
+            // console.log(error);
             setDeliveryPrice(0);
         }
         return parseFloat(deliveryPrice.toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, "."));
@@ -285,6 +285,17 @@ function Cart({ navigation }) {
                 await docRef.update({ amount: firebase.firestore.FieldValue.increment(-1) });
             }
         }
+
+        const generateRandomOrderId = () => {
+            const length = 3; // Độ dài của orderId
+            let result = '';
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const charactersLength = characters.length;
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            return result;
+        };
         // Tạo đơn hàng mới trong Firestore
         const ordersRef = firebase.firestore().collection('Orders');
         const order = {
@@ -298,7 +309,8 @@ function Cart({ navigation }) {
             createdAt: new Date(),
             deliveryPrice: parseFloat(deliveryPrice.toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")),
             payment: paymentMethod,
-            coupon: getCoupon
+            coupon: getCoupon,
+            orderId: generateRandomOrderId(),
         };
         order.imageStatus = 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/clockwise.png?alt=media&token=45c770f5-89b3-4f73-96b6-059e549e12b0';
         await ordersRef.doc(userId).set(order);
@@ -318,7 +330,8 @@ function Cart({ navigation }) {
             createdAt: new Date(),
             deliveryPrice: parseFloat(deliveryPrice.toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")),
             payment: paymentMethod,
-            coupon: getCoupon
+            coupon: getCoupon,
+            orderId: generateRandomOrderId(),
         };
         orders.imageStatus = 'https://firebasestorage.googleapis.com/v0/b/fooddelivery-844c4.appspot.com/o/clockwise.png?alt=media&token=45c770f5-89b3-4f73-96b6-059e549e12b0';
         await ordersCollectionRef.doc(userId).set(orders);
@@ -494,10 +507,9 @@ function Cart({ navigation }) {
                                 </View>
                             </TouchableOpacity>
                         </View>
-                        {/* <View style={{ paddingTop: 30, alignItems: 'center' }}>
+                        <View style={{ paddingTop: 30, alignItems: 'center' }}>
 
                             <View>
-
                                 <TouchableOpacity>
                                     <View style={{
                                         backgroundColor: '#38BBF4',
@@ -512,10 +524,9 @@ function Cart({ navigation }) {
                                         </View>
                                     </View>
                                 </TouchableOpacity>
-
                             </View>
 
-                        </View> */}
+                        </View>
                     </View>
                 </View>
             </Modal>

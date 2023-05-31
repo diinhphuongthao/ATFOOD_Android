@@ -13,7 +13,6 @@ function Home({ navigation }) {
   const todoRef_02 = firebase.firestore().collection('Holiday');
   const todoRef_03 = firebase.firestore().collection('News');
   const currentUser = firebase.auth().currentUser;
-  console.log(currentUser);
 
   const [showNotification, setShowNotification] = useState(false);
 
@@ -38,9 +37,8 @@ function Home({ navigation }) {
 
     checkEmailVerification();
   }, []);
-
+  const user = firebase.auth().currentUser;
   const handleEmailVerification = async () => {
-    const user = firebase.auth().currentUser;
     if (user) {
       try {
         setIsCheckingEmail(true);
@@ -54,8 +52,6 @@ function Home({ navigation }) {
 
   const handleVerifyButton = async () => {
     setIsCheckingEmail(true);
-
-    const user = firebase.auth().currentUser;
     if (user) {
       try {
         await user.reload();
@@ -244,7 +240,7 @@ function Home({ navigation }) {
   };
 
   return (
-    <View style={{ backgroundColor: '#F0F0DD', height: '100%' }}>
+    <View style={{ backgroundColor: '#F0F0DD', flex: 1  }}>
       <Modal
         visible={showEmailVerificationView}
         animationType="slide"

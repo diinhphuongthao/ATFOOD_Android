@@ -4,6 +4,7 @@ import { firebase } from '../config'
 import { v4 as uuidv4 } from 'uuid';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { collection, doc, getDoc, getFirestore, setDoc, updateDoc, onSnapshot, where } from 'firebase/firestore'
+import RNPickerSelect from 'react-native-picker-select';
 
 function Table_NVPV_Detail({ navigation, route }) {
     const { TableId } = route.params;
@@ -105,6 +106,8 @@ function Table_NVPV_Detail({ navigation, route }) {
                     phone: firebase.firestore.FieldValue.delete(),
                     amount: getAmountDefault(TableDetail.number),
                     date: firebase.firestore.FieldValue.delete(),
+                    hour: firebase.firestore.FieldValue.delete(),
+                    minutes: firebase.firestore.FieldValue.delete(),
                 });
                 console.log('Table status updated and name & phone fields removed successfully.');
                 // Delete matching documents from the TableHistory collection
@@ -135,6 +138,31 @@ function Table_NVPV_Detail({ navigation, route }) {
         }
     };
 
+    const [selectedHour, setSelectedHour] = useState('');
+    const [selectedMinute, setSelectedMinute] = useState('');
+
+    const renderHours = () => {
+        const hours = [];
+        for (let i = 8; i <= 20; i++) {
+            hours.push({
+                label: String(i),
+                value: String(i),
+            });
+        }
+        return hours;
+    };
+
+    const renderMinutes = () => {
+        const minutes = [];
+        for (let i = 0; i <= 59; i++) {
+            minutes.push({
+                label: String(i).padStart(2, '0'),
+                value: String(i),
+            });
+        }
+        return minutes;
+    };
+      
 
     return (
         <View style={{ height: '100%', backgroundColor: '#F0F0DD' }}>
@@ -356,6 +384,26 @@ function Table_NVPV_Detail({ navigation, route }) {
                         <TextInput style={{ fontSize: 20 }} value={TableDetail.date}></TextInput>
                     </View>
                 </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 20 }}>
+                    <Text style={{ fontSize: 20 }}>Giờ đặt:</Text>
+                    <View style={{ height: 30, width: 50, backgroundColor: 'white', borderWidth: 1, borderRadius: 10, alignItems: 'center', marginLeft: 10, justifyContent: 'center', alignItems: 'center', }}>
+                        <RNPickerSelect
+                            value={selectedHour || TableDetail.hour}
+                            onValueChange={(value) => setSelectedHour(value)}
+                            items={renderHours()}
+                        />
+                    </View>
+                    <Text style={{ marginLeft: 5, fontSize: 18 }}>Giờ</Text>
+                    <View style={{ height: 30, width: 50, backgroundColor: 'white', borderWidth: 1, borderRadius: 10, alignItems: 'center', marginLeft: 10, justifyContent: 'center', alignItems: 'center',}}>
+                        <RNPickerSelect
+                            value={selectedMinute || TableDetail.minutes}
+                            onValueChange={(value) => setSelectedMinute(value)}
+                            items={renderMinutes()}
+                        />
+                    </View>
+                    <Text style={{ marginLeft: 5, fontSize: 18 }}>Phút</Text>
+                </View>
+
                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 20 }}>
                     <Text style={{ fontSize: 20 }}>Tên khách hàng:</Text>
                     <View style={{ height: 30, width: 200, backgroundColor: 'white', borderWidth: 1, borderRadius: 10, alignItems: 'center', marginLeft: 10 }}>
