@@ -198,7 +198,7 @@ function Cart({ navigation }) {
             console.log(error);
             setDeliveryPrice(0);
         }
-        return parseFloat(deliveryPrice.toFixed(0).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, "."));
+        return parseFloat(deliveryPrice.toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, "."));
     };
 
     useEffect(() => {
@@ -296,7 +296,7 @@ function Cart({ navigation }) {
             totalPrice: calculateTotalPrice(),
             status: 'Đang chờ',
             createdAt: new Date(),
-            deliveryPrice: parseFloat(deliveryPrice.toFixed(0).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")),
+            deliveryPrice: parseFloat(deliveryPrice.toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")),
             payment: paymentMethod,
             coupon: getCoupon
         };
@@ -316,7 +316,7 @@ function Cart({ navigation }) {
             status: 'Đang chờ',
             items: cartItems,
             createdAt: new Date(),
-            deliveryPrice: parseFloat(deliveryPrice.toFixed(0).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")),
+            deliveryPrice: parseFloat(deliveryPrice.toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")),
             payment: paymentMethod,
             coupon: getCoupon
         };
@@ -494,7 +494,7 @@ function Cart({ navigation }) {
                                 </View>
                             </TouchableOpacity>
                         </View>
-                        <View style={{ paddingTop: 30, alignItems: 'center' }}>
+                        {/* <View style={{ paddingTop: 30, alignItems: 'center' }}>
 
                             <View>
 
@@ -515,7 +515,7 @@ function Cart({ navigation }) {
 
                             </View>
 
-                        </View>
+                        </View> */}
                     </View>
                 </View>
             </Modal>

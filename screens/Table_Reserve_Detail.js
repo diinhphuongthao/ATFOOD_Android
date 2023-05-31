@@ -50,7 +50,7 @@ function Table_Reserve_Detail({ navigation, route }) {
         }
     }
     const tableHistoryRef = collection(db, 'TableHistory')
-
+//đătj bàn
     const handleBookTable = async () => {
         const tableHistoryDocRef = doc(tableHistoryRef, firebase.auth().currentUser.uid)
         const tableHistoryDocSnapshot = await getDoc(tableHistoryDocRef)

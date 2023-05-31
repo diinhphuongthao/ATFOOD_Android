@@ -22,19 +22,19 @@ function Order_Detail({ route, navigation }) {
         // Unsubscribe from events when no longer in use
         return () => subscriber();
     }, [orderId]);
-    useEffect(() => {
-        const subscriber = firebase.firestore()
-            .collection('OrderHistory')
-            .doc(orderId)
-            .onSnapshot((documentSnapshot) => {
-                if (documentSnapshot.exists) {
-                    setOrder(documentSnapshot.data());
-                }
-            });
+    // useEffect(() => {
+    //     const subscriber = firebase.firestore()
+    //         .collection('OrderHistory')
+    //         .doc(orderId)
+    //         .onSnapshot((documentSnapshot) => {
+    //             if (documentSnapshot.exists) {
+    //                 setOrder(documentSnapshot.data());
+    //             }
+    //         });
 
-        // Unsubscribe from events when no longer in use
-        return () => subscriber();
-    }, [orderId]);
+    //     // Unsubscribe from events when no longer in use
+    //     return () => subscriber();
+    // }, [orderId]);
 
 
     if (!order) {
